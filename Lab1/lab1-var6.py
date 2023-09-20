@@ -12,6 +12,29 @@ def folder_create(images):
     folder_create()
  download_images(images,f'dataset/{folder_name}')
 
+def download_images(images, folder_name):
+  count=0
+  print(f"Total {len(images)} Image Found!")
+  if len(images) != 0:
+    for i, image in enumerate(images):
+      try:
+        image_link=image["src"]
+      except:
+        pass     
+      try:
+        r=requests.get(image_link).content
+        try:
+          r = str(r, 'utf-8')
+        except UnicodeDecodeError:
+          with open(f"{folder_name}/{i}.jpg", "wb+") as f:
+            f.write(r)
+          count+=1
+      except:
+        pass
+    if count==len(images):
+      print("All Images Downloaded!")
+    else:
+      print(f"Not all of {count} images are Downloaded")
 
 def main(url):
     r = requests.get(url)
