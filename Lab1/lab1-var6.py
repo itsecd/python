@@ -1,6 +1,5 @@
 import os
 import requests
-import cv2
 from bs4 import BeautifulSoup
 
 #function for creating folders
@@ -27,7 +26,7 @@ def download_images(folder_name,split):
       continue
     else:
      count=0
-     i=k
+     i=k-1
      for image in images[1:]:
       src="https:"+image['src']
       response=requests.get(src, headers={"User-Agent":"Mozilla/5.0"})
@@ -39,7 +38,7 @@ def download_images(folder_name,split):
      print(f"Total {k} Image Found!")
    
 #calling functions
-url_tiger='https://yandex.ru/images/search?text=leopard'
+url_tiger='https://yandex.ru/images/search?text=tiger'
 url_leopard='https://yandex.ru/images/search?text=leopard'
 split_tiger=(url_tiger.split('?'))[1]
 split_leopard=(url_leopard.split('?'))[1]
