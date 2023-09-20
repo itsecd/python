@@ -35,3 +35,10 @@ def download_img(search_query, save_directory, num_images=1000):
             print(f"Скачано изображение {img_filename}")
 
     print(f"Загружено {num_images} изображений")
+
+classes = ["polar bear", "brown bear"]
+num_images_for_class = 1000
+
+for class_name in classes:
+    save_directory = os.path.join("dataset", class_name)
+    download_img(class_name, save_directory, num_images=num_images_for_class)
