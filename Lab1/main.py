@@ -1,8 +1,8 @@
 # libaries
 import os
+import shutil
 from bs4 import BeautifulSoup
 import requests
-import shutil
 
 
 
@@ -23,7 +23,6 @@ def download(url, folder):
         if count+2>len(url):
                 break
 
-
 def delete(folder:str):
     shutil.rmtree(folder) 
        
@@ -33,6 +32,7 @@ URL_TULIP = "https://www.google.com/search?q=tulip.jpg&tbm=isch&ved=2ahUKEwi71Jm
 
 HTML_ROSE = requests.get(URL_ROSE, headers={"User-Agent":"Mozilla/5.0"})
 HTML_TULIP = requests.get(URL_TULIP, headers={"User-Agent":"Mozilla/5.0"})
+
 
 SOUP_ROSE = BeautifulSoup(HTML_ROSE.text, 'lxml')
 SOUP_TULIP = BeautifulSoup(HTML_TULIP.text, 'lxml')
@@ -49,8 +49,6 @@ for rose in roses:
         create_directory("dataset/rose")
         download(roses, "dataset/rose")
        
-    
-
 for tulip in tulips:
     len_folder_tulips = len(os.listdir(path="dataset/tulip"))
     len_tulip=len(tulips)
