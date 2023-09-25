@@ -2,50 +2,43 @@ import os
 import requests
 from bs4 import BeautifulSoup
 
-#function for creating folders
 
-def create_folders(folder_name_first,folder_name_second):
-        os.mkdir('dataset')
-        try:
-          os.mkdir(f'dataset/{folder_name_first}')
-          os.mkdir(f'dataset/{folder_name_second}')
-        except:
-          print("Problem! Try again")
+def download_images(my_list, folder_name):
+    os.mkdir(f'dataset/{folder_name}')
+    num = 0
+    for i in my_list:
+        response = requests.get(i)
+        with open(f"dataset/{folder_name}/{format(num).zfill(4)}.jpg", 'wb') as f:
+            f.write(response.content)
+        num += 1
 
-#function for downloading images
 
-def download_images(folder_name,split):
-  k=0
-  for p in range(0,5):
-    urls=f"https://www.yandex.ru/images/search?lr=51&p={p}&rpt=image&{split}"
-    r = requests.get(urls,headers={'User-Agent': 'Mozilla/5.0'})
-    soup = BeautifulSoup(r.text, 'lxml')
-    images = soup.find_all('img')
-    if(len(images)==2):
-        print("Houston, we have a problem")
-        continue
-    else:
-        count=0
-        i=k-1
+def correct_images(my_list, folder_name):
+    print('total: ', len(my_list))
+    sorted_list = list(set(my_list))
+    print('total: ', len(sorted_list))
+    download_images(sorted_list, folder_name)
+
+
+def create_list(split, folder_name):
+    list = []
+    count = 0
+    for pages in range(1, 10):
+        url = f"https://www.yandex.ru/images/search?lr=51&p={pages}&rpt=image&{split}"
+        response = requests.get(url).text
+        soup = BeautifulSoup(response, 'lxml')
+        images = soup.find_all('img')
         for image in images[1:]:
-          src="https:"+image['src']
-          response=requests.get(src, headers={"User-Agent":"Mozilla/5.0"})
-          with open(f"dataset/{folder_name}/{format(i).zfill(4)}.jpg",'wb') as f:
-              f.write(response.content)
-              count+=1
-              i+=1
-        k+=(i-1) 
-        print(f"Total {k} Image Found!")
-   
-#calling functions
-url_tiger='https://yandex.ru/images/search?text=tiger'
-url_leopard='https://yandex.ru/images/search?text=leopard'
-split_tiger=(url_tiger.split('?'))[1]
-split_leopard=(url_leopard.split('?'))[1]
-folder_name_tiger="tigers"
-folder_name_leopard="leopards"
-create_folders(folder_name_tiger,folder_name_leopard)
-download_images(folder_name_tiger,split_tiger)
-download_images(folder_name_leopard,split_leopard)
+            count += 1
+            list.append("https:"+image['src'])
+    correct_images(list, folder_name)
 
-
+os.mkdir('dataset')
+url_leopard = 'https://yandex.ru/images/search?text=leopard'
+split_leopard = (url_leopard.split('?'))[1]
+folder_name_leopard = (url_leopard.split('='))[1]
+create_list(split_leopard, folder_name_leopard)
+url_leopard = 'https://yandex.ru/images/search?text=tiger'
+split_leopard = (url_leopard.split('?'))[1]
+folder_name_tiger = (url_leopard.split('='))[1]
+create_list(split_leopard, folder_name_tiger)
