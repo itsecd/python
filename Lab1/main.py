@@ -5,6 +5,28 @@ from bs4 import BeautifulSoup
 import requests
 
 
+list_url_rose=[]
+count_rose=0
+for pages in range(1, 10):
+    url_rose= f"https://www.bing.com/images/search?q=rose.jpg&redig=7D4B2E55AA5E4A4CA223FB76FBC6D258&first={pages}"
+    html_rose=requests.get(url_rose, headers={"User-Agent":"Mozilla/5.0"})
+    soup_rose = BeautifulSoup(html_rose.text, 'lxml')
+    roses=soup_rose.findAll('img')
+    list_url_rose+=roses
+    count_rose+=len(roses)
+
+
+list_url_tulip=[]
+count_tulip=0
+for pages in range(1, 10):
+    url_tulip= f"https://www.bing.com/images/search?q=tulip.jpg&qs=UT&form=QBIR&sp=1&lq=0&pq=tulip.jpg&sc=2-9&cvid=9577F520591A403C88168B8637C22677&first={pages}"
+    html_tulip=requests.get(url_tulip, headers={"User-Agent":"Mozilla/5.0"})
+    soup_tulip = BeautifulSoup(html_tulip.text, 'lxml')
+    tulip=soup_tulip.findAll('img')
+    list_url_tulip+=tulip
+    count_tulip+=len(tulip)
+
+
 
 def create_directory(folder: str):
     if not os.path.exists(folder):
@@ -16,7 +38,7 @@ def download(url, folder):
         try: 
             src=link['src']
             response=requests.get(src)
-            with open(f'{folder}/{count}.jpg', 'wb') as file:
+            with open(f'{folder}/{count:04}.jpg', 'wb') as file:
                 file.write(response.content)
                 count+=1
         except: 'Uncorrect URL'
@@ -27,36 +49,23 @@ def delete(folder:str):
     shutil.rmtree(folder) 
        
 
-URL_ROSE = "https://www.google.com/search?sca_esv=566872717&q=rose.jpg&tbm=isch&source=lnms&sa=X&ved=2ahUKEwjk0ond4LiBAxUyExAIHadUCPMQ0pQJegQIEBAB&biw=1036&bih=810&dpr=1.25" 
-URL_TULIP = "https://www.google.com/search?q=tulip.jpg&tbm=isch&ved=2ahUKEwi71JmWmbmBAxWTJxAIHaCXBiMQ2-cCegQIABAA&oq=tulip.jpg&gs_lcp=CgNpbWcQARgAMgcIABATEIAEMggIABAHEB4QEzIICAAQBxAeEBMyCAgAEAcQHhATOgUIABCABDoGCAAQBxAeUKcXWIlMYOlcaARwAHgAgAH0BIgBigySAQYxMS41LTGYAQCgAQGqAQtnd3Mtd2l6LWltZ8ABAQ&sclient=img&ei=ceYKZfvXEpPPwPAPoK-amAI&bih=810&biw=1036"
-
-HTML_ROSE = requests.get(URL_ROSE, headers={"User-Agent":"Mozilla/5.0"})
-HTML_TULIP = requests.get(URL_TULIP, headers={"User-Agent":"Mozilla/5.0"})
-
-
-SOUP_ROSE = BeautifulSoup(HTML_ROSE.text, 'lxml')
-SOUP_TULIP = BeautifulSoup(HTML_TULIP.text, 'lxml')
-
-roses=SOUP_ROSE.findAll('img')
-tulips=SOUP_TULIP.findAll('img')
-
-for rose in roses:
+for rose in list_url_rose:
     len_folder_roses = len(os.listdir(path="dataset/rose"))
-    len_roses=len(roses)
+    len_roses=len(list_url_rose)
     if len_folder_roses+2>len_roses:
          break
     else:
         create_directory("dataset/rose")
-        download(roses, "dataset/rose")
+        download(list_url_rose, "dataset/rose")
        
-for tulip in tulips:
+for tulip in list_url_tulip:
     len_folder_tulips = len(os.listdir(path="dataset/tulip"))
-    len_tulip=len(tulips)
+    len_tulip=len(list_url_tulip)
     if len_folder_tulips+2>len_tulip:
          break
     else:
         create_directory("dataset/tulip")
-        download(tulips, "dataset/tulip")
+        download(list_url_tulip, "dataset/tulip")
 
 
 
