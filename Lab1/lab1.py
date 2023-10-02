@@ -10,5 +10,8 @@ URL = "https://www.cbr-xml-daily.ru/archive/"+str(start_date).replace("-","/")+"
 html_page = requests.get(URL)
 json_page = html_page.json()
 usd_value = json_page["Valute"]["USD"]["Value"]
-
+data = [str(start_date)], [str(usd_value)]
+with open("data.csv", "w") as file:
+    writer = csv.writer(file)
+    writer.writerow(data)
 print(str(start_date)+", "+str(usd_value))
