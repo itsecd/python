@@ -2,7 +2,7 @@ from bs4 import BeautifulSoup
 import requests
 import os
 
-COUNT = 2000
+COUNT = 1000
 
 def create_folder(folder : str):
     if not os.path.isdir(folder): 
@@ -46,7 +46,7 @@ for page in range(1, 999):
     roses_list_url += soup_rose.find_all("img", class_="mimg") # Get a list of <img> 
     tulips_list_url += soup_tulip.find_all("img", class_="mimg")
 
-    if(len(roses_list_url) >= COUNT and len(tulips_list_url) >= COUNT):
+    if(len(roses_list_url) >= 2*COUNT and len(tulips_list_url) >= 2*COUNT): # Search with a reserve
         break
 
 create_folder("Lab1/dataset/roses") # Create folders
