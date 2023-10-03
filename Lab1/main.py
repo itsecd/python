@@ -1,73 +1,65 @@
-# libaries
 import os
-import shutil
-from bs4 import BeautifulSoup
+import os.path
 import requests
+from bs4 import BeautifulSoup
 
-# функции для создания папок, скачивания изображений и удаления папок
+HEADERS={"User-Agent": "Mozilla/5.0"}
+MAIN_FOLDER="dataset"
+FOLDER_ROSE="rose"
+FOLDER_TULIP="tulip"
+MAX_FILES=1010
+PAGES=150
+url_rose="https://www.bing.com/images/search?q=rose.jpg&redig=7D4B2E55AA5E4A4CA223FB76FBC6D258&first=1"
+url_tulip="https://www.bing.com/images/search?q=tulip.jpg&qs=UT&form=QBIR&sp=1&lq=0&pq=tulip.jpg&sc=2-9&cvid=9577F520591A403C88168B8637C22677&first=1"
 
 
-def create_directory(folder: str):
-    if not os.path.exists(folder):
-        os.makedirs(folder)
 
+def create_directory(folder: str)->str:
+    try:
+        if not os.path.exists(folder):
+            os.makedirs(folder)
+    except: 
+        print("Folder don't create")
 
-def download(url, folder):
+def make_lists(url:str)->list:
+    list_url=[]
+    url_new=url[:-1] 
+    try:
+        for pages in range(1, PAGES):
+            url_pages:str=f"{url_new}{pages}"
+            html = requests.get(url_pages, HEADERS)
+            soup = BeautifulSoup(html.text, "lxml")
+            flowers = soup.findAll("img")
+            list_url += flowers
+        return list_url  
+    except: 
+        print("List don't create") 
+
+def download(url_list: list , folder:str)->str:
     count = 0
-    for link in url:
-        if count > 1010:
+    except_count=0
+    for link in url_list:
+        if count > MAX_FILES:
             break
         try:
             src = link["src"]
+            print(src)
             response = requests.get(src)
-            with open(f"{folder}/{count:04}.jpg", "wb") as file:
+            create_directory(folder)
+            with open(os.path.join(MAIN_FOLDER, folder, f"{count:04}.jpg").replace("\\","/"), "wb") as file:
                 file.write(response.content)
-                count += 1
+                count += 1           
         except:
-            "Uncorrect URL"
+            except_count+=1
+    print(f"Quantity download files={count}") 
+    print(f"Quantity ncorrect URL={except_count}")        
+            
+   
+if __name__ == "__main__":
 
+    r=make_lists(url_rose)
+    download(r, FOLDER_ROSE)
 
-def delete(folder: str):
-    shutil.rmtree(folder)
-
-
-# получаем все ссылки на розы/тюльпаны списком
-list_url_rose = []
-for pages in range(1, 120):
-    url_rose = f"https://www.bing.com/images/search?q=rose.jpg&redig=7D4B2E55AA5E4A4CA223FB76FBC6D258&first={pages}"
-    html_rose = requests.get(url_rose, headers={"User-Agent": "Mozilla/5.0"})
-    soup_rose = BeautifulSoup(html_rose.text, "lxml")
-    roses = soup_rose.findAll("img")
-    list_url_rose += roses
-
-
-list_url_tulip = []
-for pages in range(1, 120):
-    url_tulip = f"https://www.bing.com/images/search?q=tulip.jpg&qs=UT&form=QBIR&sp=1&lq=0&pq=tulip.jpg&sc=2-9&cvid=9577F520591A403C88168B8637C22677&first={pages}"
-    html_tulip = requests.get(url_tulip, headers={"User-Agent": "Mozilla/5.0"})
-    soup_tulip = BeautifulSoup(html_tulip.text, "lxml")
-    tulip = soup_tulip.findAll("img")
-    list_url_tulip += tulip
-
-
-# создаем папку и скачиваем все файлы из полученных списков
-len_folder_roses = 0
-for rose in list_url_rose:
-    if len_folder_roses > 1010:
-        break
-    else:
-        len_folder_roses += 1
-        create_directory("dataset/rose")
-        download(list_url_rose, "dataset/rose")
-    break
-
-
-len_folder_tulips = 0
-for tulip in list_url_tulip:
-    if len_folder_tulips > 1010:
-        break
-    else:
-        len_folder_tulips += 1
-        create_directory("dataset/tulip")
-        download(list_url_tulip, "dataset/tulip")
-    break
+    t=make_lists(url_tulip)
+    download(t, FOLDER_TULIP)
+  
