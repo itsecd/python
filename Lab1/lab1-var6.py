@@ -4,21 +4,21 @@ import logging
 from bs4 import BeautifulSoup
 from typing import Dict, List
 
-#Directing the log entry to a file
+
 logging.basicConfig(filename = "py_log.log",filemode='w', level=logging.DEBUG)
 
-"""
-function download_images Downloads images from list
-"""
-def download_images(my_list:list,folder_name:str):
+
+def download_images(my_list:list,folder_name:str)->int:
+    """Downloads images from list"""
     try:
-     os.mkdir(f'dataset\{folder_name}')
+     os.mkdir(f'dataset/{folder_name}')
      num = 0
      logging.info('Uploading images')
      for i in my_list:
-        if num!=1000:
+        if num!=os.getenv("COUNT_FOR_DOWNLOADS"):
          response = requests.get(i)
-         with open(os.path.join("dataset",f"\{folder_name}",f"{format(num).zfill(4)}.jpg"), 'wb') as f:
+         numbers=format(num).zfill(4)
+         with open(os.path.join("dataset",f"{folder_name}",f"{numbers}.jpg").replace("\\","/"), 'wb') as f:
             f.write(response.content)
          num += 1
         else:
@@ -27,37 +27,39 @@ def download_images(my_list:list,folder_name:str):
     except Exception as e:  
         logging.error('Error in download_images: ' + str(e))
 
-"""
-function correct_images checks for duplicate links and removes them
-Returns a sorted list
-"""
 
+"""
 def correct_images(my_list:list,folder_name:str)->list:
+    #function correct_images checks for duplicate links and removes them
+    #Returns a sorted list
+
     sorted_list = list(set(my_list))
     logging.info('the list is sorted')
     download_images(sorted_list,folder_name)
+"""
 
-"""
-The function searches for all src references and adds them to the list.
-Returns a list
-"""
 
 def create_list(search:str,folder_name:str)->list:
+    """
+    The function searches for all src references and adds them to the list.
+    Returns a list
+    """
     logging.info('Create list')
     list = []
     count = 0
-    for pages in range(1,33):
-        url = f"https://www.yandex.ru/images/search?lr=51&p={pages}&rpt=image&{search}"
+    for pages in range(1,200):
+        url = f"https://www.bing.com/images/search?q={search}&go=%D0%9F%D0%BE%D0%B8%D1%81%D0%BA&qs=ds&form=QBIRMH&first={pages}"
         response = requests.get(url).text
         soup = BeautifulSoup(response, 'lxml')
-        images = soup.find_all('img')
-        for image in images[1:]:
-            if count==1200:
+        images = soup.find_all('img', class_="mimg")
+        for image in images[:1]:
+           if count==os.getenv("COUNT_FOR_LIST"):
              break
-            count += 1
-            list.append("https:"+image['src'])
+           count += 1
+           list.append(image['src'])
+           print(list)
     logging.info("list created,ready for sorted")
-    correct_images(list,folder_name)
+    download_images(list,folder_name)
 
 """
 Create a dataset folder in which we will store 

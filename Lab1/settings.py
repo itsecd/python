@@ -1,4 +1,4 @@
-# settings.py
+
 import os
 from dotenv import load_dotenv
 from pathlib import Path
@@ -13,3 +13,8 @@ TEXT_TIGER=os.getenv("TEXT_TIGER")
 
 FOLDER_LEOPARD = os.getenv("FOLDER_LEOPARD")
 TEXT_LEOPARD=os.getenv("TEXT_LEOPARD")
+
+COUNT_FOR_LIST=os.getenv("COUNT_FOR_LIST")
+COUNT_FOR_DOWNLOADS=os.getenv("COUNT_FOR_DOWNLOADS")
+
+PATH=os.getenv("Users\\Yana\\Documents\\python-v6\\Lab1dataset\\")
