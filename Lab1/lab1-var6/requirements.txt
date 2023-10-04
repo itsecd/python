@@ -1,0 +1,7 @@
+beautifulsoup4==4.12.2
+bs4==0.0.1
+fake-headers==1.0.2
+ipython==8.15.0
+lxml==4.9.3
+requests==2.31.0
+pytz==2023.3.post1
