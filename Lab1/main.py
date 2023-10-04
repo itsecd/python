@@ -1,31 +1,31 @@
 import os
-import os.path
+import logging
 import requests
 from bs4 import BeautifulSoup
+from settings import HEADERS, MAIN_FOLDER, FOLDER_ROSE, FOLDER_TULIP, MAX_FILES, PAGES, url_rose, url_tulip
 
-HEADERS={"User-Agent": "Mozilla/5.0"}
-MAIN_FOLDER="dataset"
-FOLDER_ROSE="rose"
-FOLDER_TULIP="tulip"
-MAX_FILES=1010
-PAGES=150
-url_rose="https://www.bing.com/images/search?q=rose.jpg&redig=7D4B2E55AA5E4A4CA223FB76FBC6D258&first=1"
-url_tulip="https://www.bing.com/images/search?q=tulip.jpg&qs=UT&form=QBIR&sp=1&lq=0&pq=tulip.jpg&sc=2-9&cvid=9577F520591A403C88168B8637C22677&first=1"
-
-
+logging.basicConfig(level=logging.INFO)
 
 def create_directory(folder: str)->str:
+    '''The function takes the path to the folder and its name,
+    checks its presence.
+    In case of absence creates a folder.
+    '''
     try:
         if not os.path.exists(folder):
             os.makedirs(folder)
     except: 
-        print("Folder don't create")
+        logging.error("Folder don't create", exc_info=True)
 
 def make_lists(url:str)->list:
+    '''The function accepts a link to a search query.
+    Creates a list that contains links to each object
+    from all specified request pages.
+    '''
     list_url=[]
     url_new=url[:-1] 
     try:
-        for pages in range(1, PAGES):
+        for pages in range(PAGES):
             url_pages:str=f"{url_new}{pages}"
             html = requests.get(url_pages, HEADERS)
             soup = BeautifulSoup(html.text, "lxml")
@@ -33,9 +33,13 @@ def make_lists(url:str)->list:
             list_url += flowers
         return list_url  
     except: 
-        print("List don't create") 
+        logging.error("List don't create", exc_info=True) 
 
 def download(url_list: list , folder:str)->str:
+    '''The function accepts a list of links and a folder name.
+    Downloads all images from the list to a folder
+    and assigns them a unique number.
+    '''
     count = 0
     except_count=0
     for link in url_list:
@@ -45,14 +49,14 @@ def download(url_list: list , folder:str)->str:
             src = link["src"]
             print(src)
             response = requests.get(src)
-            create_directory(folder)
+            create_directory(os.path.join(MAIN_FOLDER, folder).replace("\\","/"))
             with open(os.path.join(MAIN_FOLDER, folder, f"{count:04}.jpg").replace("\\","/"), "wb") as file:
                 file.write(response.content)
                 count += 1           
         except:
             except_count+=1
-    print(f"Quantity download files={count}") 
-    print(f"Quantity ncorrect URL={except_count}")        
+    logging.info(f"Quantity download files={count}") 
+    logging.info(f"Quantity ncorrect URL={except_count}")        
             
    
 if __name__ == "__main__":
