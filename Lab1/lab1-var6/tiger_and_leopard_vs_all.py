@@ -8,10 +8,11 @@ from fake_headers import Headers
 
 def create_folders(name:str)->None:
     """This function create a folder"""
-    if not os.path.exists("Lab1/Lab1-var6/dataset"):
-        os.makedirs(f"Lab1/Lab1-var6/dataset/{name}")
-    elif  not os.path.exists(f"Lab1/Lab1-var6/dataset/{name}"):
-        os.mkdir(f"Lab1/Lab1-var6/dataset/{name}")
+    path = os.path.join("Lab1", "Lab1-var6", "dataset")
+    if not os.path.exists(path):
+        os.makedirs(os.path.join(path, name))
+    elif  not os.path.exists(os.path.join(path, name)):
+        os.mkdir(os.path.join(path, name))
 
 def save_image(url: str, filename: str) -> None:
     """This func downloads the image from the link"""
@@ -23,12 +24,17 @@ def save_image(url: str, filename: str) -> None:
                     if chunk:
                         file.write(chunk)
     except (Exception, requests.exceptions.RequestException):
-        print('Ошибка при загрузке: ', url, ':', str(Exception, requests.exceptions.RequestException))
+        print('Ошибка при загрузке: ',
+              url,
+              ':',
+              str(Exception, requests.exceptions.RequestException)
+              )
 
 def yandex_images_iarser(text : str) -> []:
+    """parser 'Yandex.Images'"""
     create_folders(text)
     i = 0
-    main_url = f"https://yandex.ru/images/search?from=tabbar&text={text}"
+    main_url = os.path.join("https://yandex.ru/images/search?from=tabbar&text=" + text) 
     headers = Headers(headers=True).generate()
     result = requests.get(main_url, headers, timeout= 10)
     print(result)
@@ -39,10 +45,10 @@ def yandex_images_iarser(text : str) -> []:
     for link in links:
         try:
             link = link.get("src")
-            save_image("http:" + link, f"Lab1/Lab1-var6/dataset/{text}/{i}.jpg")
+            save_image("http:" + link, os.path.join("Lab1", "Lab1-var6", "dataset", text, f"{i}.jpg"))
             i += 1
             print(i)
-            sleep(1)
+            sleep(3)
         except Exception:
             continue
 
