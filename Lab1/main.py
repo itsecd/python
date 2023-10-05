@@ -1,10 +1,15 @@
-from bs4 import BeautifulSoup
-import requests
-import logging
 import os
+import logging
+import requests
+import argparse
+from bs4 import BeautifulSoup
 
-COUNT = 10
-PAGES = 3
+parser = argparse.ArgumentParser(description ='Пример использования argrapse для разбора аргументов командной строки')
+parser.add_argument('-c','--count',type=int, default=1000, help="Count of ")
+args = parser.parse_args()
+
+COUNT = args.count
+PAGES = COUNT
 CORNER_FOLDER = "Lab1"
 MAIN_FOLDER = "dataset"
 ROSES_FOLDER = "roses"
@@ -17,17 +22,25 @@ url_tulip="https://www.bing.com/images/search?q=tulip.jpg&qs=UT&form=QBIR&sp=1&l
 
 logging.basicConfig(level=logging.INFO, filename=os.path.join(CORNER_FOLDER, "py_log.log"), filemode="w")
 
-def create_folder(folder: str)->str:
 
+def create_folder(folder: str)->str:
+    """
+    Creates a folder 
+
+    Сreates a folder using the passed path
+    """
     try:
         if not os.path.exists(folder):
             os.makedirs(folder)
     except Exception as err: 
         logging.error(f"{err}", exc_info=True)
 
-
 def download(list_images : list, folder : str):
+    """
+    Download images
 
+    Download images from list
+    """
     count = 0
     exec_count = 0
     for flower_url in list_images:
@@ -41,14 +54,16 @@ def download(list_images : list, folder : str):
                 count+=1
         except Exception as err:
             exec_count+=1
-            logging.warning(f"Error flower_url{count+exec_count+1}. {err}")
+            logging.warning(f"Error flower_url {count+exec_count+1}. {err}")
     logging.info(f"Successful download - {count}")
     logging.info(f"Unsuccessful download - {exec_count}")
 
-    
-
 def make_list(url : str) -> list:
+    """
+    Make list of images tags
 
+    Make list of images tags using url
+    """
     list_img = []
     new_url = url[:-1]
     try:
@@ -60,7 +75,6 @@ def make_list(url : str) -> list:
         return list_img
     except Exception as err:
         logging.error(f"{err}", exc_info=True)
-
 
 if __name__ == "__main__":
     roses = make_list(url_rose)
