@@ -1,19 +1,25 @@
 """Module providing a function printing python version 3.11.5."""
 import os
 from time import sleep
+import logging
 import requests
 from bs4 import BeautifulSoup
 
 
+logging.basicConfig()
+
 def create_folders(name:str) -> None:
     """This function create a folder"""
-    if not os.path.exists("dataset"):
-        os.makedirs(os.path.join("dataset", name))
-    elif  not os.path.exists(os.path.join("dataset", name)):
-        os.mkdir(os.path.join("dataset", name))
+    try:
+        if not os.path.exists("dataset"):
+            os.makedirs(os.path.join("dataset", name))
+        elif  not os.path.exists(os.path.join("dataset", name)):
+            os.mkdir(os.path.join("dataset", name))
+    except OSError as err:
+        logging.exception("OS error: %s",err)
 
 def make_path_and_filename(index: int, path: str) -> str:
-    """Сreates the path to the future file and its name"""
+    """This func creates the path to the future file and it's name"""
     filename = f'{index:04d}' + ".jpg"
     return os.path.join("dataset", path, filename)
 
@@ -24,27 +30,34 @@ def save_image(url: str, filename: str) -> None:
         if response.ok:
             with open(filename, 'wb') as file:
                 file.write(response.content)
-    except (Exception, requests.exceptions.RequestException):
-        print('Unable to download image: ',
+    except requests.exceptions.RequestException:
+        logging.exception('Unable to download image: %s %s %s',
               url,
               ':',
-              str(Exception, requests.exceptions.RequestException)
+              str(requests.exceptions.RequestException)
+              )
+    except Exception:
+        logging.exception('Unable to download image: %s %s %s',
+              url,
+              ':',
+              str(Exception)
               )
 
-def yandex_images_iarser(text : str) -> []:
+def yandex_images_iarser(text : str, url: str) -> []:
     """parser 'Yandex.Images'"""
     create_folders(text)
     i = 0
     for page in range(20):
-        main_url = f"https://yandex.ru/images/search?from=tabbar&text={text}&p={page}"
-        headers = "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko)"\
+        headers = "Mozilla/5.0 (Windows NT 10.0; Win64; x64)"\
+        "AppleWebKit/537.36 (KHTML, like Gecko)"\
             "Chrome/117.0.0.0 Safari/537.36 Edg/117.0.2045.47"
-        result = requests.get(main_url, headers, timeout= 10)
-        print(result)
+        result = requests.get(url + f"&p={page}", headers, timeout= 10)
+        logging.info("Page code received: %s", result.ok)
         soup = BeautifulSoup(result.content, features = "lxml")
         links = soup.findAll("img",
                             class_ = "serp-item__thumb justifier__thumb"
                             )
+        logging.info("links to images found: %s", len(links) > 0)
         for link in links:
             try:
                 link = link.get("src")
@@ -55,12 +68,12 @@ def yandex_images_iarser(text : str) -> []:
                         path_to_file
                         )
                 i += 1
-                print(i)
+                logging.info('Image download: %d', i)
                 sleep(3)
             except Exception:
-                print("Error")
+                logging.exception('Error with %d image', i)
                 continue
 
 if __name__ == "__main__":
-    yandex_images_iarser("tiger")
-    yandex_images_iarser("leopard")
+    yandex_images_iarser("tiger", "https://yandex.ru/images/search?from=tabbar&text=tiger")
+    yandex_images_iarser("leopard", "https://yandex.ru/images/search?from=tabbar&text=leopard")
