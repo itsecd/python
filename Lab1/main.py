@@ -23,11 +23,15 @@ url_tulip="https://www.bing.com/images/search?q=tulip.jpg&qs=UT&form=QBIR&sp=1&l
 logging.basicConfig(level=logging.INFO, filename=os.path.join(CORNER_FOLDER, "py_log.log"), filemode="w")
 
 
-def create_folder(folder: str)->str:
+def create_folder(folder: str):
     """
     Creates a folder 
 
     Сreates a folder using the passed path
+    Parameters
+    ----------
+    folder : str
+        Путь для создания папкм
     """
     try:
         if not os.path.exists(folder):
@@ -40,6 +44,12 @@ def download(list_images : list, folder : str):
     Download images
 
     Download images from list
+    Parameters
+    ----------
+    list_images : list
+        Список тегов с картинками
+    folder : str
+        Путь для скачивания
     """
     count = 0
     exec_count = 0
@@ -63,6 +73,14 @@ def make_list(url : str) -> list:
     Make list of images tags
 
     Make list of images tags using url
+    Parameters
+    ----------
+    url : str
+        Путь для скачивания
+    Returns
+    ----------
+    list
+        Список с тегами картинок 
     """
     list_img = []
     new_url = url[:-1]
