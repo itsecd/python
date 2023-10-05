@@ -6,7 +6,7 @@ import requests
 from bs4 import BeautifulSoup
 
 
-logging.basicConfig()
+logging.basicConfig(level=logging.INFO)
 
 def create_folders(name:str) -> None:
     """This function create a folder"""
@@ -48,16 +48,14 @@ def yandex_images_iarser(text : str, url: str) -> []:
     create_folders(text)
     i = 0
     for page in range(20):
-        headers = "Mozilla/5.0 (Windows NT 10.0; Win64; x64)"\
-        "AppleWebKit/537.36 (KHTML, like Gecko)"\
-            "Chrome/117.0.0.0 Safari/537.36 Edg/117.0.2045.47"
+        headers = "Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:109.0) Gecko/20100101 Firefox/118.0"
         result = requests.get(url + f"&p={page}", headers, timeout= 10)
         logging.info("Page code received: %s", result.ok)
         soup = BeautifulSoup(result.content, features = "lxml")
         links = soup.findAll("img",
                             class_ = "serp-item__thumb justifier__thumb"
                             )
-        logging.info("links to images found: %s", len(links) > 0)
+        logging.info("links: %d", len(links))
         for link in links:
             try:
                 link = link.get("src")
@@ -75,5 +73,5 @@ def yandex_images_iarser(text : str, url: str) -> []:
                 continue
 
 if __name__ == "__main__":
-    yandex_images_iarser("tiger", "https://yandex.ru/images/search?from=tabbar&text=tiger")
+    yandex_images_iarser("tiger", "https://yandex.ru/images/search?text=tiger")
     yandex_images_iarser("leopard", "https://yandex.ru/images/search?from=tabbar&text=leopard")
