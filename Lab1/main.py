@@ -4,10 +4,12 @@ import logging
 import requests
 from bs4 import BeautifulSoup
 
-with open(os.path.join("Lab1", "fcc.json").replace("\\", "/"), "r") as fcc_file:
-    fcc = json.load(fcc_file)
 
 logging.basicConfig(level=logging.INFO)
+
+
+with open(os.path.join("Lab1", "fcc.json").replace("\\", "/"), "r") as fcc_file:
+    fcc = json.load(fcc_file)
 
 
 def create_directory(folder: str) -> str:
