@@ -4,23 +4,16 @@ import requests
 import argparse
 from bs4 import BeautifulSoup
 
-parser = argparse.ArgumentParser(description ='Пример использования argrapse для разбора аргументов командной строки')
-parser.add_argument('-c','--count',type=int, default=1000, help="Count of ")
-args = parser.parse_args()
 
-COUNT = args.count
-PAGES = COUNT
-CORNER_FOLDER = "Lab1"
-MAIN_FOLDER = "dataset"
-ROSES_FOLDER = "roses"
-TULIPS_FOLDER = "tulips"
-_headers = {
+parser = argparse.ArgumentParser(description = "Count and type of images")
+
+MAIN_FOLDER = "Lab1"
+FOLDER = "dataset"
+HEADERS = {
    "User-Agent":"Mozilla/5.0"
 }
-url_rose="https://www.bing.com/images/search?q=rose.jpg&redig=7D4B2E55AA5E4A4CA223FB76FBC6D258&first=1"
-url_tulip="https://www.bing.com/images/search?q=tulip.jpg&qs=UT&form=QBIR&sp=1&lq=0&pq=tulip.jpg&sc=2-9&cvid=9577F520591A403C88168B8637C22677&first=1"
 
-logging.basicConfig(level=logging.INFO, filename=os.path.join(CORNER_FOLDER, "py_log.log"), filemode="w")
+logging.basicConfig(level=logging.INFO, filename=os.path.join(MAIN_FOLDER, "py_log.log"), filemode="w")
 
 
 def create_folder(folder: str):
@@ -31,13 +24,14 @@ def create_folder(folder: str):
     Parameters
     ----------
     folder : str
-        Путь для создания папкм
+        Путь для создания папки
     """
     try:
         if not os.path.exists(folder):
             os.makedirs(folder)
     except Exception as err: 
         logging.error(f"{err}", exc_info=True)
+
 
 def download(list_images : list, folder : str):
     """
@@ -54,7 +48,7 @@ def download(list_images : list, folder : str):
     count = 0
     exec_count = 0
     for flower_url in list_images:
-        if count > COUNT: break
+        if count > args.count : break
         try:
             src=flower_url['src']
             response = requests.get(src)
@@ -64,11 +58,12 @@ def download(list_images : list, folder : str):
                 count+=1
         except Exception as err:
             exec_count+=1
-            logging.warning(f"Error flower_url {count+exec_count+1}. {err}")
+            logging.warning(f"Error image_url {count+exec_count+1}. {err}")
     logging.info(f"Successful download - {count}")
     logging.info(f"Unsuccessful download - {exec_count}")
 
-def make_list(url : str) -> list:
+
+def make_list(url : str, count : int) -> list:
     """
     Make list of images tags
 
@@ -77,6 +72,8 @@ def make_list(url : str) -> list:
     ----------
     url : str
         Путь для скачивания
+    count : int
+        Кол-во изображений для скачивания
     Returns
     ----------
     list
@@ -84,20 +81,26 @@ def make_list(url : str) -> list:
     """
     list_img = []
     new_url = url[:-1]
+    pages = int(count/10)
     try:
-        for page in range(1, PAGES):
-            url = f"{new_url}{page}"
-            html = requests.get(url, headers=_headers) 
+        for page in range(1, pages):
+            new_page = f"{new_url}{page}"
+            html = requests.get(new_page, headers=HEADERS) 
             soup = BeautifulSoup(html.text, "lxml")
             list_img += soup.find_all("img", class_="mimg")
         return list_img
     except Exception as err:
         logging.error(f"{err}", exc_info=True)
 
+
 if __name__ == "__main__":
-    roses = make_list(url_rose)
-    download(roses, os.path.join(CORNER_FOLDER, MAIN_FOLDER, ROSES_FOLDER).replace("\\", "/"))
 
-    tulips = make_list(url_tulip)
-    download(tulips, os.path.join(CORNER_FOLDER, MAIN_FOLDER, TULIPS_FOLDER).replace("\\", "/"))
+    parser.add_argument('-c','--count',type=int, default=1000, help='Count of images')
+    parser.add_argument('-o', '--object', type=str, default='rose', help='Type of object for search')
+    args = parser.parse_args()
 
+    url_images= f"https://www.bing.com/images/search?q={args.object}.jpg&first=1"
+    count_images = args.count
+
+    images = make_list(url_images, count_images)
+    download(images, os.path.join(MAIN_FOLDER, FOLDER, args.object).replace("\\", "/"))
