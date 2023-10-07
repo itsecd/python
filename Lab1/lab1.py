@@ -1,12 +1,6 @@
-import requests
 import csv
-import datetime
 from datetime import date, timedelta
-from dateutil.rrule import rrule, DAILY
-
-delta = datetime.timedelta(days=30)
-end_date = date.today()
-start_date = end_date - delta
+import requests
 
 def make_lists(start_date: date,
                end_date: date,
@@ -28,9 +22,19 @@ def make_lists(start_date: date,
         start_date += delta
     return list_dates, list_usd
 
+def write_to_f(filename: str,
+               dates: list,
+               data: list
+               ) -> None:
+    with open(filename, "a", newline="", encoding="utf-8") as csv_file:
+        csv_writer = csv.writer(csv_file,delimiter=",")
+        combined_list = [(date,usd) for date, usd in zip(dates,data)]
+        csv_writer.writerows(combined_list)
 
-#with open("dataset.csv", "a", newline="", encoding="utf-8") as csv_file:
-#    csv_writer = csv.writer(csv_file, delimiter = ",")
-#
-#    csv_writer.writerow([current_date, usd_rates])
-   
+delta = timedelta(days=1)
+delta2 = timedelta(days=30)
+end_date = date.today()
+start_date = end_date - delta2
+
+dates, result = make_lists(start_date, end_date, delta)
+write_to_f("dataset.csv", dates,result)
