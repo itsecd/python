@@ -14,7 +14,7 @@ HEADERS = {
 
 
 
-def create_folder(folder: str):
+def create_folder(folder: str) -> None:
     """
     Creates a folder 
 
@@ -31,7 +31,7 @@ def create_folder(folder: str):
         logging.error(f"{err}", exc_info=True)
 
 
-def download(list_images : list, folder : str, count_images : int):
+def download(list_images : list, folder : str, count_images : int) -> None:
     """
     Download images
 
