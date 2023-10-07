@@ -2,6 +2,7 @@
 import os
 from time import sleep
 import logging
+import argparse
 import requests
 from bs4 import BeautifulSoup
 from fake_headers import Headers
@@ -21,9 +22,9 @@ def create_folders(name:str, base_folder: str = "dataset") -> None:
         logging.exception(f"OS error: {e}")
 
 
-def make_path_and_filename(index: int, path_to_file: str) -> str:
+def make_path_and_filename(index: int, path_to_file: str, extention: str) -> str:
     """This func creates the path to the future file and it's name"""
-    filename = f"{index:04d}.jpg"
+    filename = f"{index:04d}.{extention}"
     return os.path.join(path_to_file, filename)
 
 
@@ -40,13 +41,18 @@ def save_image(url: str, filename: str) -> None:
         logging.exception(f"Unable to download image: {url}:{e}")
 
 
-def yandex_images_parser(text: str, base_folder: str = "dataset", url: str = "https://www.yandex.ru/images/search?text=") -> []:
+def yandex_images_parser(text: str,
+                         max_count: int,
+                         time_sleep: int,
+                         extention: str,
+                         base_folder: str = "dataset",
+                         url: str = "https://www.yandex.ru/images/search?text=") -> []:
     """parser 'Yandex.Images'"""
     create_folders(text)
     iterator = len(os.listdir(os.path.join(base_folder, text)))
-    for page in range(iterator // 30, 40):
+    for page in range(iterator // 30, max_count // 30 + 1):
         headers = Headers(
-            browser = "chrome",
+            browser = "Chrome",
             os = "win",
             headers = True
             ).generate()
@@ -58,23 +64,43 @@ def yandex_images_parser(text: str, base_folder: str = "dataset", url: str = "ht
                             )
         logging.info(f"links: {len(links)}")
         if len(links) == 0:
-            logging.debug(soup.text)
-            break
+            raise StopIteration(soup.text)
         for second_iterator in range(iterator % 30, len(links)):
             try:
                 link = links[second_iterator].get("src")
-                path_to_file = make_path_and_filename(iterator, os.path.join(base_folder,text))
+                path_to_file = make_path_and_filename(iterator,
+                                                      os.path.join(base_folder,text),
+                                                      extention
+                                                      )
                 save_image(f"http:{link}",
                         path_to_file
                         )
                 logging.info(f"Number of downloaded images: {iterator}")
-                sleep(30)
+                sleep(time_sleep)
                 iterator += 1
+                if iterator == max_count:
+                    break
             except Exception as e:
                 logging.exception(f"Error with {iterator} image: {e}")
                 continue
 
 
 if __name__ == "__main__":
-    yandex_images_parser("tiger")
-    yandex_images_parser("leopard")
+    parser = argparse.ArgumentParser(
+                        prog='Yandex photos',
+                        description='Downloads yandex images'
+                        )
+    parser.add_argument('-m', '--max_count',
+                        type = int, default = 1000,
+                        help = 'The largest number of images'
+                        )
+    parser.add_argument('-s', '--time_sleep',
+                        type = int, default = 3,
+                        help = 'Delay between downloading images'
+                        )
+    parser.add_argument('-e', '--file_extention',
+                        type = str, default = 'jpg',
+                        help = 'With which file extension to download images')
+    args = parser.parse_args()
+    yandex_images_parser("tiger", args.max_count, args.time_sleep, args.file_extention)
+    yandex_images_parser("leopard", args.max_count, args.time_sleep, args.file_extention)
