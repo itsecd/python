@@ -1,19 +1,17 @@
 import os
+import time
+import random
 import logging
 import requests
 import argparse
 from bs4 import BeautifulSoup
 
-
-parser = argparse.ArgumentParser(description = "Count and type of images")
-
-MAIN_FOLDER = "Lab1"
-FOLDER = "dataset"
+MAIN_FOLDER = "dataset"
 HEADERS = {
-   "User-Agent":"Mozilla/5.0"
+   "User-Agent":"Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/116.0.0.0 Safari/537.36",
+   "Referer":"https://www.bing.com/"
 }
 
-logging.basicConfig(level=logging.INFO, filename=os.path.join(MAIN_FOLDER, "py_log.log"), filemode="w")
 
 
 def create_folder(folder: str):
@@ -33,7 +31,7 @@ def create_folder(folder: str):
         logging.error(f"{err}", exc_info=True)
 
 
-def download(list_images : list, folder : str):
+def download(list_images : list, folder : str, count_images : int):
     """
     Download images
 
@@ -44,11 +42,13 @@ def download(list_images : list, folder : str):
         Список тегов с картинками
     folder : str
         Путь для скачивания
+    count : int
+        Кол-во картинок для скачивания
     """
     count = 0
     exec_count = 0
     for flower_url in list_images:
-        if count > args.count : break
+        if count >= count_images : break
         try:
             src=flower_url['src']
             response = requests.get(src)
@@ -81,20 +81,26 @@ def make_list(url : str, count : int) -> list:
     """
     list_img = []
     new_url = url[:-1]
-    pages = int(count/10)
     try:
-        for page in range(1, pages):
+        for page in range(1, count):
+            if(len(list_img) >= count): return list_img
             new_page = f"{new_url}{page}"
+
+            sleep_time = random.uniform(2, 10)
+            time.sleep(sleep_time)
             html = requests.get(new_page, headers=HEADERS) 
+
             soup = BeautifulSoup(html.text, "lxml")
             list_img += soup.find_all("img", class_="mimg")
-        return list_img
     except Exception as err:
         logging.error(f"{err}", exc_info=True)
+    return list_img
 
 
 if __name__ == "__main__":
+    logging.basicConfig(level=logging.INFO, filename=os.path.join("py_log.log"), filemode="w")
 
+    parser = argparse.ArgumentParser(description = "Count and type of images")
     parser.add_argument('-c','--count',type=int, default=1000, help='Count of images')
     parser.add_argument('-o', '--object', type=str, default='rose', help='Type of object for search')
     args = parser.parse_args()
@@ -103,4 +109,4 @@ if __name__ == "__main__":
     count_images = args.count
 
     images = make_list(url_images, count_images)
-    download(images, os.path.join(MAIN_FOLDER, FOLDER, args.object).replace("\\", "/"))
+    download(images, os.path.join(MAIN_FOLDER, args.object).replace("\\", "/"), count_images)
