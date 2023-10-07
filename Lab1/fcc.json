@@ -1,4 +1,4 @@
-{
+{   "headers":{"User-Agent": "Mozilla/5.0"},
     "classes": ["rose","tulip"], 
     "search_url":"https://www.bing.com/images/search?q={classes}&first=1",
     "main_folder":"dataset",

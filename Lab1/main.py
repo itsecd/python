@@ -3,7 +3,6 @@ import json
 import logging
 import requests
 from bs4 import BeautifulSoup
-from constans import HEADERS
 
 
 logging.basicConfig(level=logging.INFO)
@@ -31,7 +30,7 @@ def make_list(url: str) -> list:
         for pages in range(fcc["pages"]):
             url_new = url[:-1]
             url_pages: str = f"{url_new}{pages}"
-            html = requests.get(url_pages, HEADERS)
+            html = requests.get(url_pages, fcc['headers'])
             soup = BeautifulSoup(html.text, "lxml")
             flowers = soup.findAll("img")
             list_url += flowers
