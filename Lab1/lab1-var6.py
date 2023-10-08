@@ -1,7 +1,6 @@
 import os
 import requests
 import logging
-import string
 from bs4 import BeautifulSoup
 from settings import (
     FOLDER_TIGER,
@@ -10,18 +9,21 @@ from settings import (
     COUNT_FOR_DOWNLOADS,
     SEARCH_TIGER,
     SEARCH_LEOPARD,
+    PAGES,
 )
-from typing import Dict, List
+
 
 HEADERS = {
-   "User-Agent":"Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/116.0.0.0 Safari/537.36",
-   "Referer":"https://www.bing.com/"
+    "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/116.0.0.0 Safari/537.36",
+    "Referer": "https://www.bing.com/",
 }
-logging.basicConfig(filename="py_log.log", filemode="w", level=logging.DEBUG)
-
+logging.basicConfig(filename="py_log.log", filemode="w")
 
 
 def create_folder(folder_name: str) -> str:
+    """The function creates a subfolder in the dataset
+    folder for subsequent downloading of images.
+    """
     try:
         if not os.path.exists(f"dataset/{folder_name}"):
             os.mkdir(f"dataset/{folder_name}")
@@ -31,17 +33,20 @@ def create_folder(folder_name: str) -> str:
 
 
 def create_list(url: str) -> list:
+    """The function scrolls pages and saves all
+    found img tags to a list.
+    """
     list = []
     count = 0
     try:
-        for pages in range(1, 30):
+        for pages in range(1, int(PAGES)):
             if count >= int(COUNT_FOR_LIST):
                 break
             url_pages: str = f"{url[:-1]}{pages}"
             response = requests.get(url_pages, headers=HEADERS)
             soup = BeautifulSoup(response.text, "lxml")
             images = soup.find_all("img")
-            list+=images
+            list += images
             count += 1
         return list
     except Exception as e:
@@ -50,20 +55,23 @@ def create_list(url: str) -> list:
 
 
 def download_images(url: str, folder_name: str) -> str:
-    list=create_list(url)
+    """The function searches for links to thumbnails in the list
+    and downloads them to a folder.
+    In lines 72-74 we skip invalid links.
+    There are a lot of incorrect images because we are looking only
+    by the src attribute.
+    """
+    list = create_list(url)
     logging.info("ready for download")
-    num=0
+    num = 0
     for img_tag in list:
-        if len(list) < int(COUNT_FOR_DOWNLOADS):
-            continue
+        if num > int(COUNT_FOR_DOWNLOADS):
+            break
         try:
             src = img_tag["src"]
-            tag=img_tag.find('rp')
-            if(tag!=-1):
-                list.remove(img_tag)
-                img_tag+=1
+            if (str(src).find("rp") != -1):
+                img_tag += 1
                 break
-            print(src)
             response = requests.get(src)
             numbers = format(num).zfill(4)
             create_folder(folder_name)
@@ -72,9 +80,9 @@ def download_images(url: str, folder_name: str) -> str:
                     f.write(response.content)
                     num += 1
             except Exception as e:
-                    logging.error(f"Error creating file: {str(e)}")
+                logging.error(f"Error creating file: {str(e)}")
         except Exception as e:
-            logging.error(f"Error processing link:{str(e)}")
+            logging.error(f"incorrect imgs:{img_tag}")
     logging.info("Images downloaded")
 
 
