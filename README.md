@@ -14,7 +14,7 @@
 1.1. Имя форкнутого репозитория может быть каким вам удобно;  
 1.2. В дескрипшене репозитория будет полезно указать свои ФИО, номер группы;  
 1.3. Копировать необходимо `main` ветку;  
-1.4. Для выполнения лабораторной работы  необходимо в форкнутом репозитории [завести новую ветку](https://docs.github.com/en/pull-requests/collaborating-with-pull-requests/proposing-changes-to-your-work-with-pull-requests/creating-and-deleting-branches-within-your-repository), основанную на вашей `master`-ветке;   
+1.4. Для выполнения лабораторной работы  необходимо в форкнутом репозитории [завести новую ветку](https://docs.github.com/en/pull-requests/collaborating-with-pull-requests/proposing-changes-to-your-work-with-pull-requests/creating-and-deleting-branches-within-your-repository), основанную на вашей `main`-ветке;   
 1.5. Ветка *должна* именоваться `lab*номер_лабы*-var*номер_варианта*`. Все модификации репозитория для указанной лабораторной работы должны производиться именно в этой ветке;
 
 
