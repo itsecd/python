@@ -48,3 +48,9 @@ def download_images(query, num_images, num_pages=100):
                             break
                 except Exception as e:
                     print(f"Error downloading image")
+
+if __name__=="__main__":
+    classes = ["polar bear", "brown bear"]
+    num_images_per_class = 1000
+    for class_name in classes:
+        download_images(class_name, num_images_per_class)
