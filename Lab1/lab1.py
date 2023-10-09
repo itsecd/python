@@ -17,6 +17,7 @@ def create_folder(base_folder: str = "dataset") -> None:
     except Exception as ex:
         logging.exception(f"Can't create folder: {ex.message}\n{ex.args}\n")
 
+
 def make_lists(start_date: date,
                end_date: date,
                delta: timedelta,
