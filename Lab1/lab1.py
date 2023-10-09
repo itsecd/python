@@ -1,5 +1,6 @@
 import argparse
 import csv
+import os
 from datetime import date, timedelta
 import requests
 import logging
@@ -7,6 +8,14 @@ import logging
 
 logging.basicConfig(level=logging.INFO)
 
+
+def create_folder(base_folder: str = "dataset") -> None:
+    """The function form a folder"""
+    try:
+        if not os.path.exists(base_folder):
+            os.mkdir(base_folder)
+    except Exception as ex:
+        logging.exception(f"Can't create folder: {ex.message}\n{ex.args}\n")
 
 def make_lists(start_date: date,
                end_date: date,
@@ -39,39 +48,46 @@ def make_lists(start_date: date,
 
 def write_to_f(filename: str,
                dates: list,
-               data: list
+               data: list,
+               file_path: str
                ) -> None:
     """The function takes filename and two lists of data,
     then writes data to a file with the specified name.
     """
     try:
-        with open(filename, "a", newline="", encoding="utf-8") as csv_file:
+        output_file_path = os.path.join(file_path, filename).replace("\\","/")
+        create_folder(file_path)
+        with open(output_file_path, "a", newline="", encoding="utf-8") as csv_file:
             csv_writer = csv.writer(csv_file, delimiter=",")
             combined_list = [(date, usd) for date, usd in zip(dates, data)]
             csv_writer.writerows(combined_list)
     except Exception as ex:
-        logging.error(f"Can't write data to file: {ex.message}\n{ex.args}\n")
+        logging.error(f"Can't write data to file: {ex}")
 
 
 if __name__ == "__main__":
     parser = argparse.ArgumentParser(description='Collect USD exchange rates.')
     parser.add_argument('--delta',
                         type=int, default=1,
-                        help='Delta in days'
+                        help='Step in while'
                         )
     parser.add_argument('--delta2',
                         type=int, default=9000,
-                        help='Delta2 in days'
+                        help='Number of days'
                         )
     parser.add_argument('--output',
                         type=str, default='dataset.csv',
-                        help='Output file path'
+                        help='Output file name'
+                        )
+    parser.add_argument('--path_file',
+                        type=str, default='dataset',
+                        help='The path to the data file'
                         )
     parser.add_argument('--url_template',
                         type=str, default='https://www.cbr-xml-daily.ru/archive/{year}/{month}/{day}/daily_json.js',
                         help='URL template for fetching data'
                         )
-
+    
     args = parser.parse_args()
 
     delta = timedelta(days=args.delta)
@@ -80,4 +96,4 @@ if __name__ == "__main__":
     end_date = start_date - delta2
 
     dates, result = make_lists(start_date, end_date, delta, args.url_template)
-    write_to_f(args.output, dates, result)
+    write_to_f(args.output, dates, result, args.path_file)
