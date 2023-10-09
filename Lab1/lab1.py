@@ -1,3 +1,4 @@
+import argparse
 import csv
 from datetime import date, timedelta
 import requests
@@ -18,7 +19,7 @@ def make_lists(start_date: date,
     list_usd = []
     list_dates = []
     try:
-        while (start_date!=end_date):
+        while (start_date != end_date):
             current_day = start_date.strftime('%d')
             current_month = start_date.strftime('%m')
             current_year = start_date.year
@@ -34,6 +35,7 @@ def make_lists(start_date: date,
     except Exception as ex:
         logging.error(f"can't get data: {ex.message}\n{ex.args}\n")
 
+
 def write_to_f(filename: str,
                dates: list,
                data: list
@@ -43,16 +45,34 @@ def write_to_f(filename: str,
     """
     try:
         with open(filename, "a", newline="", encoding="utf-8") as csv_file:
-            csv_writer = csv.writer(csv_file,delimiter=",")
-            combined_list = [(date,usd) for date, usd in zip(dates,data)]
+            csv_writer = csv.writer(csv_file, delimiter=",")
+            combined_list = [(date, usd) for date, usd in zip(dates, data)]
             csv_writer.writerows(combined_list)
     except Exception as ex:
         logging.error(f"Can't write data to file: {ex.message}\n{ex.args}\n")
 
-delta = timedelta(days=1)
-delta2 = timedelta(days=9000)
-start_date = date.today()
-end_date = start_date - delta2
 
-dates, result = make_lists(start_date, end_date, delta)
-write_to_f("dataset.csv", dates,result)
+if __name__ == "__main__":
+    parser = argparse.ArgumentParser(description='Collect USD exchange rates.')
+    parser.add_argument('--delta',
+                        type=int, default=1,
+                        help='Delta in days'
+                        )
+    parser.add_argument('--delta2',
+                        type=int, default=9000,
+                        help='Delta2 in days'
+                        )
+    parser.add_argument('--output',
+                        type=str, default='dataset.csv',
+                        help='Output file path'
+                        )
+
+    args = parser.parse_args()
+
+    delta = timedelta(days=args.delta)
+    delta2 = timedelta(days=args.delta2)
+    start_date = date.today()
+    end_date = start_date - delta2
+
+    dates, result = make_lists(start_date, end_date, delta)
+    write_to_f(args.output, dates, result)
