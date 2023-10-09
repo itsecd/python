@@ -8,7 +8,7 @@ HEADERS = {
     "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/116.0.0.0 Safari/537.36",
     "Referer": "https://www.bing.com/",
 }
-logging.basicConfig(filename="py_log.log", filemode="a",level=logging.INFO)
+logging.basicConfig(filename="py_log.log", filemode="a", level=logging.INFO)
 
 
 def create_folder(folder_name: str) -> str:
@@ -23,18 +23,17 @@ def create_folder(folder_name: str) -> str:
         logging.error(f"Error creating folder: {e}")
 
 
-
-def create_list(url: str) -> list:
+def create_list(url: str, count_for_list: str, pages: str) -> list:
     """The function scrolls pages and saves all
     found img tags to a list.
     """
     list = []
     count = 0
     try:
-        for pages in range(1, int(os.getenv("PAGES"))):
-            if count >= int(os.getenv("COUNT_FOR_LIST")):
+        for page in range(1, int(pages)):
+            if count >= int(count_for_list):
                 break
-            url_pages: str = f"{url[:-1]}{pages}"
+            url_pages: str = f"{url[:-1]}{page}"
             response = requests.get(url_pages, headers=HEADERS)
             soup = BeautifulSoup(response.text, "lxml")
             images = soup.find_all("img")
@@ -46,22 +45,28 @@ def create_list(url: str) -> list:
     logging.info("img uploaded to list")
 
 
-def download_images(url: str, folder_name: str) -> str:
+def download_images(
+    url: str,
+    folder_name: str,
+    count_for_downloads: str,
+    count_for_list: str,
+    pages: str,
+) -> str:
     """The function searches for links to thumbnails in the list
     and downloads them to a folder.
     In lines 72-74 we skip invalid links.
     There are a lot of incorrect images because we are looking only
     by the src attribute.
     """
-    list = create_list(url)
+    list = create_list(url, count_for_list, pages)
     logging.info("ready for download")
     num = 0
     for img_tag in list:
-        if num > int(os.getenv("COUNT_FOR_DOWNLOADS")):
+        if num > int(count_for_downloads):
             break
         try:
             src = img_tag["src"]
-            if (str(src).find("rp") != -1):
+            if str(src).find("rp") != -1:
                 img_tag += 1
                 break
             response = requests.get(src)
@@ -81,5 +86,17 @@ def download_images(url: str, folder_name: str) -> str:
 if __name__ == "__main__":
     logging.info("start")
     os.mkdir("dataset")
-    download_images(os.getenv("SEARCH_TIGER"), os.getenv("FOLDER_TIGER"))
-    download_images(os.getenv("SEARCH_LEOPARD"),os.getenv("FOLDER_LEOPARD"))
+    download_images(
+        os.getenv("SEARCH_TIGER"),
+        os.getenv("FOLDER_TIGER"),
+        os.getenv("COUNT_FOR_DOWNLOADS"),
+        os.getenv("COUNT_FOR_LIST"),
+        os.getenv("PAGES"),
+    )
+    download_images(
+        os.getenv("SEARCH_LEOPARD"),
+        os.getenv("FOLDER_LEOPARD"),
+        os.getenv("COUNT_FOR_DOWNLOADS"),
+        os.getenv("COUNT_FOR_LIST"),
+        os.getenv("PAGES"),
+    )
