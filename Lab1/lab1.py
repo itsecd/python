@@ -10,7 +10,8 @@ logging.basicConfig(level=logging.INFO)
 
 def make_lists(start_date: date,
                end_date: date,
-               delta: timedelta
+               delta: timedelta,
+               url_template: str = 'https://www.cbr-xml-daily.ru/archive/{year}/{month}/{day}/daily_json.js'
                ) -> list:
     """The function takes start date, end date, delta,
     passes through all dates with a given delta
@@ -23,7 +24,7 @@ def make_lists(start_date: date,
             current_day = start_date.strftime('%d')
             current_month = start_date.strftime('%m')
             current_year = start_date.year
-            url = f'https://www.cbr-xml-daily.ru/archive/{current_year}/{current_month}/{current_day}/daily_json.js'
+            url = url_template.format(year=current_year, month=current_month, day=current_day)
             response = requests.get(url)
             if response.status_code == 200:
                 data = response.json()
@@ -66,6 +67,10 @@ if __name__ == "__main__":
                         type=str, default='dataset.csv',
                         help='Output file path'
                         )
+    parser.add_argument('--url_template',
+                        type=str, default='https://www.cbr-xml-daily.ru/archive/{year}/{month}/{day}/daily_json.js',
+                        help='URL template for fetching data'
+                        )
 
     args = parser.parse_args()
 
@@ -74,5 +79,5 @@ if __name__ == "__main__":
     start_date = date.today()
     end_date = start_date - delta2
 
-    dates, result = make_lists(start_date, end_date, delta)
+    dates, result = make_lists(start_date, end_date, delta, args.url_template)
     write_to_f(args.output, dates, result)
