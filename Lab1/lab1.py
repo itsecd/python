@@ -1,14 +1,25 @@
 import os
 import requests
+import logging
 from bs4 import BeautifulSoup
 
 
-def create_directory(directory):
-    if not os.path.exists(directory):
-        os.makedirs(directory)
+def create_directory(directory: str) -> None:
+    """This function forms a directory for uploading images"""
+    try:
+        if not os.path.exists(directory):
+            os.makedirs(directory)
+    except Exception as exc:
+        logging.exception(f"Can't create folder: {exc.message}\n{exc.args}\n")
+    
 
 
-def download_images(query, num_images):
+def download_images(query: str,
+                     num_images: int
+                     ) -> None:
+    """This function uploads images to the selected directory 
+    for a specified number of images
+    """
     create_directory("dataset")
     count = 0
     page = 1
@@ -34,7 +45,7 @@ def download_images(query, num_images):
                     if count >= num_images:
                         break
                 except Exception as e:
-                    print(f"Error downloading image")
+                    logging.exception(f"Error downloading image: {e.message}\n{e.args}\n")
         page += 1
 
 
