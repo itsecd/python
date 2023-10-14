@@ -11,19 +11,28 @@ def get_html_source(url):
     return source
 
 
-def link_for_all_review(sourse):
-    soup = BeautifulSoup(sourse.text, 'lxml')
+def get_links_for_all_review(source):
+    soup = BeautifulSoup(source.text, 'lxml')
     responses = soup.findAll('div', class_="l22dd3882")
     links=[]
     for resp in responses:
         links.append("https://www.banki.ru" + resp.find('a').get('href'))
-    print(links)
+    return links
+
+def get_all_review(link):
+    source=get_html_source(link)
+    soup = BeautifulSoup(source.text, 'lxml')
+    all_review = soup.find('p')
+    return all_review 
 
 def main():
     url = f"https://www.banki.ru/services/responses/bank/alfabank/?page=1&rate=1"
     source = get_html_source(url)
     sleep(3)
-    soup_search(source)
+    links=get_links_for_all_review(source)
+    #print(get_all_review(links[0]).text)
+    #print(links[0])
+
     '''
     os.mkdir("dataset")
     for num_of_stars in range(1, 6):
