@@ -4,16 +4,23 @@ import csv
 import datetime
 import logging
 
+
 logging.basicConfig(level=logging.INFO)
 
-def create_or_clear_csv_file(filename):
+
+def create_or_clear_csv_file(filename: str) -> None:
+    """Function take filename and create csv file. If file already created it will be deleted"""
     try:
         with open(filename, "w", newline="") as file:
             pass
     except Exception as ex:
         logging.error(f"Couldn't open or clear file: {ex.message}\n{ex.args}\n")
 
-def write_data_to_csv(filename, data):
+
+def write_data_to_csv(filename: str,
+                      data: list
+                      ) -> None:
+    """Function writing data from list to csv file"""
     try:
         with open(filename, "a", newline="") as file:
             writer = csv.writer(file)
@@ -21,16 +28,19 @@ def write_data_to_csv(filename, data):
     except Exception as ex:
         logging.error(f"Can't write data to file: {ex.message}\n{ex.args}\n")
 
-def get_json(date):
+
+def get_json(date: str) -> dict:
+    """Function getting json_file from html page"""
     try:
-        URL = "https://www.cbr-xml-daily.ru/archive/" + date.replace("-", "/") + "/daily_json.js"
-        html_page = requests.get(URL)
+        url = "https://www.cbr-xml-daily.ru/archive/" + date.replace("-", "/") + "/daily_json.js"
+        html_page = requests.get(url)
         if html_page.status_code != 200:
             return {"error": "Page not found"}
         json_page = html_page.json()
         return json_page
     except Exception as ex:
         logging.error(f"Can't get json file: {ex.message}\n{ex.args}\n")
+
 
 def main():
     current_date = datetime.date(2022, 2, 2)
