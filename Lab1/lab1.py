@@ -2,17 +2,21 @@ import os
 import requests
 from bs4 import BeautifulSoup
 
+
 def create_directory(directory):
     if not os.path.exists(directory):
         os.makedirs(directory)
+
 
 def download_images(query, num_images, num_pages=1500):
     create_directory("dataset")
     count = 0
     page = 1
-    while count<num_images:
+    while count < num_images:
         search_url = f"https://www.bing.com/images/search?q={query}&form=HDRSC2&first={page}"
-        headers = {"User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/58.0.3029.110 Safari/537.3"}
+        headers = {
+            "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/58.0.3029.110 Safari/537.3"
+        }
         response = requests.get(search_url, headers=headers)
         soup = BeautifulSoup(response.text, "lxml")
         img_tags = soup.find_all('img', {"src": True}, class_='mimg')
@@ -31,8 +35,10 @@ def download_images(query, num_images, num_pages=1500):
                         break
                 except Exception as e:
                     print(f"Error downloading image")
-        page+=1
-if __name__=="__main__":
+        page += 1
+
+
+if __name__ == "__main__":
     classes = ["polar bear", "brown bear"]
     num_images_per_class = 1000
     for class_name in classes:
