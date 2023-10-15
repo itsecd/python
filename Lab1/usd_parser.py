@@ -51,6 +51,8 @@ def get_json(date: str,
 
 
 def usd_parser():
+    """the final function that uses the previous ones and
+       parses usd exchange rate from html pages"""
     current_date = datetime.date.today()
     end_date = args.end_date
     while str(current_date).replace('-', '/') != end_date:
@@ -65,6 +67,7 @@ def usd_parser():
             data = [date_str, str(usd_value)]
             write_data_to_csv(os.path.join(args.path, "data.csv").replace('\\', '/'), data)           
             current_date -= datetime.timedelta(days=1)
+
 
 if __name__ == "__main__":
     parser = argparse.ArgumentParser(description="taking usd exchange rate from html page")
