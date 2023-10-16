@@ -1,8 +1,12 @@
+import argparse
 import os
 import requests
 import logging
 from bs4 import BeautifulSoup
-
+HEADERS = {
+            "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/58.0.3029.110 Safari/537.3"
+        }
+SEARCH_URL=f"https://www.bing.com/images/search"
 
 def create_directory(directory: str) -> None:
     """This function forms a directory for uploading images"""
@@ -10,12 +14,13 @@ def create_directory(directory: str) -> None:
         if not os.path.exists(directory):
             os.makedirs(directory)
     except Exception as exc:
-        logging.exception(f"Can't create folder: {exc.message}\n{exc.args}\n")
-    
+        logging.exception(f"Can't create folder: {exc.message}\n{exc.args}\n")   
 
 
 def download_images(query: str,
-                     num_images: int
+                     num_images: int,
+                     search_url: str,
+                     headers: str,
                      ) -> None:
     """This function uploads images to the selected directory 
     for a specified number of images
@@ -23,12 +28,11 @@ def download_images(query: str,
     create_directory("dataset")
     count = 0
     page = 1
+    print(search_url)
+    url = f"{SEARCH_URL}?q={query}&form=HDRSC2&first={page}"
+    print(url)
     while count < num_images:
-        search_url = f"https://www.bing.com/images/search?q={query}&form=HDRSC2&first={page}"
-        headers = {
-            "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/58.0.3029.110 Safari/537.3"
-        }
-        response = requests.get(search_url, headers=headers)
+        response = requests.get(url, headers=headers)
         soup = BeautifulSoup(response.text, "lxml")
         img_tags = soup.find_all('img', {"src": True}, class_='mimg')
 
@@ -50,7 +54,19 @@ def download_images(query: str,
 
 
 if __name__ == "__main__":
-    classes = ["polar bear", "brown bear"]
-    num_images_per_class = 1000
-    for class_name in classes:
-        download_images(class_name, num_images_per_class)
+    parser = argparse.ArgumentParser(description='Download images in classes')
+    parser.add_argument('--class1',
+                        type=str,default="polar_bear",
+                        help='name of first class'
+                        )
+    parser.add_argument('--class2',
+                        type=str,default="brown_bear",
+                        help='name of second class'
+                        )
+    parser.add_argument('--num_images',
+                        type=int,default=1000,
+                        help='num_images_per_class'
+                        )
+    args = parser.parse_args()
+    download_images(args.class1, args.num_images, SEARCH_URL, HEADERS)
+    download_images(args.class2, args.num_images, SEARCH_URL, HEADERS)
