@@ -1,22 +1,21 @@
 import os
+import logging
 import requests
 from bs4 import BeautifulSoup
 
 
-#Создание папки в случае отсутствия
-def create_directory(directory):
-    if not os.path.exists(directory):
-        os.makedirs(directory)
-
-def get_html_page(url):
-    headers = {"User-Agent": "Mozilla/5.0"}
-    response = requests.get(url, headers=headers)
-    return response.text
+"""The function creates a folder if it does not exist"""
+def create_directory(directory: str) -> None:
+    try:
+        if not os.path.exists(directory):
+            os.makedirs(directory)
+    except Exception as exc:
+        logging.exception(f"Can't create folder: {exc.message}\n{exc.args}\n")
 
 def download_img(search_query, save_directory, num_images=1000):
     create_directory(save_directory)
 
-    for start in range(0, num_images, 100):
+    for start in range(1, num_images, 1):
         
         base_url = f"https://www.bing.com/images/search?q={search_query}&form=HDRSC2&first={start}"
         try:
@@ -35,11 +34,12 @@ def download_img(search_query, save_directory, num_images=1000):
 
                 print(f"Скачано изображение {img_filename}")
         except requests.exceptions.MissingSchema:
-            print(f"Проблема с URL: {base_url}")
+         print(f"Проблема с URL: {base_url}")
+           # continue
 
     print(f"Загружено {num_images} изображений класса {search_query}")
 
-classes = ["polar bear", "brown bear"]
+classes = ["polar_bear", "brown_bear"]
 num_images_for_class = 1000
 
 for class_name in classes:
