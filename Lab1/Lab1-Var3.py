@@ -47,4 +47,11 @@ def download_images(query: str,
         page += 1
 
 
+if __name__ == "__main__":
+    parser = argparse.ArgumentParser(description="Script for downloading images.")
+    parser.add_argument("classes", nargs='+', help="List of classes to download images for.")
+    parser.add_argument("--num_images_per_class", type=int, default=1000, help="Number of images to download per class.")
+    args = parser.parse_args()
 
+    for class_name in args.classes:
+        download_images(class_name, args.num_images_per_class)
