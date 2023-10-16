@@ -13,7 +13,7 @@ def create_directory(directory: str) -> None:
         if not os.path.exists(directory):
             os.makedirs(directory)
     except Exception as exc:
-        logger.exception(f"Can't create folder: {exc}")
+        logger.exception(f"Can't create folder: {exc}") 
 
 
 def download_images(query: str, 
@@ -30,21 +30,7 @@ def download_images(query: str,
         soup = BeautifulSoup(response.text, "lxml")
         img_tags = soup.find_all('img', {"src": True}, class_='mimg')
 
-        for img_tag in img_tags:
-            img_url = img_tag["src"]
-            if img_url and img_url.startswith("http"):
-                try:
-                    img_data = requests.get(img_url, headers=headers, timeout=10).content
-                    class_folder = f"dataset/{query}"
-                    create_directory(class_folder)
-                    with open(f"{class_folder}/{count:04}.jpg", "wb") as img_file:
-                        img_file.write(img_data)
-                    count += 1
-                    if count >= num_images:
-                        break
-                except Exception as e:
-                    logger.exception(f"Error downloading image: {str(e)}")
-        page += 1
+
 
 
 if __name__ == "__main__":
