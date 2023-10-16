@@ -3,10 +3,12 @@ import os
 import requests
 import logging
 from bs4 import BeautifulSoup
+
 HEADERS = {
             "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/58.0.3029.110 Safari/537.3"
         }
 SEARCH_URL=f"https://www.bing.com/images/search"
+
 
 def create_directory(directory: str) -> None:
     """This function forms a directory for uploading images"""
