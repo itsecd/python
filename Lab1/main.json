@@ -1,7 +1,7 @@
-{   "headers":{"User-Agent": "Mozilla/5.0"},
-    "classes": ["кот","собака"], 
-    "search_url":"https://www.bing.com/images/search?q={classes}&first=1",
-    "main_folder":"dataset",
-    "max_files": 1015,
+{   "headers": {"User-Agent": "Mozilla/5.0"},
+    "folder": "dataset",
+    "search": ["кот","собака"], 
+    "url": "https://www.bing.com/images/search?q={classes}&first=1",
+    "max_file": 1005,
     "pages": 100
 }
