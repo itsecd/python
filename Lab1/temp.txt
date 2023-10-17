@@ -1,0 +1,49 @@
+while not all_dirs_full:
+
+    #Блок работы с запросом и кодом страницы
+
+    URL = f"https://www.livelib.ru/reviews/~{page_number}#reviews"
+    html_page = requests.get(URL, headers={"User-Agent":"Mozilla/5.0"})
+    encoding = chardet.detect(html_page.content)['encoding'] #Определяем кодировку страницы
+    decoded_html_page = html_page.content.decode(encoding) #Декодируем страницу. Иначе кириллические символы вызовут UnicodeError
+    soup = BeautifulSoup(decoded_html_page, features="html.parser")
+
+    #Блок парсинга 
+
+    cards = soup.find_all("article", class_="review-card lenta__item") #Находим все рецензии
+
+
+    for card in cards:
+
+        try: #В try паковать его приходится, потому что не везде могут найтись нужные элементы
+            rating = card.find("span", class_="lenta-card__mymark").text #Находим оценку книги
+        except(AttributeError):
+            continue
+        rating = re.search(r"\d", rating).group(0)
+
+        try:
+            title = card.find("a", class_="lenta-card__book-title").text #Находим название книги
+        except(AttributeError):
+            continue
+        title = str(card.find("a", class_="lenta-card__book-title").text).strip()
+
+        try:
+            full_text_p = card.find("div", class_="lenta-card__text without-readmore").find("div").find_all("p") #Находим текст обзора, разбитый на параграфы
+        except(full_text_p == None):
+            continue
+        full_text = "\n"
+        for p in full_text_p: #Проходим по каждому параграфу, вынимая из них текст и складывая его в full_text
+            full_text += (p.text + "\n")
+        
+        if (card_nums[rating] < 999): #Проверяем, не полна ли директория (1000 эл-тов)
+            with open("dataset/" + rating + "/" + str(card_nums[rating]).zfill(4), "w") as f:
+                f.write(title + full_text)
+            card_nums[rating] += 1
+            
+    for rating in range(1, 6):
+        if os.path.exists(f"dataset/{rating}/0999.txt"):
+            if rating <= 4: continue
+            else: all_dirs_full = True
+
+    page_number += 1
+    print(f"New page, current page: {page_number} \n\t1 star: {card_nums['1']} \n\t2 star: {card_nums['2']} \n\t3 star: {card_nums['3']} \n\t4 star: {card_nums['4']} \n\t5 star: {card_nums['5']}")
