@@ -9,7 +9,7 @@ import logging
 
 #Блок работы с запросом и кодом страницы
 def get_page(URL: str) -> str:
-    html_page = requests.get(URL, headers={"User-Agent":"Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/116.0.5845.967 YaBrowser/23.9.1.967 Yowser/2.5 Safari/537.36"}, timeout=100)
+    html_page = requests.get(URL, headers={"User-Agent":"Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/118.0.0.0 Safari/537.36"}, timeout=100)
     encoding = chardet.detect(html_page.content)['encoding'] #Определяем кодировку страницы
     decoded_html_page = html_page.content.decode(encoding) #Декодируем страницу. Иначе кириллические символы вызовут UnicodeError
     soup = BeautifulSoup(decoded_html_page, features="html.parser")
@@ -25,7 +25,7 @@ def create_dataset(name: str) -> None:
 
 
 #Блок парсинга 
-def parse_soup(soup: str, dataset_name: str) -> None:
+def parse_soup(soup: str, dataset_name: str) -> dict[str, int]:
     cards = soup.find_all("article", class_="review-card lenta__item") #Находим все рецензии
     card_nums = {
         '0': 0,
@@ -59,7 +59,10 @@ def parse_soup(soup: str, dataset_name: str) -> None:
 
         with open(f"{dataset_name}/" + rating + "/" + str(card_nums[rating]).zfill(4), "w", encoding="utf-8") as f:
             f.write(title + full_text)
+            print(f"Update: {rating} -- {card_nums[rating]}")
         card_nums[rating] += 1
+    
+    return card_nums
         
 
 URL = "https://www.livelib.ru/reviews/~1#reviews"
@@ -67,12 +70,19 @@ URL = "https://www.livelib.ru/reviews/~1#reviews"
 os.chdir("Lab1")
 create_dataset("dataset")
 
-for i in range(1, 20):
+card_nums = {
+        '0': 0,
+        '1': 0,
+        '2': 0,
+        '3': 0,
+        '4': 0,
+        '5': 0,
+    }
+i = 1;
+while card_nums["4"] < 999 and card_nums["5"] < 999:
     soup = get_page(f"https://www.livelib.ru/reviews/~{i}#reviews")
-    if ("captcha" in soup):
-        print("Captcha")
-
-    parse_soup(soup, "dataset")
+    card_nums = parse_soup(soup, "dataset")
+    i+=1
 
 
 
