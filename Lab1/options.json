@@ -1,0 +1,6 @@
+{
+    "url":"https://www.bing.com/images/search?q={query}&form=hdrsc2&first={page}",
+    "queries":["tiger","leopard"],
+    "main_folder":"dataset",
+    "count": 1000
+}
