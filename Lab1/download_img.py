@@ -50,6 +50,7 @@ def download_images(query: str,
                 except Exception as e:
                         logger.exception(f"Error downloading image: {str(e)}")
         page += 1
+    logger.info(f"Downloaded {num_images} images for '{query}'")    
 
 if __name__ == "__main__":
     parser = argparse.ArgumentParser(description="Download images in classes")
@@ -60,4 +61,3 @@ if __name__ == "__main__":
 
     for class_name in args.classes:
         download_images(class_name, args.num_images_per_class, args.dataset_directory)
-    logger.info(f"Downloaded {args.num_images_per_class} images for each class in the '{args.dataset_directory}' directory.")
