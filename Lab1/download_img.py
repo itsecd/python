@@ -16,8 +16,8 @@ def create_directory(directory: str) -> None:
     try:
         if not os.path.exists(directory):
             os.makedirs(directory)
-    except Exception as exc:
-        logger.exception(f"Can't create folder: {exc}")
+    except Exception as e:
+        logger.exception(f"Can't create folder: {e}")
 
 
 def download_images(query: str,
@@ -45,12 +45,10 @@ def download_images(query: str,
                     create_directory(class_folder)
                     with open(os.path.join(class_folder, f"{count:04}.jpg"), "wb") as img_file:
                         img_file.write(img_data)
-                    count += 1
-                    logger.info(f"Downloaded {count}/{num_images} images for '{query}'")
-                    if count >= num_images:
-                        break
+                        count += 1
+                        logger.info(f"Downloaded {count}/{num_images} images for '{query}'")
                 except Exception as e:
-                    logger.exception(f"Error downloading image: {str(e)}")
+                        logger.exception(f"Error downloading image: {str(e)}")
         page += 1
 
 if __name__ == "__main__":
@@ -62,3 +60,4 @@ if __name__ == "__main__":
 
     for class_name in args.classes:
         download_images(class_name, args.num_images_per_class, args.dataset_directory)
+    logger.info(f"Downloaded {args.num_images_per_class} images for each class in the '{args.dataset_directory}' directory.")
