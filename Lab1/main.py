@@ -15,10 +15,10 @@ HEADERS = {
 logging.basicConfig(level=logging.INFO)
 
 
-def get_page(URL: str) -> str:
+def get_page(url: str) -> str:
     '''Takes in URL of a page, returns a soup for further parsing'''
     sleep(5)
-    html_page = requests.get(URL, headers=HEADERS)
+    html_page = requests.get(url, headers=HEADERS)
     encoding = chardet.detect(html_page.content)['encoding'] #Определяем кодировку страницы
     decoded_html_page = html_page.content.decode(encoding) #Декодируем страницу. Иначе кириллические символы вызовут UnicodeError
     soup = BeautifulSoup(decoded_html_page, features="html.parser")
