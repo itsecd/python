@@ -56,13 +56,13 @@ def dowload_images(queries: str,
     queries = options["queries"]
     for query in queries:
         image_urls = get_images_urls(query, count, url)
-        create_folder(os.path.join(main_folder, query).replace("\\", "/"))
+        create_folder(os.path.join(main_folder, query))
         try:
             for i, url1 in enumerate(image_urls):
                 response = requests.get(url1)
                 if response.status_code == 200:
                     try:
-                        with open(os.path.join(main_folder, query, f"{i:04d}.jpg").replace("\\", "/"), "wb") as file:
+                        with open(os.path.join(main_folder, query, f"{i:04d}.jpg"), "wb") as file:
                             file.write(response.content)
                     except Exception as ex:
                         logging.error(
