@@ -5,7 +5,7 @@ import chardet
 import argparse
 from bs4 import BeautifulSoup
 
-BASE_URL = "https://otzovik.com/reviews/"
+BASE_URL = "https://otzovik.com/reviews"
 HEADERS = {"User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/58.0.3029.110 Safari/537.3"}
 
 
@@ -16,30 +16,30 @@ def create_folder(name:str) -> None:
     """This function creates a new folder if it does not exist"""
     try:
         if not os.path.exists(f"{name}"):
-            os.mkdir(name)
+            os.makedirs(name)
     except Exception as exc:
         logging.exception(f"Can not create folder: {exc.message}\n{exc.args}\n")
 
 
 def get_page(URL: str) -> str:
     """This function decoding url for later use"""
-    html_page = requests.get(URL, headers=HEADERS, timeout=5)
+    html_page = requests.get(URL, headers=HEADERS, timeout=10)
     encode = chardet.detect(html_page.content)['encoding']
     decoded_html_page = html_page.content.decode(encode)
     soup = BeautifulSoup(decoded_html_page, features="html.parser")
     return soup
 
 
-def w_review_to_txt_file(soup: str, dataset_name: str, n_of_reviews:int)-> dict[str, int]:
+def w_review_to_txt_file(dataset_name: str, link: str, n_of_reviews:int)-> dict[str, int]:
     """This function creating review file in corresponding folder"""
     create_folder(dataset_name)
     for rating in range(1, 6):
         page = 1
         count = 0
         while count < n_of_reviews:
-            url = f"{BASE_URL}/{page}/?ratio={rating}"
+            url = f"{BASE_URL}/{link}/{page}/?ratio={rating}"
             soup = get_page(url)
-            reviews = soup.find_all('div', itemprop ="review")
+            reviews = soup.find_all('div', itemprop ='review')
             for review in reviews:
                 review_url = review["review-teaser"]
                 if review_url:
@@ -60,9 +60,9 @@ def w_review_to_txt_file(soup: str, dataset_name: str, n_of_reviews:int)-> dict[
         logging.info(f"All reviews for {rating} rating has been downloaded")
 
 if __name__=="__main__":
-    parser = argparse.ArgumentParser(description="Input path name for reviews, link for parsing, count of reviews")
-    parser.add_argument("--path", help="Input path name for reviews", type=str)
-    parser.add_argument("--link", help="Input link of the reviews", type=str)
-    parser.add_argument("--count", help="Input count of reviews", type=int)
+    parser = argparse.ArgumentParser(description='Input path name for reviews, link for parsing, count of reviews')
+    parser.add_argument('--path', type=str,default="dataset", help='Input path name for reviews')
+    parser.add_argument('--link',type=str,default="sberbank_rossii" ,help='Input link of the reviews')
+    parser.add_argument('--count',type=int,default=500, help='Input count of reviews')
     args = parser.parse_args()
     w_review_to_txt_file(args.path, args.link, args.count)
