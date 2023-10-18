@@ -69,31 +69,22 @@ def parse_soup(soup: str, dataset_name: str, card_nums: dict[str, int]) -> dict[
     return card_nums
 
 
-def circle_pages(URL: str, dataset_name: str, target_size: int) -> None:
+def circle_pages(url: str, dataset_name: str, target_size: int) -> None:
     '''Takes in a URL, a name of dataset and a target size of the dataset'''
     i = 1
     dataset_size = 0
-    card_nums = {
-        '0': 0,
-        '1': 0,
-        '2': 0,
-        '3': 0,
-        '4': 0,
-        '5': 0,
-    }
+    card_nums = {str(key):0 for key in range (0,6)}
     while dataset_size < target_size: 
-        soup = get_page(URL)
-        print(URL)
+        soup = get_page(url.replace('{page}', str(i)))
         card_nums = parse_soup(soup, dataset_name, card_nums)
-        dataset_size = card_nums["0"] + card_nums["1"] + card_nums["2"] + card_nums["3"] + card_nums["4"] + card_nums["5"]
+        dataset_size = sum(value for value in card_nums.values())
         i += 1
-        URL = URL.replace(f"reviews/~{i-1}", f"reviews/~{i}")
 
 
 if __name__ == "__main__":
 
     parser = argparse.ArgumentParser(description='Save review entries into the dataset')
-    parser.add_argument('--url', type=str, default="https://www.livelib.ru/reviews/~1#reviews", help='URL of the site to scrap')
+    parser.add_argument('--url', type=str, default="https://www.livelib.ru/reviews/~{page}#reviews", help='URL of the site to scrap. Replace page number with {page}')
     parser.add_argument('--ds', type=str, default="dataset", help='Name of the dataset directory')
     parser.add_argument('--size', type=int, default=1000, help='Target size of the dataset')
     args = parser.parse_args()
