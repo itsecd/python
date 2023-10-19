@@ -1,26 +1,20 @@
-from ImageScrapper import Image_Scrapper as IS
+import argparse
+from image_scrapper import ImageScrapper
 
-MAIN_DIR = "dataset"
-POLAR_BEAR_DIR = "polar_beer"
-BROWN_BEAR_DIR = "brown_beer"
 HEADER = {"User-Agent":"Mozilla/5.0"}
-url_polar_bear = "https://www.bing.com/images/search?q=polar_bear.jpg&first=1"
-url_brown_bear = "https://www.bing.com/images/search?q=brown_bear.jpg&&first=1"
-
 
 if __name__ == "__main__":
-    pb_scrap = IS(POLAR_BEAR_DIR, MAIN_DIR, url_polar_bear, HEADER)
-    bb_scrap = IS(BROWN_BEAR_DIR, MAIN_DIR, url_brown_bear, HEADER) 
+    parser = argparse.ArgumentParser()
+    parser.add_argument(         'request', help='image search query'           , type=str)
+    parser.add_argument('-md', '--maindir', help='specifying the main directory', type=str, default='dataset')
+    parser.add_argument('-sd', '--subdir' , help='specifying the subdirectory'  , type=str, default='data')
+    parser.add_argument('-n' , '--number' , help='number of downloaded images'  , type=int, default=1000)
+    parser.add_argument('-w' , '--width'  , help='images width'                 , type=int, default=50)
+    args = parser.parse_args()
 
-    pb_scrap.get_pages_imgs(1050, 50)
-    pb_scrap.download() 
+    url = f"https://www.bing.com/images/search?q={args.request}&&first=1"
 
-    bb_scrap.get_pages_imgs(1050, 50)
-    bb_scrap.download()   
-     
- 
-
-
-
-
-
+    img_scrap = ImageScrapper(args.subdir, args.maindir, url, HEADER)
+    img_scrap.get_pages_imgs(args.number, args.width, args.request)
+    img_scrap.download() 
+  
