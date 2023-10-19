@@ -3,16 +3,8 @@ import time
 import random
 import logging
 import requests
-import argparse
+import json
 from bs4 import BeautifulSoup
-
-MAIN_FOLDER = "dataset"
-HEADERS = {
-   "User-Agent":"Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/116.0.0.0 Safari/537.36",
-   "Referer":"https://www.bing.com/"
-}
-
-
 
 def create_folder(folder: str) -> None:
     """
@@ -80,6 +72,7 @@ def make_list(url : str, count : int) -> list:
         Список с тегами картинок 
     """
     list_img = []
+    url = url.replace("object", OBJECT)
     new_url = url[:-1]
     try:
         for page in range(1, count):
@@ -100,13 +93,14 @@ def make_list(url : str, count : int) -> list:
 if __name__ == "__main__":
     logging.basicConfig(level=logging.INFO, filename=os.path.join("py_log.log"), filemode="w")
 
-    parser = argparse.ArgumentParser(description = "Count and type of images")
-    parser.add_argument('-c','--count',type=int, default=1000, help='Count of images')
-    parser.add_argument('-o', '--object', type=str, default='rose', help='Type of object for search')
-    args = parser.parse_args()
+    with open(os.path.join("Lab1", "input_data.json"), 'r') as fjson:
+        fj = json.load(fjson)
 
-    url_images= f"https://www.bing.com/images/search?q={args.object}.jpg&first=1"
-    count_images = args.count
+    URL = fj["search_url"]
+    HEADERS = fj["headers"]
+    COUNT = fj["counter"]
+    MAIN_FOLDER =  fj["main_folder"]
+    OBJECT = fj["object"]
 
-    images = make_list(url_images, count_images)
-    download(images, os.path.join(MAIN_FOLDER, args.object).replace("\\", "/"), count_images)
+    images = make_list(URL, COUNT)
+    download(images, os.path.join(MAIN_FOLDER, OBJECT).replace("\\", "/"), COUNT)

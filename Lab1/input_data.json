@@ -1,0 +1,8 @@
+{   
+    "headers":{"User-Agent":"Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/116.0.0.0 Safari/537.36",
+               "Referer":"https://www.bing.com/"},
+    "object": "rose", 
+    "search_url":"https://www.bing.com/images/search?q={object}&first=1",
+    "main_folder":"Lab1/dataset",
+    "counter": 50
+}
