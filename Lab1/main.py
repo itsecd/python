@@ -42,7 +42,8 @@ def download(
         url_list = make_list(url.replace("search", cd)) 
         for exile in url_list:
             total_files = len(os.listdir(os.path.join(folder, cd))) 
-            if total_files > max_files: continue
+            if total_files > max_files: 
+                continue
             try:
                 src = exile["src"]
                 response = requests.get(src)
@@ -56,7 +57,7 @@ def download(
             except Exception as ex:
                 incorrect_url += 1
                 logging.error(f"Total incorrect URL: {incorrect_url}")
-            logging.info(f"Completoin of data loading")
+    logging.info(f"Completoin of data loading")
 
 if __name__ == "__main__":
     with open(os.path.join("Lab1", "main.json"), "r") as main_file: 
