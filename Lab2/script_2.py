@@ -1,11 +1,10 @@
-import csv
 import json
 import os
 import logging
 import shutil
-from script_1 import create_csv
+from script_1 import create_csv, write_in_csv
 
-def make_new_folder(name_csv : str, img_class : str, directory : str) -> None:
+def make_new_fold(name_csv : str, img_class : str, directory : str) -> None:
     try:
         create_csv(name_csv)
         number_of_img = len(os.listdir(os.path.join(directory, img_class)))
@@ -19,23 +18,9 @@ def make_new_folder(name_csv : str, img_class : str, directory : str) -> None:
         logging.error(f"Error of copy img : {img} | {ex}")
 
 
-def write_in_csv(name_csv : str, img_class : str, directory : str) -> None:
-    try:    
-        row = [
-            os.path.abspath(directory).replace("\\", "/"),
-            directory.replace("\\", "/"),
-            img_class
-        ]
-        with open(f"{name_csv}.csv", "a") as file:
-            writer = csv.writer(file)
-            writer.writerow(row)
-    except Exception as ex:
-        logging.error(f"Error of writing row in csv: {ex}")
-
-
 if __name__ == "__main__":
     with open(os.path.join("Lab1", "input_data.json"), 'r') as fjson:
         fj = json.load(fjson)
 
     logging.basicConfig(level=logging.INFO)
-    make_new_folder("Lab2/dataset_new", fj["object"], fj["main_folder"])
+    make_new_fold("Lab2/dataset_new", fj["object"], fj["main_folder"])
