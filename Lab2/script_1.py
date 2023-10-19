@@ -33,4 +33,4 @@ if __name__ == '__main__':
         fj = json.load(fjson)
 
     logging.basicConfig(level=logging.INFO)
-    write_in_file("dataset", fj["object"], os.path.join("Lab1", fj["main_folder"]))
+    write_in_file("Lab2/dataset", fj["object"], fj["main_folder"])
