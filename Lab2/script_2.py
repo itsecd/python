@@ -22,5 +22,8 @@ if __name__ == "__main__":
     with open(os.path.join("Lab1", "input_data.json"), 'r') as fjson:
         fj = json.load(fjson)
 
+    with open("Lab2/src_csv.json", "r") as srcjson:
+        sj = json.load(srcjson)
+
     logging.basicConfig(level=logging.INFO)
-    make_new_fold("Lab2/dataset_new", fj["object"], fj["main_folder"])
+    make_new_fold(os.path.join("Lab2", sj["together"]), fj["object"], fj["main_folder"])
