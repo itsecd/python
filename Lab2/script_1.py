@@ -15,10 +15,11 @@ def create_csv(name_csv : str) -> None:
 def write_in_file(name_csv : str, img_class : str, directory : str) -> None:
     try:
         create_csv(name_csv)
-        for img in range(len(os.listdir(os.path.join(directory, img_class)))):
+        number_of_img = len(os.listdir(os.path.join(directory, img_class)))
+        for img in range(number_of_img):
             row = [
-                os.path.abspath(os.path.join(directory, img_class, f"{img:04}.jpg")),
-                os.path.join(directory, img_class, f"{img:04}.jpg"),
+                os.path.abspath(os.path.join(directory, img_class, f"{img:04}.jpg")).replace("\\", '/'),
+                os.path.join(directory, img_class, f"{img:04}.jpg").replace("\\", '/'),
                 img_class
             ]
             with open(f"{name_csv}.csv", "a") as file:
