@@ -28,6 +28,19 @@ def make_new_folder(name_csv : str, img_class : str, directory : str) -> None:
         logging.error(f"Error of copy img : {img} | {ex}")
 
 
+def write_in_csv(name_csv : str, img_class : str, directory : str) -> None:
+    try:    
+        row = [
+            os.path.abspath(directory).replace("\\", "/"),
+            directory.replace("\\", "/"),
+            img_class
+        ]
+        with open(f"{name_csv}.csv", "a") as file:
+            writer = csv.writer(file)
+            writer.writerow(row)
+    except Exception as ex:
+        logging.error(f"Error of writing row in csv: {ex}")
+
 
 if __name__ == "__main__":
     with open(os.path.join("Lab1", "input_data.json"), 'r') as fjson:
