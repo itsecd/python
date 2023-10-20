@@ -1,12 +1,13 @@
 import os
 import logging
 import requests
-import chardet
 import argparse
+from fake_headers import Headers
 from bs4 import BeautifulSoup
 
-BASE_URL = "https://otzovik.com/reviews"
-HEADERS = {"User-Agent":"Mozilla/5.0"}
+BASE_URL = "https://www.banki.ru/services/responses/bank"
+HEADER = Headers(browser="chrome", os="win", headers=True)
+TIMEOUTS = (6, 60)
 
 
 logging.basicConfig(level=logging.INFO)
@@ -23,46 +24,64 @@ def create_folder(name:str) -> None:
 
 def get_page(URL: str) -> str:
     """This function decoding url for later use"""
-    html_page = requests.get(URL, headers=HEADERS, timeout=10)
-    encode = chardet.detect(html_page.content)['encoding']
-    decoded_html_page = html_page.content.decode(encode)
-    soup = BeautifulSoup(decoded_html_page, features="html.parser")
+    html_page = requests.get(URL, headers=HEADER.generate(), timeout=TIMEOUTS)
+    soup = BeautifulSoup(html_page.text, "lxml")
     return soup
 
 
-def w_review_to_txt_file(dataset_name: str, link: str, n_of_reviews:int)-> dict[str, int]:
-    """This function creating review file in corresponding folder"""
+def get_review_links(URL:str) -> list[str]:
+    """This function gets all review links from the page"""
+    soup = get_page(URL)
+    links = soup.findAll('div', "l22dd3882")
+    review_links = []
+    for link in links:
+        review_links.append(f"{"https://www.banki.ru"}{link.find('a').get('href')}")
+    return review_links
+
+
+def create_txt(count:int, dataset_name: str, rating: int, review: str)-> None:
+    """This function creates a new txt file review in corresponding folder"""
+    rate_folder = os.path.join(dataset_name, f'{rating}').replace("\\","/")
+    create_folder(rate_folder)
+    review_filename = f"{count:04}.txt"
+    review_path = os.path.join(rate_folder, review_filename)
+    with open(review_path, mode="w", encoding="utf-8") as review_file:
+        review_file.write(review)
+
+
+def review_file(dataset_name: str, link: str, review_count:int)-> None:
+    """This function gets review links, checks if the file exist, if not creates a new one"""
     create_folder(dataset_name)
     for rating in range(1, 6):
         page = 1
         count = 0
-        while count < n_of_reviews:
-            url = f"{BASE_URL}/{link}/{page}/?ratio={rating}"
-            soup = get_page(url)
-            reviews = soup.find_all('div', itemprop ='review')
-            for review in reviews:
-                review_url = review["review-teaser"]
-                if review_url:
-                    try:
-                        review_data = requests.get(review_url, headers=HEADERS, timeout=10).content
-                        rate_folder = os.path.join(dataset_name, page).replace("\\","/")
-                        create_folder(rate_folder)
-                        review_filename = f"{count:04}.txt"
-                        review_path = os.path.join(rate_folder, review_filename)
-                        with open(review_path, "w") as review_file:
-                            review_file.write(review_data)
-                        count +=1
-                        if count >= n_of_reviews:
-                            break
-                    except Exception as exc:
-                        logging.exception(f"Error downloading review:{exc.args}\n")
-            page += 1
+        while count < review_count:
+            if not os.path.exists(os.path.join(os.path.join(dataset_name, f'{rating}').replace("\\","/"), f"{count:04}.txt")):
+                url = f"{BASE_URL}/{link}/?page={page}/?type=all&rate={rating}"
+                review_links = get_review_links(url)
+                for review_link in review_links:
+                    if not os.path.exists(os.path.join(os.path.join(dataset_name, f'{rating}').replace("\\","/"), f"{count:04}.txt")):
+                        review = get_page(review_link).find('p').text
+                        review_test = review.replace("\t", "")
+                        if review_test != "\nПомогите другим пользователям выбрать лучший банк\n":
+                            try:
+                                create_txt(count, dataset_name, rating, review)
+                                count +=1
+                                if count >= review_count:
+                                    break
+                            except Exception as exc:
+                                logging.exception(f"Error downloading review:{exc.args}\n")
+                page += 1
+            else:
+                count += 1
+                if count % 25 == 0:
+                    page += 1
         logging.info(f"All reviews for {rating} rating has been downloaded")
 
 if __name__=="__main__":
     parser = argparse.ArgumentParser(description='Input path name for reviews, link for parsing, count of reviews')
     parser.add_argument('--path', type=str,default="dataset", help='Input path name for reviews')
-    parser.add_argument('--link',type=str,default="sberbank_rossii" ,help='Input link of the reviews')
+    parser.add_argument('--link',type=str,default="alfabank" ,help='Input link of the reviews')
     parser.add_argument('--count',type=int,default=500, help='Input count of reviews')
     args = parser.parse_args()
-    w_review_to_txt_file(args.path, args.link, args.count)
+    review_file(args.path, args.link, args.count)
