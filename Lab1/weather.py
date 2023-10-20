@@ -4,9 +4,10 @@ import bs4
 import requests
 import csv
 from datetime import datetime
-from dateutil.relativedelta import relativedelta
+from dateutil.relativedelta import *
 from fake_headers import Headers
-import pandas as pd
+import logging
+import argparse
 import os
 
 URL = 'https://www.gismeteo.ru/diary/'
@@ -24,12 +25,12 @@ def get_list_of_date(start_date: datetime, end_date: datetime) -> list:
     Эта функция возвращает список с датами типа ['2008/01', '2008/02', '2008/03'], 
     чтобы запрашивать актуальный месяц погоды
     '''
-    res = pd.date_range(
-        start_date,
-        end_date+relativedelta(months=1),
-        freq='M'
-        ).strftime('%Y/%m').tolist()
-    return res
+    list_of_date = list()
+    while start_date < end_date:
+        list_of_date.append(start_date.strftime('%Y/%m'))
+        start_date = start_date + relativedelta(months=+1)
+
+    return list_of_date
 
 
 def get_data(url: str) -> str:
@@ -44,7 +45,7 @@ def get_data(url: str) -> str:
             )
         return requests.get(url=url, headers=header.generate()).text
     except Exception as e:
-        print(e)
+        logging.error(e)
 
 
 def get_rows_of_weather_table(data: str, date: str) -> bs4.element.ResultSet:
@@ -53,6 +54,7 @@ def get_rows_of_weather_table(data: str, date: str) -> bs4.element.ResultSet:
     с атрибутами align=center
     '''
     try:
+        logging.info(f"Выкачиваем данные за {date}")
         soup = bs4.BeautifulSoup(data, 'html.parser')
         rows = soup.find_all("tr", {"align": "center"})
         ans = list()
@@ -62,12 +64,12 @@ def get_rows_of_weather_table(data: str, date: str) -> bs4.element.ResultSet:
             ans.append(row)
         return ans
     except Exception as e:
-        print(e)
+        logging.error(e)
 
 
 def write_weather_csv(code_sity: str, path: str, start_date: datetime, end_date: datetime):
     '''
-    Эта функция запрашивает и инициалезирует остальные функции и формирует csv файл
+    Эта функция запрашивает и инициализирует остальные функции и формирует csv файл
     '''
     dates = get_list_of_date(start_date, end_date)
     
@@ -89,10 +91,39 @@ def write_weather_csv(code_sity: str, path: str, start_date: datetime, end_date:
                 for i in rows:
                     writer.writerow(i)
     except Exception as e:
-        print(e)
+        logging.error(e)
+
 
 if __name__ == '__main__':
-    write_weather_csv(code_sity='4618', 
-                      path='./paaaath', 
-                      start_date=datetime(2008, 1, 1), 
-                      end_date=datetime.now())
+    parser = argparse.ArgumentParser(description='My example explanation')
+    parser.add_argument(
+        '-code_sity',
+        type=str,
+        default='4618',
+        help='provide an string (default: 4618)'
+    )
+    parser.add_argument(
+        '-path',
+        type=str,
+        default='./',
+        help='provide an string (default: ./)'
+    )
+    parser.add_argument(
+        '-start_date',
+        type=datetime,
+        default=datetime(2008, 1, 1),
+        help='provide an datetime (default: datetime(2008, 1, 1))'
+    )
+    parser.add_argument(
+        '-end_date',
+        type=datetime,
+        default=datetime.now(),
+        help='provide an datetime (default: datetime.now())'
+    )
+    namespace = parser.parse_args()
+
+    logging.basicConfig(level=logging.INFO)
+    write_weather_csv(code_sity=namespace.code_sity, 
+                      path=namespace.path, 
+                      start_date=namespace.start_date, 
+                      end_date=namespace.end_date)
