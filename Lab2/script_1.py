@@ -4,9 +4,16 @@ import os
 import logging
 from get_way import get_path_normal
 
-SRC = "Lab2/dataset"
-
 def create_csv(name_csv : str) -> None:
+    """
+    Create csv file
+
+    Create csv file using a name_csv
+    Parameters
+    ----------
+    name_csv : str
+        Name of csv file
+    """
     try:
         if not os.path.exists(name_csv):
             with open(f"{name_csv}.csv", "w", newline='') as file:
@@ -16,6 +23,19 @@ def create_csv(name_csv : str) -> None:
         logging.error(f"Error create csv file: {ex}")
 
 def write_in_file(name_csv : str, img_classes : list, directory : str) -> None:
+    """
+    Pick over objects
+
+    Pick over objects
+    Parameters
+    ----------
+    name_csv : str
+        Name of csv file
+    img_classes : list
+        List if objects
+    directory : str
+        Directory where is our img
+    """
     try:
         create_csv(name_csv)
         for img_class in img_classes:
@@ -26,6 +46,19 @@ def write_in_file(name_csv : str, img_classes : list, directory : str) -> None:
         logging.error(f"Error of add to csv file : {img} | {ex}")
 
 def write_in_csv(name_csv : str, img_class : str, directory : str) -> None:
+    """
+    Write in csv file
+
+    Wrute in csv file
+    Parameters
+    ----------
+    name_csv : str
+        Name of csv file
+    img_class : str
+        Name of object
+    directory : str
+        Directory where is our img
+    """
     try:    
         row = [
             os.path.abspath(directory).replace("\\", "/"),

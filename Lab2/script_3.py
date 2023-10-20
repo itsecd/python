@@ -7,7 +7,18 @@ from script_1 import create_csv, write_in_csv
 from get_way import get_path_random
 from iterator import Iterator
 
-def make_new_fold(name_csv : str, img_classes : list, directory : str) -> None:
+def make_new_fold(name_csv : str, img_classes : list) -> None:
+    """
+    Make new csv file
+
+    Make new csv file
+    Parameters
+    ----------
+    name_csv : str
+        Name of csv file
+    img_classes : str
+        List of objects
+    """
     try:
         create_csv(name_csv)
         for img_class in img_classes:
@@ -35,4 +46,4 @@ if __name__ == '__main__':
         os.mkdir(os.path.join(fj["main_folder"], sj["random"]))
 
     logging.basicConfig(level=logging.INFO)
-    make_new_fold(os.path.join("Lab2", sj["random"]), fj["objects"], fj["main_folder"])
+    make_new_fold(os.path.join("Lab2", sj["random"]), fj["objects"])
