@@ -12,7 +12,7 @@ def make_new_fold(name_csv : str, img_classes : list, directory : str) -> None:
             number_of_img = len(os.listdir(os.path.join(directory, img_class)))
             for img in range(number_of_img):
                 _random = random.randint(0, 10000)
-                shutil.copyfile(os.path.join(directory, img_class, f"{img:04}.jpg"), os.path.join(directory, f"{_random}.jpg"))
+                shutil.copyfile(os.path.join(directory, img_class, f"{img:04}.jpg"), os.path.join(directory, sj["random"], f"{_random}.jpg"))
                 # os.remove(os.path.join(directory, img_class, f"{img:04}.jpg"))
 
                 write_in_csv(name_csv, img_class, os.path.join(directory, f"{_random}.jpg"))

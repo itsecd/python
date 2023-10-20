@@ -10,7 +10,7 @@ def make_new_fold(name_csv : str, img_classes : list, directory : str) -> None:
         for img_class in img_classes:
             number_of_img = len(os.listdir(os.path.join(directory, img_class)))
             for img in range(number_of_img):
-                shutil.copyfile(os.path.join(directory, img_class, f"{img:04}.jpg"), os.path.join(directory, f"{img_class}_{img:04}.jpg"))
+                shutil.copyfile(os.path.join(directory, img_class, f"{img:04}.jpg"), os.path.join(directory, sj["together"], f"{img_class}_{img:04}.jpg"))
                 # os.remove(os.path.join(directory, img_class, f"{img:04}.jpg"))
 
                 write_in_csv(name_csv, img_class, os.path.join(directory, f"{img_class}_{img:04}.jpg"))
