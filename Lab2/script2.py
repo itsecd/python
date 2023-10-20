@@ -5,10 +5,13 @@ import csv
 import logging
 import script1
 
+
 logging.basicConfig(level=logging.INFO)
 
 
 def new_csv(name_new_csv: str, classes: str, directory: str, number: int) -> None:
+    '''the function creates a new csv file
+    that records the updated dataset'''
     try:
         row = [
             os.path.abspath(os.path.join(f"{classes}_{number:04}.jpg")),
@@ -25,6 +28,8 @@ def new_csv(name_new_csv: str, classes: str, directory: str, number: int) -> Non
 def download_in_new_directory(
     old_directory: str, classes: str, new_directory: str, name_csv: str
 ) -> None:
+    '''The function copies images from class folders to the dataset.
+    New file name=class+number'''
     try:
         script1.make_csv(name_csv)
         for c in classes:
@@ -44,5 +49,5 @@ if __name__ == "__main__":
     with open(os.path.join("Lab1", "fcc.json"), "r") as fcc_file:
         fcc = json.load(fcc_file)
 
-download_in_new_directory(
-    fcc["main_folder"], fcc["classes"], "dataset", "dataset_new")
+    download_in_new_directory(
+        fcc["main_folder"], fcc["classes"], "dataset", "dataset_new")
