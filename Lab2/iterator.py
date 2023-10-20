@@ -11,7 +11,8 @@ class Iterator:
         with open(self.path_csv, 'r') as file:
             csv_file = csv.reader(file)
             for row in csv_file:
-                self.list.append(row)
+                if object == row[2]:
+                    self.list.append(row)
 
     def __iter__(self):
         return self
@@ -19,7 +20,8 @@ class Iterator:
     def __next__(self) -> str:
         if self.counter < len(self.list):
             self.counter += 1
-            if self.object == self.list[self.counter][2]:
-                return self.list[self.counter][1]
+            if self.object == self.list[self.counter-1][2]:
+                return self.list[self.counter-1][1]
+            else: return None
         else:
             raise StopIteration

@@ -4,20 +4,24 @@ import random
 import logging
 import shutil
 from script_1 import create_csv, write_in_csv
-from get_way import get_path_normal, get_path_random
+from get_way import get_path_random
+from iterator import Iterator
 
 def make_new_fold(name_csv : str, img_classes : list, directory : str) -> None:
     try:
         create_csv(name_csv)
         for img_class in img_classes:
-            number_of_img = len(os.listdir(os.path.join(directory, img_class)))
-            for img in range(number_of_img):
-                _random = random.randint(0, 10000)
-                shutil.copyfile(get_path_normal(img_class, img), get_path_random(img_class, _random))
-                write_in_csv(name_csv, img_class, get_path_random(img_class, _random))
-            
+            iterator = Iterator(f'Lab2/{sj["normal"]}.csv', img_class)
+            for element in iterator:
+                if element != None and os.path.isfile(str(element)):
+                    _random = random.randint(0, 10000)
+                    shutil.copyfile(str(element), get_path_random(img_class, _random))
+                    write_in_csv(name_csv, img_class, get_path_random(img_class, _random))
+                else: 
+                    del iterator
+                    break
     except Exception as ex:
-        logging.error(f"Error of copy img : {img} | {ex}")
+        logging.error(f"Error of copy img : {iterator.counter-1} | {ex}")
 
 
 if __name__ == '__main__':
