@@ -60,17 +60,16 @@ def review_file(dataset_name: str, link: str, review_count:int)-> None:
                 url = f"{BASE_URL}/{link}/?page={page}/?type=all&rate={rating}"
                 review_links = get_review_links(url)
                 for review_link in review_links:
-                    if not os.path.exists(os.path.join(os.path.join(dataset_name, f'{rating}').replace("\\","/"), f"{count:04}.txt")):
-                        review = get_page(review_link).find('p').text
-                        review_test = review.replace("\t", "")
-                        if review_test != "\nПомогите другим пользователям выбрать лучший банк\n":
-                            try:
-                                create_txt(count, dataset_name, rating, review)
-                                count +=1
-                                if count >= review_count:
-                                    break
-                            except Exception as exc:
-                                logging.exception(f"Error downloading review:{exc.args}\n")
+                    review = get_page(review_link).find('p').text
+                    review_test = review.replace("\t", "")
+                    if review_test != "\nПомогите другим пользователям выбрать лучший банк\n":
+                        try:
+                            create_txt(count, dataset_name, rating, review)
+                            count +=1
+                            if count >= review_count:
+                                break
+                        except Exception as exc:
+                            logging.exception(f"Error downloading review:{exc.args}\n")
                 page += 1
             else:
                 count += 1
