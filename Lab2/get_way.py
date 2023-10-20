@@ -1,9 +1,9 @@
 def get_path_together(object : str, number : int) -> str:
-    return f"dataset/{object}_{number:04}.jpg"
+    return f"dataset/dataset_together/{object}_{number:04}.jpg"
 
 
 def get_path_random(object : str, number : int) -> str:
-    return f"dataset/{number:04}.jpg"
+    return f"dataset/dataset_random/{number:04}.jpg"
 
 
 def get_path_normal(object : str, number : int) -> str:
