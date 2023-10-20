@@ -3,29 +3,28 @@ import requests
 from bs4 import BeautifulSoup
 
 
-
 class ImageScrapper():
     '''This class that searches for a given number of images, a given size, at the specified URL'''
 
-    def __init__(self, _dir : str, _main_dir : str, _url : str, _header : dict[str,str]):
-        self.dir = _dir
-        self.url = _url
-        self.header = _header
-        self.main_dir = _main_dir
-        self.dataset = set()
+    def __init__(self, dir : str, main_dir : str, url : str, header : dict[str,str]):
+        self._dir = dir
+        self._url = url
+        self._header = header
+        self._main_dir = main_dir
+        self._dirdataset = set()
 
     def create_dir(self):
         '''This Method that creates a directory for the dataset at the specified address'''
         try:
-            os.makedirs(os.path.join(self.main_dir, self.dir))
+            os.makedirs(os.path.join(self._main_dir, self._dir))
         except:
             print("[Error]: A folder with the same name already exists")
    
     def get_page_imgs(self, number_page: int, min_width : int) -> list:
         '''This method parses the page and searches for all tags with the value "img" on the page'''
-        url_new = self.url[:-1] 
+        url_new = self._url[:-1] 
         url_pages:str = f"{url_new}{number_page}"
-        html = requests.get(url_pages, self.header)
+        html = requests.get(url_pages, self._header)
         soup = BeautifulSoup(html.text, "lxml")
         elements = soup.findAll("img")
         imgs = []
@@ -40,7 +39,7 @@ class ImageScrapper():
         page = 1
         except_count=0  
         list_response = []
-        while len(self.dataset) < max_files:
+        while len(self._dataset) < max_files:
             src_list = self.get_page_imgs(page, min_width)
             for src in src_list: 
                 try:
@@ -53,14 +52,14 @@ class ImageScrapper():
                 except:
                     except_count+=1
             page += 1            
-            self.dataset = set(list_response)
-            print(len(self.dataset))
+            self._dataset = set(list_response)
+            print(len(self._dataset))
         print(f"Quantity ncorrect URL={except_count}")
-        return self.dataset  
+        return self._dataset  
 
     def download(self):
         '''This method downloads files from the collected dataset to the specified directory''' 
         self.create_dir()
-        for count, img in enumerate(self.dataset):
-            with open(os.path.join( self.main_dir, self.dir, f"{count + 1:04}.jpg").replace("\\","/"), "wb") as file:
+        for count, img in enumerate(self._dataset):
+            with open(os.path.join( self._main_dir, self._dir, f"{count + 1:04}.jpg"), "wb") as file:
                 file.write(img.content)            
