@@ -6,9 +6,9 @@ from bs4 import BeautifulSoup
 class ImageScrapper():
     '''This class that searches for a given number of images, a given size, at the specified URL'''
 
-    def __init__(self, dir : str, main_dir : str, url : str, header : dict[str,str]):
+    def __init__(self, dir : str, main_dir : str, querry : str, header : dict[str,str]):
         self._dir = dir
-        self._url = url
+        self._url = f"https://www.bing.com/images/search?q={querry}&&first=1"
         self._header = header
         self._main_dir = main_dir
         self._dirdataset = set()
