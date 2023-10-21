@@ -100,25 +100,25 @@ if __name__ == '__main__':
         '-code_sity',
         type=str,
         default='4618',
-        help='provide an string (default: 4618)'
+        help='provide a string (default: 4618)'
     )
     parser.add_argument(
         '-path',
         type=str,
         default='./',
-        help='provide an string (default: ./)'
+        help='provide a string (default: ./)'
     )
     parser.add_argument(
         '-start_date',
         type=datetime,
         default=datetime(2008, 1, 1),
-        help='provide an datetime (default: datetime(2008, 1, 1))'
+        help='provide a datetime (default: datetime(2008, 1, 1))'
     )
     parser.add_argument(
         '-end_date',
         type=datetime,
         default=datetime.now(),
-        help='provide an datetime (default: datetime.now())'
+        help='provide a datetime (default: datetime.now())'
     )
     namespace = parser.parse_args()
 
