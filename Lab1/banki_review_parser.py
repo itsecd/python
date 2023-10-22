@@ -39,7 +39,7 @@ def get_review_links(URL:str) -> list[str]:
     return review_links
 
 
-def create_txt(count:int, dataset_name: str, rating: int, review: str)-> None:
+def create_txt(count:int, dataset_name: str, rating: int, review: str) -> None:
     """This function creates a new txt file review in corresponding folder"""
     rate_folder = os.path.join(dataset_name, f'{rating}')
     create_folder(rate_folder)
@@ -49,32 +49,32 @@ def create_txt(count:int, dataset_name: str, rating: int, review: str)-> None:
         review_file.write(review)
 
 
-def review_file(dataset_name: str, link: str, review_count:int)-> None:
+def review_file(dataset_name: str, link: str, review_count:int) -> None:
     """This function gets review links, checks if the file exist, if not creates a new one"""
     create_folder(dataset_name)
     for rating in range(1, 6):
         page = 1
         count = 0
         while count < review_count:
-            if not os.path.exists(os.path.join(os.path.join(dataset_name, f'{rating}'), f"{count:04}.txt")):
                 url = f"{BASE_URL}/{link}/?page={page}/?type=all&rate={rating}"
                 review_links = get_review_links(url)
                 for review_link in review_links:
-                    review = get_page(review_link).find('div', class_='lfd76152f').text.strip()
-                    if review:
-                        try:
-                            create_txt(count, dataset_name, rating, review)
-                            logging.info(f"Review {count:04}.txt has been downloaded")
-                            count +=1
-                            if count >= review_count:
-                                break
-                        except Exception as exc:
-                            logging.exception(f"Error downloading review:{exc.args}\n")
+                    if not os.path.exists(os.path.join(os.path.join(dataset_name, f'{rating}'), f"{count:04}.txt")):
+                        review = get_page(review_link).find('div', class_='lfd76152f').text.strip()
+                        if review:
+                            try:
+                                create_txt(count, dataset_name, rating, review)
+                                logging.info(f"Review {count:04}.txt has been downloaded")
+                                count +=1
+                            except Exception as exc:
+                                logging.exception(f"Error downloading review:{exc.args}\n")
+                        if count == review_count:
+                            break
+                    else:
+                        count += 1
+                        if count % 25 == 0:
+                            page += 1
                 page += 1
-            else:
-                count += 1
-                if count % 25 == 0:
-                    page += 1
         logging.info(f"All reviews for {rating} rating has been downloaded")
 
 if __name__=="__main__":
