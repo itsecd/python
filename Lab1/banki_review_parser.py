@@ -50,7 +50,7 @@ def create_txt(count:int, dataset_name: str, rating: int, review: str) -> None:
 
 
 def review_file(dataset_name: str, link: str, review_count:int) -> None:
-    """This function gets review links, checks if the file exist, if not creates a new one"""
+    """This function gets review links, checks if the file exists, if not creates a new one"""
     create_folder(dataset_name)
     for rating in range(1, 6):
         page = 1
@@ -68,12 +68,13 @@ def review_file(dataset_name: str, link: str, review_count:int) -> None:
                                 count +=1
                             except Exception as exc:
                                 logging.exception(f"Error downloading review:{exc.args}\n")
-                        if count == review_count:
-                            break
                     else:
+                        logging.info(f"Review {count:04}.txt already exists")
                         count += 1
                         if count % 25 == 0:
                             page += 1
+                    if count == review_count:
+                        break
                 page += 1
         logging.info(f"All reviews for {rating} rating has been downloaded")
 
