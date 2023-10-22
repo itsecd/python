@@ -60,14 +60,14 @@ def review_file(dataset_name: str, link: str, review_count:int)-> None:
                 url = f"{BASE_URL}/{link}/?page={page}/?type=all&rate={rating}"
                 review_links = get_review_links(url)
                 for review_link in review_links:
-                    review = get_page(review_link).find('div', class_='lfd76152f').text
-                    review_test = review.replace("\t", "")
-                    if review_test != "\nПомогите другим пользователям выбрать лучший банк\n":
+                    review = get_page(review_link).find('div', class_='lfd76152f').text.strip()
+                    if review:
                         try:
                             create_txt(count, dataset_name, rating, review)
-                            count +=1
-
                             logging.info(f"Review {count:04}.txt has been downloaded")
+                            count +=1
+                            if count >= review_count:
+                                break
                         except Exception as exc:
                             logging.exception(f"Error downloading review:{exc.args}\n")
                 page += 1
