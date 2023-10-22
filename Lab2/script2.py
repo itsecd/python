@@ -1,7 +1,6 @@
 import os
 import json
 import shutil
-import csv
 import logging
 import script1
 
@@ -9,29 +8,13 @@ import script1
 logging.basicConfig(level=logging.INFO)
 
 
-def new_csv(name_new_csv: str, classes: str, directory: str, number: int) -> None:
-    '''the function creates a new csv file
-    that records the updated dataset'''
-    try:
-        row = [
-            os.path.abspath(os.path.join(f"{classes}_{number:04}.jpg")),
-            (os.path.join(directory, f"{classes}_{number:04}.jpg")),
-            classes,
-        ]
-        with open(f"{name_new_csv}.csv", "a") as file:
-            writer = csv.writer(file, lineterminator="\n")
-            writer.writerow(row)
-    except:
-        logging.error(f"Failed to write data: {ex.message}\n{ex.args}\n")
-
-
 def download_in_new_directory(
     old_directory: str, classes: str, new_directory: str, name_csv: str
 ) -> None:
-    '''The function copies images from class folders to the dataset.
-    New file name=class+number'''
+    """The function copies images from class folders to the dataset.
+    New file name=class+number"""
     try:
-        script1.make_csv(name_csv)
+        img_list = list()
         for c in classes:
             count_files = len(os.listdir(os.path.join(old_directory, c)))
             for i in range(count_files):
@@ -40,7 +23,9 @@ def download_in_new_directory(
                 f = os.path.abspath(os.path.join(
                     new_directory, f"{c}_{i:04}.jpg"))
                 shutil.copy(r, f)
-                new_csv(name_csv, c, new_directory, i)
+                l = [[f, os.path.relpath(f), c]]
+                img_list += l
+        script1.write_in_file(name_csv, img_list)
     except:
         logging.error(f"Failed to write")
 
@@ -50,4 +35,5 @@ if __name__ == "__main__":
         fcc = json.load(fcc_file)
 
     download_in_new_directory(
-        fcc["main_folder"], fcc["classes"], "dataset", "dataset_new")
+        fcc["main_folder"], fcc["classes"], "dataset", "dataset_new"
+    )
