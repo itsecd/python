@@ -60,14 +60,14 @@ def review_file(dataset_name: str, link: str, review_count:int)-> None:
                 url = f"{BASE_URL}/{link}/?page={page}/?type=all&rate={rating}"
                 review_links = get_review_links(url)
                 for review_link in review_links:
-                    review = get_page(review_link).find('p').text
+                    review = get_page(review_link).find('div', class_='lfd76152f').text
                     review_test = review.replace("\t", "")
                     if review_test != "\nПомогите другим пользователям выбрать лучший банк\n":
                         try:
                             create_txt(count, dataset_name, rating, review)
                             count +=1
-                            if count >= review_count:
-                                break
+
+                            logging.info(f"Review {count:04}.txt has been downloaded")
                         except Exception as exc:
                             logging.exception(f"Error downloading review:{exc.args}\n")
                 page += 1
@@ -78,6 +78,7 @@ def review_file(dataset_name: str, link: str, review_count:int)-> None:
         logging.info(f"All reviews for {rating} rating has been downloaded")
 
 if __name__=="__main__":
+    """This soft is designed to download reviews of banks from https://banki.ru"""
     parser = argparse.ArgumentParser(description='Input path name for reviews, link for parsing, count of reviews')
     parser.add_argument('--path', type=str,default="dataset", help='Input path name for reviews')
     parser.add_argument('--link',type=str,default="services/responses/bank/alfabank" ,help='Input link of the reviews')
