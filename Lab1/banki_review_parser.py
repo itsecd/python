@@ -69,10 +69,6 @@ def review_file(dataset_name: str, link: str, review_count:int) -> None:
                             logging.exception(f"Error downloading review:{exc.args}\n")
                 else:
                     count += 1
-                    if count % 25 == 0:
-                        page += 1
-                if count == review_count:
-                    break
             logging.info(f"Review {count-25:04}-{count-1:04} has been downloaded")
             page += 1
         logging.info(f"All reviews for {rating} rating has been downloaded")
