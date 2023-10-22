@@ -64,17 +64,16 @@ def review_file(dataset_name: str, link: str, review_count:int) -> None:
                         if review:
                             try:
                                 create_txt(count, dataset_name, rating, review)
-                                logging.info(f"Review {count:04}.txt has been downloaded")
                                 count +=1
                             except Exception as exc:
                                 logging.exception(f"Error downloading review:{exc.args}\n")
                     else:
-                        logging.info(f"Review {count:04}.txt already exists")
                         count += 1
                         if count % 25 == 0:
                             page += 1
                     if count == review_count:
                         break
+                logging.info(f"Review {count-25:04}-{count-1:04} has been downloaded")
                 page += 1
         logging.info(f"All reviews for {rating} rating has been downloaded")
 
