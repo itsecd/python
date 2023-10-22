@@ -56,26 +56,27 @@ def review_file(dataset_name: str, link: str, review_count:int) -> None:
         page = 1
         count = 0
         while count < review_count:
-                url = f"{BASE_URL}/{link}/?page={page}/?type=all&rate={rating}"
-                review_links = get_review_links(url)
-                for review_link in review_links:
-                    if not os.path.exists(os.path.join(os.path.join(dataset_name, f'{rating}'), f"{count:04}.txt")):
-                        review = get_page(review_link).find('div', class_='lfd76152f').text.strip()
-                        if review:
-                            try:
-                                create_txt(count, dataset_name, rating, review)
-                                count +=1
-                            except Exception as exc:
-                                logging.exception(f"Error downloading review:{exc.args}\n")
-                    else:
-                        count += 1
-                        if count % 25 == 0:
-                            page += 1
-                    if count == review_count:
-                        break
-                logging.info(f"Review {count-25:04}-{count-1:04} has been downloaded")
-                page += 1
+            url = f"{BASE_URL}/{link}/?page={page}/?type=all&rate={rating}"
+            review_links = get_review_links(url)
+            for review_link in review_links:
+                if not os.path.exists(os.path.join(os.path.join(dataset_name, f'{rating}'), f"{count:04}.txt")):
+                    review = get_page(review_link).find('div', class_='lfd76152f').text.strip()
+                    if review:
+                        try:
+                            create_txt(count, dataset_name, rating, review)
+                            count +=1
+                        except Exception as exc:
+                            logging.exception(f"Error downloading review:{exc.args}\n")
+                else:
+                    count += 1
+                    if count % 25 == 0:
+                        page += 1
+                if count == review_count:
+                    break
+            logging.info(f"Review {count-25:04}-{count-1:04} has been downloaded")
+            page += 1
         logging.info(f"All reviews for {rating} rating has been downloaded")
+
 
 if __name__=="__main__":
     """This soft is designed to download reviews of banks from https://banki.ru"""
