@@ -5,7 +5,7 @@ import argparse
 from fake_headers import Headers
 from bs4 import BeautifulSoup
 
-BASE_URL = "https://www.banki.ru/services/responses/bank"
+BASE_URL = "https://www.banki.ru"
 HEADER = Headers(browser="chrome", os="win", headers=True)
 TIMEOUTS = (6, 60)
 
@@ -35,13 +35,13 @@ def get_review_links(URL:str) -> list[str]:
     links = soup.findAll('div', "l22dd3882")
     review_links = []
     for link in links:
-        review_links.append(f"{"https://www.banki.ru"}{link.find('a').get('href')}")
+        review_links.append(f"{BASE_URL}{link.find('a').get('href')}")
     return review_links
 
 
 def create_txt(count:int, dataset_name: str, rating: int, review: str)-> None:
     """This function creates a new txt file review in corresponding folder"""
-    rate_folder = os.path.join(dataset_name, f'{rating}').replace("\\","/")
+    rate_folder = os.path.join(dataset_name, f'{rating}')
     create_folder(rate_folder)
     review_filename = f"{count:04}.txt"
     review_path = os.path.join(rate_folder, review_filename)
@@ -56,7 +56,7 @@ def review_file(dataset_name: str, link: str, review_count:int)-> None:
         page = 1
         count = 0
         while count < review_count:
-            if not os.path.exists(os.path.join(os.path.join(dataset_name, f'{rating}').replace("\\","/"), f"{count:04}.txt")):
+            if not os.path.exists(os.path.join(os.path.join(dataset_name, f'{rating}'), f"{count:04}.txt")):
                 url = f"{BASE_URL}/{link}/?page={page}/?type=all&rate={rating}"
                 review_links = get_review_links(url)
                 for review_link in review_links:
@@ -80,7 +80,7 @@ def review_file(dataset_name: str, link: str, review_count:int)-> None:
 if __name__=="__main__":
     parser = argparse.ArgumentParser(description='Input path name for reviews, link for parsing, count of reviews')
     parser.add_argument('--path', type=str,default="dataset", help='Input path name for reviews')
-    parser.add_argument('--link',type=str,default="alfabank" ,help='Input link of the reviews')
+    parser.add_argument('--link',type=str,default="services/responses/bank/alfabank" ,help='Input link of the reviews')
     parser.add_argument('--count',type=int,default=500, help='Input count of reviews')
     args = parser.parse_args()
     review_file(args.path, args.link, args.count)
