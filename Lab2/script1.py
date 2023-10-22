@@ -52,4 +52,4 @@ if __name__ == "__main__":
         fcc = json.load(fcc_file)
 
     l = make_list("dataset", fcc["classes"])
-    write_in_file("dataset", l)
+    write_in_file("datasets", l)

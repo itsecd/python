@@ -1,8 +1,7 @@
-import random
 import os
 import json
+import random
 import shutil
-import csv
 import logging
 import script1
 
