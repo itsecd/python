@@ -45,14 +45,31 @@ def get_page(page) -> BeautifulSoup:
         logging.error(f"Необработанная ошибка")
         return None
 
+def review_text(review_block):
+    text_element = review_block.find('div', class_="brand_words")
+    if text_element is not None:
+        return text_element.get_text()
+    else:
+        return "Текст рецензии не найден"
+
+def save_review_to_file(review_text, folder_name, film_title):
+    if folder_name not in ["good", "bad"]:
+        logging.error(f"Неправильное имя папки: {folder_name}")
+        return
+
+    reviews_count = len(os.listdir(os.path.join("dataset", folder_name)))
+    unique_id = str(reviews_count + 1).zfill(4)
+    category = "good" if folder_name == "good" else "bad"
+    file_name = f"{unique_id}_{category}.txt"
+    file_path = os.path.join("dataset", folder_name, file_name)
+
+    with open(file_path, "w", encoding="utf-8") as file:
+        file.write(f"Film: {film_title}\n")
+        file.write(review_text)
+
 def process_review(review_block, good_reviews, bad_reviews):
     try:
-        text_element = review_block.find('div', class_="brand_words")
-        if text_element is not None:
-            review_text = text_element.get_text()
-        else:
-            review_text = "Текст рецензии не найден"
-            print(review_text)
+        review_text = review_text(review_block)
         element = review_block.find('ul', class_='voter')
         if element:
             li_elements = element.find_all('li')
@@ -63,28 +80,17 @@ def process_review(review_block, good_reviews, bad_reviews):
                     category = "bad"
                 else:
                     category = "good"
-
-                if category == "good":
-                    folder_name = "good"
-                    good_reviews_count = len(os.listdir(os.path.join("dataset", folder_name)))
-                    unique_id = str(good_reviews_count + 1).zfill(4)
-                else:
-                    folder_name = "bad"
-                    bad_reviews_count = len(os.listdir(os.path.join("dataset", folder_name)))
-                    unique_id = str(bad_reviews_count + 1).zfill(4)
-                file_name = f"{unique_id}_{category}.txt"
-                file_path = os.path.join("dataset", folder_name, file_name)
                 film_title_element = soup.find('div', class_="breadcrumbs__sub")
                 if film_title_element is not None:
                     film_title = film_title_element.get_text()
                 else:
                     film_title = "Название фильма не найдено"
                     print(film_title)
-                with open(file_path, "w", encoding="utf-8") as file:
-                    file.write(f"Film: {film_title}\n")
-                    file.write(review_text)
+                save_review_to_file(review_text, category, film_title)
+
     except Exception:
         print(f"Ошибка при обработке рецензии")
+
     return good_reviews, bad_reviews
 
 good_reviews = 0
