@@ -1,7 +1,6 @@
 """Module providing a function printing python version 3.11.5."""
 import os
 import csv
-import argparse
 import logging
 from pathlib import Path
 
@@ -25,7 +24,10 @@ def create_csv_annotation(folder: str = "dataset",
                 writer = csv.DictWriter(csv_file, fieldnames=fieldnames)
                 writer.writeheader()
                 for item in filenames:
-                    writer.writerow({'absolute_path': os.path.abspath(item), 'relative_path': item, 'class': f.name})
+                    writer.writerow({'absolute_path': os.path.abspath(item),
+                                     'relative_path': os.path.relpath(item), 
+                                     'class': f.name}
+                                     )
         csv_file.close()
     except Exception as e:
         logging.exception(e)
