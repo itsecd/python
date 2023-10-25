@@ -1,6 +1,0 @@
-{
-    "dataset": "dataset", 
-    "name_csv_file": "annotation_dataset",
-    "copy_name_csv_file": "new_data_annotation",
-    "random_copy_name_csv_file": "random_new_data_annotation"
-}

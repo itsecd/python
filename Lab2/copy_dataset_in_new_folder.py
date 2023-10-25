@@ -6,7 +6,9 @@ import shutil
 import logging
 from pathlib import Path
 
+
 logging.basicConfig(level=logging.DEBUG)
+
 
 def create_folder(path_new_folder: str, base_folder: str) -> None:
     """This func create folder, to which we upload copies"""
@@ -20,15 +22,17 @@ def create_folder(path_new_folder: str, base_folder: str) -> None:
     except OSError as e:
         logging.exception(f"OS error: {e}")
 
+
 def get_filenames(path: str) -> None:
     """Getting a list of file names from a folder"""
     return list(str(f) for f in Path(path).rglob("*"))
+
 
 def copy_dataset_in_new_folder(path_new_folder: str, path_dataset: str, annotation: str) -> None:
     """Main func, that using other functions uploads copies of images with new names to a new folder"""
     create_folder(path_new_folder, path_dataset)
     try:
-        csv_file = open(f"{annotation}.scv", 'w')
+        csv_file = open(f"{annotation}.csv", 'w', newline='')
         fieldnames = ['absolute_path', 'relative_path', 'class']
         writer = csv.DictWriter(csv_file, fieldnames=fieldnames)
         writer.writeheader()
@@ -52,7 +56,10 @@ def copy_dataset_in_new_folder(path_new_folder: str, path_dataset: str, annotati
     except Exception as e:
         logging.exception(f"OS error: {e}")
 
+
 if __name__ == "__main__":
-    with open("user_settings.json", "r") as f:
+    with open(os.path.join("Lab2","user_settings.json"), "r", newline='') as f:
         settings = json.load(f)
-    copy_dataset_in_new_folder("D:/new_folder_for_data", settings['dataset'], settings["copy_name_csv_file"])
+    copy_dataset_in_new_folder(settings["new_folder_for_data"],
+                               settings['dataset'],
+                               settings["copy_name_csv_file"])
