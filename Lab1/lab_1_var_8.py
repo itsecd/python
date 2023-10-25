@@ -25,7 +25,7 @@ def create_directories():
 create_directories()
  
 def get_page(page) -> BeautifulSoup:
-    url ="https://irecommend.ru/content/sait-geekbrains?page="+ str(page)
+    url ="https://irecommend.ru/content/internet-magazin-ozon-kazan-0?page="+ str(page)
     try:
         sleep_time = random.uniform(1, 3)
         sleep(sleep_time)
@@ -70,19 +70,35 @@ def status_review(review):
     except Exception as e:
         logging.error("Ошибка при получении статуса рецензии:", e)
 
-def save_review_to_file(review_text, status_review, review_number):
-    folder_name = "good" if status_review == "good" else "bad"
-    file_name = f"{review_number:04d}.txt"
-    file_path = os.path.join("dataset", folder_name, file_name)
+def save_review_to_file(review_text, status_review,review_number_good,review_number_bad):
+    if status_review == "good":
+        folder_name = "good"
+        file_name = f"{review_number_good:04d}.txt"
+        file_path = os.path.join("dataset", folder_name, file_name) 
+    else:
+        folder_name = "bad"
+        file_name = f"{review_number_bad:04d}.txt"
+        file_path = os.path.join("dataset", folder_name, file_name)
 
     try:
         with open(file_path, "w", encoding="utf-8") as file:
             file.write(review_text)
     except Exception as e:
-        logging.error(f"Ошибка при сохранении рецензии {review_number}: {e}")
-        
-reviews = get_list_of_reviews(get_page(1))
-for review in reviews:
-    text = review_text(review)
-    status = status_review(review)
-    
+        logging.error(f"Ошибка при сохранении рецензии : {e}")
+
+number = 1
+review_number_bad = 1
+review_number_good = 1
+for page in range(1,61):     
+    reviews = get_list_of_reviews(get_page(page))
+    for review in reviews:
+        text = review_text(review)
+        status = status_review(review)
+        save_review_to_file(text, status, review_number_good, review_number_bad)
+        if status == 'good':
+            review_number_good += 1
+            number+=1
+        else:
+            review_number_bad += 1
+            number+=1
+    print(number)
