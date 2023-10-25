@@ -1,6 +1,6 @@
 import logging
 import os
-from dataset_interface import create_csv, write_in_csv
+from usefull_functions import create_csv, write_in_csv
 from get_way import get_path_normal
 
 def write_in_file(name_csv : str, img_classes : list, directory : str) -> None:

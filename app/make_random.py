@@ -2,7 +2,7 @@ import os
 import logging
 import shutil
 import random
-from dataset_interface import create_csv, write_in_csv
+from usefull_functions import create_csv, write_in_csv
 from get_way import get_path_normal, get_path_random
 
 def make_new_fold(name_csv : str, img_classes : list, directory : str) -> None:
