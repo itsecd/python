@@ -16,16 +16,16 @@ if __name__ == "__main__":
         name = json.load(name_json)
 
     if setting["mode"] == "normal":
-        make_normal.MakeNormalCsv.write_in_file(os.path.join(src["name-dir"], src["name-csv-dir"], name["name-normal"]), setting["objects"], src["name-images-dir"])
+        make_normal.write_in_file(os.path.join(src["name-dir"], src["name-csv-dir"], name["name-normal"]), setting["objects"], src["name-images-dir"])
     elif setting["mode"] == "together":
         if not os.path.isdir(os.path.join(src["name-dir"], src["name-data-dir"], name["name-together"])):
             os.mkdir(os.path.join(src["name-dir"], src["name-data-dir"], name["name-together"]))
 
-        make_together.MakeTogetherData.make_new_fold(os.path.join(src["name-dir"], src["name-csv-dir"], name["name-together"]), setting["objects"], src["name-images-dir"])
+        make_together.make_new_fold(os.path.join(src["name-dir"], src["name-csv-dir"], name["name-together"]), setting["objects"], src["name-images-dir"])
     elif setting["mode"] == "random":
         if not os.path.isdir(os.path.join(src["name-dir"], src["name-data-dir"], name["name-random"])):
             os.mkdir(os.path.join(src["name-dir"], src["name-data-dir"], name["name-random"]))
 
-        make_random.MakeRandomData.make_new_fold(os.path.join(src["name-dir"], src["name-csv-dir"], name["name-random"]), setting["objects"], src["name-images-dir"])
+        make_random.make_new_fold(os.path.join(src["name-dir"], src["name-csv-dir"], name["name-random"]), setting["objects"], src["name-images-dir"])
     else:
         raise Exception("invalid setting")

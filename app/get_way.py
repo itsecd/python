@@ -1,6 +1,9 @@
 import json, os
 
-def json_unpack():
+def json_unpack() -> list:
+    """
+    Open jsons files
+    """
     path_to_dir = os.path.dirname(__file__)
 
     with open(os.path.join(path_to_dir, "json", "src.json"), 'r') as src_json:
