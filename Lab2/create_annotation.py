@@ -1,6 +1,7 @@
 """Module providing a function printing python version 3.11.5."""
 import os
 import csv
+import json
 import logging
 from pathlib import Path
 
@@ -11,8 +12,8 @@ def get_filenames(path: str) -> None:
     """Getting a list of file names from a folder"""
     return list(str(f) for f in Path(path).rglob("*"))
 
-def create_csv_annotation(folder: str = "dataset",
-                          csv_filename: str = "annotation_dataset"
+def create_csv_annotation(folder: str,
+                          csv_filename: str
                           ) -> None:
     """Main function, that create csv annotation"""
     try:
@@ -31,3 +32,8 @@ def create_csv_annotation(folder: str = "dataset",
         csv_file.close()
     except Exception as e:
         logging.exception(e)
+
+if __name__ == "__main__":
+    with open("user_settings.json", "r") as f:
+        settings = json.load(f)
+    create_csv_annotation(settings["dataset"], settings["name_csv_file"])
