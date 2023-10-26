@@ -20,12 +20,12 @@ def create_csv_annotation(folder: str,
     """Main function, that create csv annotation"""
     try:
         csv_file = open(f"{csv_filename}.csv", 'w', newline='')
+        fieldnames = ['absolute_path', 'relative_path', 'class']
+        writer = csv.DictWriter(csv_file, fieldnames=fieldnames)
+        writer.writeheader()
         for f in os.scandir(folder):
             if f.is_dir():
                 filenames = get_filenames(f)
-                fieldnames = ['absolute_path', 'relative_path', 'class']
-                writer = csv.DictWriter(csv_file, fieldnames=fieldnames)
-                writer.writeheader()
                 for item in filenames:
                     writer.writerow({'absolute_path': os.path.abspath(item),
                                      'relative_path': os.path.relpath(item), 

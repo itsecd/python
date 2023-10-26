@@ -32,15 +32,14 @@ class PhotoIterator:
             return self.objects[self.counter - 1]
         else:
             raise StopIteration("End of iteration")
-        
+
 
 if __name__ == "__main__":
     with open(os.path.join("Lab2","user_settings.json"), "r", newline='') as f:
         settings = json.load(f)
     ph_iter = PhotoIterator(settings["annotation_for_iterating"], settings["class"])
     try:
-        while(True):
+        while True:
             logging.info(next(ph_iter))
     except StopIteration as e:
         logging.debug(e)
-

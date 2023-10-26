@@ -39,7 +39,6 @@ def copy_dataset_in_new_folder(path_new_folder: str, path_dataset: str, annotati
         for f in os.scandir(path_dataset):
                 if f.is_dir():
                     paths_filenames = get_filenames(f)
-                    
                     for item in paths_filenames:
                         filename = Path(item).name
                         path_new_file = os.path.join(path_new_folder,

@@ -37,7 +37,10 @@ def generate_random_array() -> None:
 
 
 def copy_dataset_in_new_folder(path_new_folder: str, path_dataset: str, annotation: str) -> None:
-    """Main func, that using other functions uploads copies of images with new names to a new folder"""
+    """
+    Main func, that using other functions
+    uploads copies of images with new names to a new folder
+    """
     create_folder(path_new_folder, path_dataset)
     try:
         csv_file = open(f"{annotation}.csv", 'w')
