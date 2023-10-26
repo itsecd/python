@@ -1,0 +1,9 @@
+{   
+    "directory": "Lab2",
+    "folder": "csv_files",
+
+    "normal": "datasets",
+    "new_name": "dataset_new",
+    "random": "dataset_random"
+
+}

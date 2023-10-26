@@ -13,8 +13,7 @@ def make_csv(name_csv: str) -> None:
     try:
         if not os.path.exists(name_csv):
             with open(f"{name_csv}.csv", "a") as file:
-                writer = csv.writer(file, lineterminator="\n")
-                writer.writerow(("Absolute path", "Relative path", "Class"))
+                csv.writer(file, lineterminator="\n")
     except Exception as ex:
         logging.error(f"Couldn't create file: {ex.message}\n{ex.args}\n")
 
