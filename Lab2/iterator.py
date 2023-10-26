@@ -1,22 +1,28 @@
 import pandas as pd
+import os
+import csv
 
 
-class Iterator:
+class MyIterator:
     """The iterator class gets the path to the cvs file and the class,
     returns the next element if it is of the same class, else it returns None"""
 
     def __init__(self, name_csv: str, name_class: str) -> None:
         """The method initializes the initial values of the iterator"""
-        data = pd.read_csv(name_csv)
-        self.limit = len(data)
+        self.data = list()
+        self.count = -1
+        with open(name_csv, "r") as file:
+            reader = csv.reader(file)
+            for row in reader:
+                self.data.append(row)
+                self.count = 0
+        self.limit = len(self.data)
         for i in range(self.limit):
-            if data.values[i][2] == name_class:
+            if self.data[i][2] == name_class:
                 self.count = i - 1
                 break
-        self.counter = -1
         self.mark = name_class
         self.name_csv = name_csv
-        self.limit = len(data)
 
     def __iter__(self):
         """Returns the iterator itself"""
@@ -24,10 +30,14 @@ class Iterator:
 
     def __next__(self) -> str:
         """Returns the absolute path to the next class element"""
-        if self.counter < self.limit:
-            data = pd.read_csv(self.name_csv)
-            if self.mark == data.values[self.counter + 1][2]:
-                self.counter += 1
-            return data.values[self.counter][0]
+        if self.count < self.limit:
+            if self.mark == self.data[self.count + 1][2]:
+                self.count += 1
+            return self.data[self.count][0]
         else:
             return None
+
+
+if __name__ == "__main__":
+    mi = MyIterator("Lab2\csv_files\datasets.csv", "rose")
+    print(mi.__next__())
