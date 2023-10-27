@@ -1,7 +1,11 @@
 {   
     "directory": "Lab2",
     "folder": "csv_files",
+    "classes": ["rose","tulip"], 
+    "main_folder":"dataset",
 
+    "mode":"normal",
+    
     "normal": "datasets",
     "new_name": "dataset_new",
     "random": "dataset_random"

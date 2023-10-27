@@ -25,8 +25,8 @@ def make_list(directory: str, classes: str) -> list:
         count_files = len(os.listdir(os.path.join(directory, c)))
         for i in range(count_files):
             r = [
-                [os.path.abspath(os.path.join(directory, c, f"{i}.jpg")),
-                    os.path.join(directory, c, f"{i}.jpg"),
+                [os.path.abspath(os.path.join(directory, c, f"{i:04}.jpg")),
+                    os.path.join(directory, c, f"{i:04}.jpg"),
                     c,]
             ]
             img_list += r
