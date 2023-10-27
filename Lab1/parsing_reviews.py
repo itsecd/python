@@ -3,12 +3,21 @@ import os
 import random
 from time import sleep
 
+import argparse
 import requests
 from bs4 import BeautifulSoup
 from fake_useragent import UserAgent
 from typing import List
 
-# Функция для генерации случайного User-Agent
+
+def parse_arguments():
+    parser = argparse.ArgumentParser(description="Скрипт для сбора данных с веб-сайта и сохранения их в датасет")
+    parser.add_argument("--output_dir", type=str, default="dataset", help="Путь к директории для сохранения датасета")
+    parser.add_argument("--base_url", type=str, default="https://irecommend.ru/content/internet-magazin-ozon-kazan-0?page=", help="Базовый URL для сбора данных")
+    parser.add_argument("--pages", type=int, default=3, help="Количество страниц для обхода")
+    return parser.parse_args()
+
+
 def generate_random_user_agent() -> str:
     """
     Генерирует случайный User-Agent.
@@ -18,7 +27,7 @@ def generate_random_user_agent() -> str:
 
 logging.basicConfig(level=logging.INFO)
 
-# Функция для создания папок "good" и "bad"
+
 def create_directories():
     """
     Создает директории "good" и "bad" в папке "dataset" (если их нет).
@@ -33,7 +42,7 @@ def create_directories():
 
 create_directories()
 
-# Функция для получения страницы и парсинга её в объект BeautifulSoup
+
 def get_page(page: int, base_url: str = "https://irecommend.ru/content/internet-magazin-ozon-kazan-0?page=") -> BeautifulSoup:
     """
     Получает страницу с веб-сайта и возвращает объект BeautifulSoup для парсинга.
@@ -56,7 +65,7 @@ def get_page(page: int, base_url: str = "https://irecommend.ru/content/internet-
         logging.exception(f"Необработанная ошибка: {e.args}")
         return None
 
-# Функция для получения списка рецензий с объекта BeautifulSoup
+
 def get_list_of_reviews(soup: BeautifulSoup) -> List[BeautifulSoup]:
     """
     Получает список рецензий с объекта BeautifulSoup.
@@ -67,7 +76,7 @@ def get_list_of_reviews(soup: BeautifulSoup) -> List[BeautifulSoup]:
     except Exception as e:
         logging.exception("Ошибка при получении списка рецензий:", e)
 
-# Функция для извлечения текста рецензии
+
 def review_text(review: BeautifulSoup) -> str:
     """
     Извлекает текст из объекта BeautifulSoup рецензии.
@@ -81,7 +90,7 @@ def review_text(review: BeautifulSoup) -> str:
     except Exception as e:
         logging.exception("Ошибка при получении текста рецензии:", e)
 
-# Функция для определения статуса рецензии (хорошая или плохая)
+
 def status_review(review: BeautifulSoup) -> str:
     """
     Определяет статус рецензии (хорошая или плохая) на основе числа звёзд. 
@@ -96,19 +105,19 @@ def status_review(review: BeautifulSoup) -> str:
     except Exception as e:
         logging.exception("Ошибка при получении статуса рецензии:", e)
 
-# Функция для сохранения рецензии в файл
-def save_review_to_file(review_text: str, status_review: str, review_number_good: int, review_number_bad: int):
+
+def save_review_to_file(review_text: str, status_review: str, review_number_good: int, review_number_bad: int, output_dir: str):
     """
     Сохраняет рецензию в файл в соответствующей директории (good или bad).
     """
     if status_review == "good":
         folder_name = "good"
         file_name = f"{review_number_good:04d}.txt"
-        file_path = os.path.join("dataset", folder_name, file_name)
     else:
         folder_name = "bad"
         file_name = f"{review_number_bad:04d}.txt"
-        file_path = os.path.join("dataset", folder_name, file_name)
+    
+    file_path = os.path.join(output_dir, folder_name, file_name)
 
     try:
         with open(file_path, "w", encoding="utf-8") as file:
@@ -117,15 +126,20 @@ def save_review_to_file(review_text: str, status_review: str, review_number_good
         logging.exception(f"Ошибка при сохранении рецензии : {e}")
 
 if __name__ == "__main__":
+    args = parse_arguments()
+    output_dir = args.output_dir
+    base_url = args.base_url
+    pages = args.pages
+
     number = 0
     review_number_bad = 1
     review_number_good = 1
-    for page in range(1, 3):
-        reviews = get_list_of_reviews(get_page(page))
+    for page in range(1, pages + 1):
+        reviews = get_list_of_reviews(get_page(page, base_url))
         for review in reviews:
             text = review_text(review)
             status = status_review(review)
-            save_review_to_file(text, status, review_number_good, review_number_bad)
+            save_review_to_file(text, status, review_number_good, review_number_bad, output_dir)
             if status == 'good':
                 review_number_good += 1
                 number += 1
