@@ -1,0 +1,55 @@
+[
+    {
+        "absolute path": "abs_class11",
+        "relative path":"rel_class11",
+        "class label": "class1"
+    },
+    {
+        "absolute path": "abs_class21",
+        "relative path":"rel_class21",
+        "class label": "class1"
+    },
+    {
+        "absolute path": "abs_class12",    
+        "relative path":"rel_class12",    
+        "class label": "class2"
+    },
+    {
+        "absolute path": "abs_class31",
+        "relative path":"rel_class31",
+        "class label": "class1"
+    },
+    {
+        "absolute path": "abs_class13",
+        "relative path":"rel_class13",
+        "class label": "class3"
+    },
+    {
+        "absolute path": "abs_class23",
+        "relative path":"rel_class23",
+        "class label": "class3"
+    },
+    {
+        "absolute path": "abs_class22",
+        "relative path":"rel_class22",
+        "class label": "class2"
+    },
+    {
+        "absolute path": "abs_class41",
+        "relative path":"rel_class41",
+        "class label": "class1"
+    },
+    {
+        "absolute path": "abs_class51",
+        "relative path":"rel_class51",
+        "class label": "class1"
+    },
+    {
+        "absolute path": "abs_class32",
+        "relative path":"rel_class32",
+        "class label": "class2"
+    }
+] 
+
+
+                     
