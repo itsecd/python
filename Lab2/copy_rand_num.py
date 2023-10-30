@@ -1,5 +1,5 @@
 import argparse
-from write_reader import *       
+from Lab2.src.write_reader import DataWriteReader       
 
 if __name__ == "__main__":
     parser = argparse.ArgumentParser()

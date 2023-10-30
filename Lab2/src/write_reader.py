@@ -6,45 +6,6 @@ import random
 import logging
 from typing import Optional
 
-class ClassInstanceIterator:
-    '''The iterator class receives a class label as input 
-       and returns the next instance (path to it) of this class
-    '''
-
-    def __init__(self, key: str,
-                 class_label : Optional[str] = None,
-                *args: dict[str, str]):
-        '''A constructor that receives data as input,
-           the key by which the class label will be compared
-           and the class label by which the path to the next instance will be given;
-           if the label is not specified,
-           the iteration proceeds along the label of the first instance in the data set
-        '''       
-        self.__data: list[dict[str, str]] = list(args)
-        self.__key : str = key
-        self.__class_label : str
-        if class_label:
-            self.__class_label = class_label
-        else:    
-            self.__class_label = self.__data[0][self.__key]
-
-    def __iter__(self) -> "ClassInstanceIterator":
-        return self    
-
-    def __next__(self) -> dict[str: str]:
-        '''The method returns the first match of a class label in the data set, 
-           and then removes it from the set
-        '''
-        index : int = 0
-        while self.__data[index][self.__key] != self.__class_label:
-            if index == (len(self.__data) - 1):
-                raise StopIteration
-            index += 1
-        return self.__data.pop(index)   
-      
-    def change_class_label(self, class_label : str) -> None:
-        self.__class_label = class_label     
-  
 
 class DataWriteReader:
     '''Class for working with file data\n
@@ -63,8 +24,8 @@ class DataWriteReader:
         '''This static method that creates a directory for the dataset at the specified address'''
         try:
             os.makedirs(os.path.join(dir))
-        except:
-            logging.error('A folder with the same name already exists') 
+        except FileExistsError as e:
+            logging.error(f'[{e}] A folder with the same name already exists') 
     
     def __init__(self, main_dir: str, *args : Optional[dict[str,str]]):
         '''main_dir: directory from which files-data will be extracted\n
@@ -75,8 +36,7 @@ class DataWriteReader:
             self.data_list : list[dict[str, str]] = list(args)
         else:    
             self.data_list : list[dict[str, str]] = list()
-            self.scan_instances(main_dir)
-        self.__iter : ClassInstanceIterator = ClassInstanceIterator(DataWriteReader.key3, None, *self.data_list)   
+            self.scan_instances(main_dir)        
 
     def scan_instances(self, main_dir : str) -> None:
         '''This method scans the directory and saves the data\n
@@ -97,38 +57,25 @@ class DataWriteReader:
                                                    DataWriteReader.key3: class_label})                            
                     else:
                         logging.warning(f"directory '{catalog}' is empty")   
-                except:
+                except NotADirectoryError:
                         relative_path : str = os.path.join(main_dir, catalog)
                         absolute_path : str = os.path.abspath(catalog)
                         class_label : str = catalog[:-4]
                         self.data_list.append({DataWriteReader.key1: absolute_path,
                                                DataWriteReader.key2: relative_path,
                                                DataWriteReader.key3: class_label})       
-        except:             
-            logging.error(f"Directory '{main_dir}' does not exist")          
-
-    def class_list(self, class_label: str) -> ClassInstanceIterator:
-        '''This method returning an iterator object for the selected class label'''
-        return ClassInstanceIterator(DataWriteReader.key3, class_label, *self.data_list)
-      
-    def next(self, class_label: str) -> str:
-        '''This method that iterates over a set of data in the current object,\n
-           returns the path to the next instance corresponding to the class label
-        '''
-        self.__iter.change_class_label(class_label)
-        return next(self.__iter)[DataWriteReader.key2]
+        except FileExistsError as e:             
+            logging.error(f"[{e}] Directory '{main_dir}' does not exist")          
 
     def write_to_csv(self, path: str) -> None:
         '''This method writes file data contained in the current object to a CSV file'''   
         with open(path, "w", newline='') as csv_file:
             csv_writer = csv.writer(csv_file)
-            # write column names
             csv_writer.writerow(self.data_list[0].keys())
-            # iterate over data dicts and write values
             for dict_item in self.data_list:
                 csv_writer.writerow(dict_item.values())
 
-    def read_from_csv(self, path: str) -> "DataWriteReader":
+    def read_from_csv(self, path: str) -> list[dict[str, str]]:
         '''This method reads file data from CSV\n 
            and returns a new object of the current class with the read data
         '''
@@ -140,9 +87,9 @@ class DataWriteReader:
                     data_list.append({DataWriteReader.key1: row[0],
                                       DataWriteReader.key2: row[1],
                                       DataWriteReader.key3: row[2]}) 
-            return DataWriteReader(self.main_dir, *data_list)        
-        except:  
-            logging.error(f"CSV '{path}' does not exist") 
+            return data_list       
+        except FileNotFoundError as e:  
+            logging.error(f"[{e}] CSV '{path}' does not exist") 
 
     def copy_dataset_num_class(self, path: str) -> "DataWriteReader": 
         '''This method copies files to the specified directory\n 
