@@ -35,7 +35,7 @@ class PhotoIterator:
 
 
 if __name__ == "__main__":
-    with open(os.path.join("Lab2","user_settings.json"), "r", newline='') as f:
+    with open(os.path.join("Lab2","json","user_settings.json"), "r", newline='') as f:
         settings = json.load(f)
     ph_iter = PhotoIterator(settings["annotation_for_iterating"], settings["class"])
     try:

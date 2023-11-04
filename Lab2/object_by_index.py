@@ -24,7 +24,7 @@ def object_by_index(name_csv: str, index: int, object: str) -> str:
 
 
 if __name__ == "__main__":
-    with open(os.path.join("Lab2","user_settings.json"), "r", newline='') as f:
+    with open(os.path.join("Lab2","json","user_settings.json"), "r", newline='') as f:
         settings = json.load(f)
     logging.info(object_by_index(settings["annotation_for_iterating"],
                                  settings["number_of_iteration"],
