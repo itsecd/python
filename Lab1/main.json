@@ -1,7 +1,7 @@
 {   
     "headers": {"User-Agent": "Mozilla/5.0"},
-    "folder": "datasets",
-    "search": ["кот","собака"], 
+    "folder": "dataset",
+    "search": ["cat","dog"], 
     "url": "https://www.bing.com/images/search?q={search}&first=1",
     "max_file": 40,
     "pages": 10

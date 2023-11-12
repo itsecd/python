@@ -11,7 +11,7 @@ def create_directory(folder: str) -> str:
     try:
         if not os.path.exists(folder):
             os.makedirs(folder)
-    except Exception as ex:
+    except:
         logging.error(f"Error in create_directory")
 
 
@@ -22,9 +22,8 @@ def make_list(url: str) -> list:
         for pages in range(main["pages"]):
             url_new = url[:-1]
             url_pages: str = f"{url_new}{pages}"
-            # делаем запрос и получаем html
             responce = requests.get(url_pages, main['headers']).text
-            soup = BeautifulSoup(responce, "lxml")  # используем парсер lxml
+            soup = BeautifulSoup(responce, "lxml")
             animals = soup.findAll("img")
             list_url += animals
         return list_url
@@ -49,10 +48,11 @@ def download(
                 continue
             try:
                 src = exile["src"]
+                print(src)
                 response = requests.get(src)
-                create_directory(os.path.join(folder, cd))
+                create_directory(os.path.join(folder, cd).replace("\\", "/"))
                 try:
-                    with open(os.path.join(folder, cd, f"{count:04}.jpg"), "wb") as file:
+                    with open(os.path.join(folder, cd, f"{count:04}.jpg").replace("\\", "/"), "wb") as file:
                         file.write(response.content)
                         count += 1
                 except Exception as ex:
