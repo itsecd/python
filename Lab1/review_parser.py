@@ -5,6 +5,7 @@ import os
 import logging
 import requests
 from time import sleep
+import random
 
 
 def get_html_source(url: str) -> str:
@@ -42,10 +43,7 @@ def get_links_for_all_review(
     """
     soup = BeautifulSoup(source, 'lxml')
     responses = soup.findAll('div', find_class)
-    links = []
-    for resp in responses:
-        links.append(f"{link}{resp.find('a').get('href')}")
-    return links
+    return [f"{link}{resp.find('a').get('href')}" for resp in responses]
 
 
 def get_all_review(link: str) -> str:
@@ -104,12 +102,13 @@ def w_reviews_to_files(
     cnt_pages : int
     """
     dirs_for_reviews(path_n_dir)
-    num_of_rev = 0
     for num_of_stars in range(1, 6):
+        num_of_rev = 0
         for num_of_page in range(1, cnt_pages + 1):
             url = f"{url}{num_of_page}&rate={num_of_stars}"
             source = get_html_source(url)
-            sleep(3)
+
+            sleep(1 if random.random()>0.5 else 2)
             links = get_links_for_all_review(source)
             for link in links:
                 review = get_all_review(link)
