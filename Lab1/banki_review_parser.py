@@ -73,7 +73,7 @@ def review_file(dataset_name: str, link: str, review_count:int) -> None:
             page += 1
         logging.info(f"All reviews for {rating} rating has been downloaded")
 
-
+        
 if __name__=="__main__":
     """This soft is designed to download reviews of banks from https://banki.ru"""
     parser = argparse.ArgumentParser(description='Input path name for reviews, link for parsing, count of reviews')
