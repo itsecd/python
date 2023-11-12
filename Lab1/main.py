@@ -27,7 +27,7 @@ def make_list(url: str) -> list:
             animals = soup.findAll("img")
             list_url += animals
         return list_url
-    except Exception as ex:
+    except:
         logging.error(f"Error in make_list")
 
 
