@@ -36,7 +36,7 @@ def write_in_file(
     search: list, 
     eggs: str
 ) -> None:
-    '''принимает название строки для таблицы 
+    '''принимает название строк для таблицы 
     и имя папки, в которую пойдет запись'''
     try:
         make_csv(eggs)
@@ -54,3 +54,4 @@ if __name__ == "__main__":
         main = json.load(main_file)
 
     write_in_file(make_list("dataset", main["search"]), "Lab2\set\dataset_another")
+    

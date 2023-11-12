@@ -68,3 +68,4 @@ if __name__ == "__main__":
         main = json.load(main_file)
 
     download(main["folder"], main["search"], main["url"], main["max_file"])
+    
