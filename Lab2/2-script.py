@@ -14,11 +14,12 @@ def copy_to_dir(old_dir='dataset',new_dir='new_dataset'):
     os.mkdir(new_dir)
     for star in range(1, 6):
         dir = os.path.join(old_dir, f'{star}')
+        print(len(os.listdir(dir)))
         for file in os.listdir(dir):
             shutil.copy(os.path.join(dir, file), os.path.join(new_dir, f'{star}_{file}'))
 
 
-def get_annotation(new_dir='new_dataset'):
+def get_annotation(new_dir='new_dataset') -> Generator[list, None, None]:
     """
     the function creates list of lists consisting of three elements:
     relative path, absolute path and class label for each file.
