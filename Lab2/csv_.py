@@ -5,7 +5,7 @@ from pathlib import Path
 import logging
 
 os.chdir("C:\\Users\\Yana\\Documents\\python-v6\\")
-logging.basicConfig(filename="py_log1.log", filemode="a", level=logging.INFO)
+logging.basicConfig(filename="Lab2\\py_log1.log", filemode="a", level=logging.INFO)
 
 def make_csv(name_csv:str) -> None:
     """This function creates a csv

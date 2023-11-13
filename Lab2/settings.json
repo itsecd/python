@@ -1,0 +1,11 @@
+{
+    "directory":"Lab2",
+    "tags":["tiger","leopard"],
+    "main_folder":"Lab1\\dataset",
+
+    "mode":"normal",
+
+    "normal":"file",
+    "new_name":"new_file",
+    "random":"random_file"
+}
