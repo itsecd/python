@@ -1,8 +1,0 @@
-{   
-    "directory": "Lab2",
-    "file": "csv_file",
-    "folder": "dataset",
-    "search": ["cat","dog"],
-    "new": "new_dataset",
-    "random": "random_dataset"
-}
