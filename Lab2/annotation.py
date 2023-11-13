@@ -19,7 +19,8 @@ def mkdir(path: str) -> None:
     except Exception as err:
         logging.error(f"{err}", exc_info=True)
 
-def copy_with_rand_num(old_dir='dataset',new_dir='dataset_with_rand_num') -> Generator[list, None, None]:
+
+def copy_with_rand_num(old_dir='dataset', new_dir='dataset_with_rand_num') -> Generator[list, None, None]:
     """
     the function copy each file to new directory.
     ----------
@@ -30,13 +31,14 @@ def copy_with_rand_num(old_dir='dataset',new_dir='dataset_with_rand_num') -> Gen
     for star in range(1, 6):
         dir = os.path.join(old_dir, f'{star}')
         for file in os.listdir(dir):
-            path_to_file=f'{str(random.randrange(10000)).zfill(4)}.txt'
-            while os.path.isfile(os.path.join(new_dir, path_to_file)):#replace number, if file exists
-                path_to_file=f'{str(random.randrange(10000)).zfill(4)}.txt'
+            path_to_file = f'{str(random.randrange(10000)).zfill(4)}.txt'
+            while os.path.isfile(os.path.join(new_dir, path_to_file)):  # replace number, if file exists
+                path_to_file = f'{str(random.randrange(10000)).zfill(4)}.txt'
             shutil.copy(os.path.join(dir, file), os.path.join(new_dir, path_to_file))
             relative_path = os.path.join(new_dir, path_to_file)
             absolute_path = os.path.abspath(relative_path)
             yield [absolute_path, relative_path, star]
+
 
 def get_annotation(dir='dataset') -> Generator[list, None, None]:
     """
@@ -53,11 +55,10 @@ def get_annotation(dir='dataset') -> Generator[list, None, None]:
             relative_path = os.path.join(
                 directory, f'{str(file).zfill(4)}.txt')
             absolute_path = os.path.abspath(relative_path)
-            yield [absolute_path,relative_path, star]
+            yield [absolute_path, relative_path, star]
 
 
-
-def copy_to_dir(old_dir='dataset',new_dir='new_dataset'):
+def copy_to_dir(old_dir='dataset', new_dir='new_dataset'):
     """
     the function copy each file to new directory.
     ----------
@@ -71,33 +72,34 @@ def copy_to_dir(old_dir='dataset',new_dir='new_dataset'):
             shutil.copy(os.path.join(dir, file), os.path.join(new_dir, f'{star}_{file}'))
 
 
-def get_annotation_new_dir(old_dir='dataset',new_dir='new_dataset') -> Generator[list, None, None]:
+def get_annotation_new_dir(old_dir='dataset', new_dir='new_dataset') -> Generator[list, None, None]:
     """
     the function creates list of lists consisting of three elements:
     relative path, absolute path and class label for each file.
     ----------
     dir : str
     """
-    copy_to_dir(old_dir,new_dir)
+    copy_to_dir(old_dir, new_dir)
     for file in os.listdir(new_dir):
-        relative_path = os.path.join(new_dir,f'{file}')
+        relative_path = os.path.join(new_dir, f'{file}')
         absolute_path = os.path.abspath(relative_path)
         yield [absolute_path, relative_path, file[0]]
 
-def write_csv(path_to_csv='reviews.csv',label_of_annotation=0,new_dir='new_dataset',old_dir='dataset') -> str:
+
+def write_csv(path_to_csv='reviews.csv', label_of_annotation=0, new_dir='new_dataset', old_dir='dataset') -> str:
     """
     the function writes list elements to a csv file.
     return path to csv file.
     ----------
     path : str
     """
-    list=[]
-    if label_of_annotation==0:
-        list=get_annotation(old_dir)
-    elif label_of_annotation==1:
-        list=get_annotation_new_dir(old_dir,new_dir)
-    elif label_of_annotation==2:
-        list=copy_with_rand_num(old_dir,new_dir)
+    list = []
+    if label_of_annotation == 0:
+        list = get_annotation(old_dir)
+    elif label_of_annotation == 1:
+        list = get_annotation_new_dir(old_dir, new_dir)
+    elif label_of_annotation == 2:
+        list = copy_with_rand_num(old_dir, new_dir)
     else:
         raise Exception("Incorrect mode")
     try:
