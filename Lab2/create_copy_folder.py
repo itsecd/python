@@ -1,15 +1,24 @@
 import os
 import logging
-import create_annotation
 import shutil
 import json
-
+import create_annotation
 
 logging.basicConfig(level=logging.INFO)
 
 
-def copy_folder(old_dir: str,new_dir: str, classes: str, csv_name:str) -> None:
-    """This function copies txt files from old directory to new, renames files and creates annotation"""
+def copy_folder(old_dir: str,new_dir: str, classes: list, csv_name:str) -> None:
+    """This function copies txt files from old directory to new, renames files \
+        and creates annotation
+            
+    Parametres:
+        old_dir(str): path of old the directory
+
+        new_dir(str): path of new the directory
+
+        classes(list): list filled with names of classes
+
+        csv_name(str): name of the csv file"""
     try:
         csv_list = list()
         for c in classes:
@@ -28,4 +37,5 @@ def copy_folder(old_dir: str,new_dir: str, classes: str, csv_name:str) -> None:
 if __name__ == "__main__":
     with open(os.path.join("Lab2", "settings.json"), "r") as settings:
         settings = json.load(settings)
-    copy_folder(settings["main_folder"], settings["copy"], settings["classes"], f"{settings["csv"]}/{settings["copy"]}")
+    copy_folder(settings["main_folder"], settings["copy"], settings["classes"], \
+                f"{settings["csv"]}/{settings["copy"]}")

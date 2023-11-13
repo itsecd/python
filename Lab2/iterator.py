@@ -4,7 +4,8 @@ import json
 
 
 class PathIterator:
-    """This Iterator returns path of the class. When class ends, raises StopIteration"""
+    """This Iterator returns path of the class. When class ends, raises\
+        StopIteration"""
     def __init__(self, csv_path: str, name_class: str):
         self.data = list()
         self.count = 0
