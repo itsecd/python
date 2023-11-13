@@ -1,0 +1,12 @@
+{
+    "directory": "Lab2",
+    "classes": ["1", "2", "3", "4", "5"],
+    "csv": "csv",
+    "main_folder": "dataset",
+
+    "mode": "normal",
+
+    "normal": "dataset",
+    "random": "rand_dataset",
+    "copy": "copy_dataset"
+}

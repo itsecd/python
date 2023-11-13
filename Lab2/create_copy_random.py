@@ -1,10 +1,9 @@
-import numbers
 import os
 import logging
-import argparse
 import random
 import create_annotation
 import shutil
+import json
 
 
 logging.basicConfig(level=logging.INFO)
@@ -16,7 +15,7 @@ def get_random_list() -> list:
     return rand_list
 
 
-def copy_random(old_dir: str, classes: str, new_dir: str, csv:str) -> None:
+def copy_random(old_dir: str, new_dir: str, classes: str, csv:str) -> None:
     try:
         csv_list = list()
         rand_list = get_random_list()
@@ -36,12 +35,7 @@ def copy_random(old_dir: str, classes: str, new_dir: str, csv:str) -> None:
 
 
 if __name__ == "__main__":
-    parser = argparse.ArgumentParser(description='Input file name for annotation file, path of dataset')
-    parser.add_argument('--old_path', type=str, default='dataset', help='Input path of dataset')
-    parser.add_argument('--new_path', type=str, default='rand_dataset', help='Input path of new dataset')
-    parser.add_argument('--classes', type=list, default=['1', '2', '3', '4', '5'])
-    parser.add_argument('--name', type=str, default='annotation_rand', help='Input name for annotation')
-    args = parser.parse_args()
-    copy_random(args.old_path, args.classes, args.new_path, args.name)
-
+    with open(os.path.join("Lab2", "settings.json"), "r") as settings:
+        settings = json.load(settings)
+    copy_random(settings["main_folder"], settings["random"], settings["classes"], f"{settings["csv"]}/{settings["random"]}")
 

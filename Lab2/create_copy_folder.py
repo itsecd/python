@@ -1,13 +1,14 @@
 import os
 import logging
-import argparse
 import create_annotation
 import shutil
+import json
+
 
 logging.basicConfig(level=logging.INFO)
 
 
-def copy_folder(old_dir: str, classes: str, new_dir: str, csv:str) -> None:
+def copy_folder(old_dir: str,new_dir: str, classes: str, csv_name:str) -> None:
     try:
         csv_list = list()
         for c in classes:
@@ -18,16 +19,12 @@ def copy_folder(old_dir: str, classes: str, new_dir: str, csv:str) -> None:
                 shutil.copy(old, new)
                 row = [[new, os.path.relpath(new), c]]
                 csv_list += row
-        create_annotation.write_into_csv(csv, csv_list)
+        create_annotation.write_into_csv(csv_name, csv_list)
     except Exception as exc:
         logging.error(f"Can not write: {exc.message}\n{exc.args}\n")
 
 
 if __name__ == "__main__":
-    parser = argparse.ArgumentParser(description='Input file name for annotation file, path of dataset')
-    parser.add_argument('--old_path', type=str, default='dataset', help='Input path of dataset')
-    parser.add_argument('--new_path', type=str, default='new_dataset', help='Input path of new dataset')
-    parser.add_argument('--classes', type=list, default=['1', '2', '3', '4', '5'])
-    parser.add_argument('--name', type=str, default='annotation_copy', help='Input name for annotation')
-    args = parser.parse_args()
-    copy_folder(args.old_path, args.classes, args.new_path, args.name)
+    with open(os.path.join("Lab2", "settings.json"), "r") as settings:
+        settings = json.load(settings)
+    copy_folder(settings["main_folder"], settings["copy"], settings["classes"], f"{settings["csv"]}/{settings["copy"]}")
