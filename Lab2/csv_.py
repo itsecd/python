@@ -14,7 +14,7 @@ def make_csv(name_csv:str) -> None:
     try:
         if not os.path.exists(name_csv):
             with open(f"Lab2\\{name_csv}.csv","w") as f:
-                writer=csv.writer(f)
+                csv.writer(f)
     except Exception as e:
         logging.error(f"file not created:{e}")
 
