@@ -31,6 +31,7 @@ def create_list(url: str, count_for_list: str, pages: str) -> list:
     count = 0
     try:
         for page in range(1, int(pages)):
+            print(page)
             if count >= int(count_for_list):
                 break
             url_pages: str = f"{url[:-1]}{page}"
