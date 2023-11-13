@@ -21,8 +21,7 @@ def create_csv_list(directory: str, classes: str) -> list:
     for star in classes:
         count = len(os.listdir(os.path.join(directory, star)))
         for i in range(count):
-            r = [os.path.abspath(os.path.join(directory, star, f"{i:04}.txt")), os.path.join(directory, star, f"{i:04}.txt"), star]
+            r = [[os.path.abspath(os.path.join(directory, star, f"{i:04}.txt")), os.path.join(directory, star, f"{i:04}.txt"), star]]
             csv_list += r
     return csv_list
 
-print(create_csv_list("dataset", ["1", "2", "3", "4", "5"]))
