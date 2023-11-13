@@ -2,10 +2,11 @@
     "directory":"Lab2",
     "tags":["tiger","leopard"],
     "main_folder":"Lab1\\dataset",
+    "folder":"Lab2\\dataset",
 
-    "mode":"normal",
+    "mode":"copy",
 
     "normal":"file",
-    "new_name":"new_file",
+    "copy":"new_file",
     "random":"random_file"
 }
