@@ -4,7 +4,7 @@
     "main_folder":"Lab1\\dataset",
     "folder":"Lab2\\dataset",
 
-    "mode":"copy",
+    "mode":"random",
 
     "normal":"file",
     "copy":"new_file",
