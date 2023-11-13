@@ -9,6 +9,7 @@ logging.basicConfig(level=logging.INFO)
 
 
 def copy_folder(old_dir: str,new_dir: str, classes: str, csv_name:str) -> None:
+    """This function copies txt files from old directory to new, renames files and creates annotation"""
     try:
         csv_list = list()
         for c in classes:

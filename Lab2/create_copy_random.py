@@ -10,12 +10,14 @@ logging.basicConfig(level=logging.INFO)
 
 
 def get_random_list() -> list:
+    """This function gets random list filled with int numbers"""
     rand_list = list(i for i in range(0, 10000))
     random.shuffle(rand_list)
     return rand_list
 
 
 def copy_random(old_dir: str, new_dir: str, classes: str, csv:str) -> None:
+    """This function copies txt files from old directory to new, renames files to random numbers and creates annotation"""
     try:
         csv_list = list()
         rand_list = get_random_list()
