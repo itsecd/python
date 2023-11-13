@@ -131,6 +131,8 @@ dmypy.json
 
 /dataset
 /new_dataset
+/rand_dataset
 .vscode/
 annotation_og.csv
 annotation_copy.csv
+annotation_rand.csv
