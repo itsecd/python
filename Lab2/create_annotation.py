@@ -1,6 +1,7 @@
 import csv
 import os
 import logging
+import argparse
 
 
 logging.basicConfig(level=logging.INFO)
@@ -37,4 +38,10 @@ def write_into_csv(name: str, csv_list: list) -> None:
 
 
 if __name__ == "__main__":
-    
+    parser = argparse.ArgumentParser(description='Input file name for annotation file, path of dataset')
+    parser.add_argument('--path', type=str, default='dataset', help='Input path of dataset')
+    parser.add_argument('--name', type=str, default='annotation_og', help='Input name for annotation')
+    parser.add_argument('--stars', type=list, default=['1', '2', '3', '4', '5'])
+    args = parser.parse_args()
+    csv_list = create_csv_list(args.path, args.stars)
+    write_into_csv(args.name, csv_list)
