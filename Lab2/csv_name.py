@@ -2,7 +2,6 @@ import csv
 import os
 import json
 import logging
-import pandas as pd
 
 logging.basicConfig(level=logging.INFO)
 
@@ -44,7 +43,6 @@ def write_in_file(
         make_csv(eggs)
         for s in string:
             with open(f'{eggs}.csv', 'a', newline='') as csvfile:
-                # добавление; указатель на конце файла, если файл есть; создает новый файл, если его нет
                 spamwriter = csv.writer(csvfile, lineterminator="\n")
                 spamwriter.writerow(s)
     except:
@@ -52,7 +50,6 @@ def write_in_file(
 
 if __name__ == "__main__":
     with open(os.path.join("Lab1", "main.json"), "r") as main_file:
-        # чтение; указатель на начале файла; вызывается по умолчанию
         main = json.load(main_file)
 
     write_in_file(make_list(main["folder"], main["search"]), main["folder_an"])

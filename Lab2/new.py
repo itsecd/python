@@ -1,7 +1,5 @@
 import os
 import json
-import shutil
-import csv
 import logging
 import csv_name
 
@@ -17,7 +15,7 @@ def write_in_new(
         string = []
         for s in search:
             for photo in range(main["max_file"]):
-                new = os.path.abspath(os.path.join(folder, f"{s}_{photo:04}.jpg")) # dataset\cat_0000.jpg абсолютный путь новый
+                new = os.path.abspath(os.path.join(folder, f"{s}_{photo:04}.jpg")) 
                 a = [[new, os.path.relpath(new), s]]
                 string += a
         csv_name.write_in_file(string, eggs)
@@ -29,4 +27,4 @@ if __name__ == "__main__":
         main = json.load(main_file)
 
     write_in_new(main["folder"], main["search"], main["folder_new"])
-    
+
