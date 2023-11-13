@@ -8,4 +8,5 @@
     "url": "https://www.bing.com/images/search?q={search}&first=1",
     "max_file": 40,
     "pages": 10
+    
 }

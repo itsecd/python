@@ -56,4 +56,3 @@ if __name__ == "__main__":
         main = json.load(main_file)
 
     write_in_file(make_list(main["folder"], main["search"]), main["folder_an"])
-    

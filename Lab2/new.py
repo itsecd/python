@@ -29,3 +29,4 @@ if __name__ == "__main__":
         main = json.load(main_file)
 
     write_in_new(main["folder"], main["search"], main["folder_new"])
+    
