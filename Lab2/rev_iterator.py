@@ -1,6 +1,6 @@
 import os
 import csv
-
+import argparse
 
 class RevIterator:
     def __init__(self,path_to_csv:str,class_label:int) -> None:
@@ -26,6 +26,10 @@ class RevIterator:
             raise StopIteration
         
 if __name__ == "__main__":
-    iter = RevIterator('reviews.csv',2)
+    parser = argparse.ArgumentParser(description="Input csv path, label of class")
+    parser.add_argument("-c", "--csv", help="Input csv path", type=str)
+    parser.add_argument("-l", "--label", help="Input label of class", type=int)
+    args = parser.parse_args()
+    iter = RevIterator(args.csv,args.label)
     for i in iter:
         print(i)

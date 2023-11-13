@@ -1,4 +1,6 @@
 import csv
+import argparse
+from annotation import write_csv 
 
 
 def get_path_of_next(class_label:int,ind:int,csv_path='reviews.csv'):
@@ -25,4 +27,14 @@ def get_path_of_next(class_label:int,ind:int,csv_path='reviews.csv'):
              
 
 if __name__ == '__main__':
-    print(get_path_of_next(1,1))
+    parser = argparse.ArgumentParser(description="Input csv path, label of class, index, label of annotation")
+    parser.add_argument("-c", "--csv", help="Input csv path", type=str)
+    parser.add_argument("-l", "--label", help="Input label of class", type=int)
+    parser.add_argument("-i", "--index", help="Input index", type=int)
+    parser.add_argument("-a", "--annotation", help="Input label of annotation", type=int)
+    parser.add_argument("-n", "--new", help="Input path to new dir", type=str)
+    parser.add_argument("-o", "--old", help="Input path to old dir", type=str)
+    args = parser.parse_args()
+    #-c review.csv -l 1 -i 3 -a 2 -n new_dataset -o dataset
+    print(get_path_of_next(args.label,args.index,(write_csv(args.csv,args.annotation,args.new,args.old))))
+    
