@@ -23,7 +23,8 @@ class PathIterator:
             return self.data[self.count-1]
         else:
             raise StopIteration
-        
+
+
 if __name__ == "__main__":
     with open(os.path.join("Lab2", "settings.json"), "r") as settings:
         settings = json.load(settings)

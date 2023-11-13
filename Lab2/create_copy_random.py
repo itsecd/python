@@ -40,4 +40,3 @@ if __name__ == "__main__":
     with open(os.path.join("Lab2", "settings.json"), "r") as settings:
         settings = json.load(settings)
     copy_random(settings["main_folder"], settings["random"], settings["classes"], f"{settings["csv"]}/{settings["random"]}")
-

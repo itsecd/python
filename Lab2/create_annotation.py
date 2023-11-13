@@ -7,16 +7,6 @@ import json
 logging.basicConfig(level=logging.INFO)
 
 
-def create_csv(name: str) -> None:
-    """This function creates new csv file, if it not exists"""
-    try: 
-        if not os.path.exists(name):
-            with open(f"{name}.csv", "a") as file:
-                csv.writer(file, lineterminator="\n")
-    except Exception as exc:
-        logging.error(f"Can not create file: {exc.message}\n{exc.args}\n")
-
-
 def create_csv_list(directory: str, classes: str) -> list:
     """This function creates list filled with absolute path, relative path and class"""
     csv_list = list()
@@ -29,9 +19,8 @@ def create_csv_list(directory: str, classes: str) -> list:
 
 
 def write_into_csv(name: str, csv_list: list) -> None:
-    """This function writes row to the csv file"""
+    """This function creates csv file and writes row to the csv file"""
     try:
-        create_csv(name)
         for c in csv_list:
             with open(f"{name}.csv", "a") as file:
                 write = csv.writer(file, lineterminator="\n")
