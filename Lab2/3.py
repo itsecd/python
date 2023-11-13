@@ -10,6 +10,8 @@ import shutil
 logging.basicConfig(level=logging.INFO)
 
 
+
+
 def copy_random(old_dir: str, classes: str, new_dir: str, csv:str) -> None:
     try:
         csv_list = list()
@@ -30,11 +32,15 @@ def copy_random(old_dir: str, classes: str, new_dir: str, csv:str) -> None:
         logging.error(f"Can not write: {exc.message}\n{exc.args}\n")
 
 
-if __name__ == "__main__":
-    parser = argparse.ArgumentParser(description='Input file name for annotation file, path of dataset')
-    parser.add_argument('--old_path', type=str, default='dataset', help='Input path of dataset')
-    parser.add_argument('--new_path', type=str, default='rand_dataset', help='Input path of new dataset')
-    parser.add_argument('--classes', type=list, default=['1', '2', '3', '4', '5'])
-    parser.add_argument('--name', type=str, default='annotation_rand', help='Input name for annotation')
-    args = parser.parse_args()
-    copy_random(args.old_path, args.classes, args.new_path, args.name)
+#if __name__ == "__main__":
+#    parser = argparse.ArgumentParser(description='Input file name for annotation file, path of dataset')
+#    parser.add_argument('--old_path', type=str, default='dataset', help='Input path of dataset')
+#    parser.add_argument('--new_path', type=str, default='rand_dataset', help='Input path of new dataset')
+#    parser.add_argument('--classes', type=list, default=['1', '2', '3', '4', '5'])
+#    parser.add_argument('--name', type=str, default='annotation_rand', help='Input name for annotation')
+#    args = parser.parse_args()
+#    copy_random(args.old_path, args.classes, args.new_path, args.name)
+
+
+random.randrange(0, 10000)
+print(random.randrange(0, 10000))
