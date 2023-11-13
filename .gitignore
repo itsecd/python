@@ -130,5 +130,7 @@ dmypy.json
 
 
 /dataset
+/new_dataset
 .vscode/
 annotation_og.csv
+annotation_copy.csv

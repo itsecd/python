@@ -18,11 +18,11 @@ def create_csv(name: str) -> None:
 
 def create_csv_list(directory: str, classes: str) -> list:
     csv_list = list()
-    for star in classes:
-        count = len(os.listdir(os.path.join(directory, star)))
+    for c in classes:
+        count = len(os.listdir(os.path.join(directory, c)))
         for i in range(count):
-            r = [[os.path.abspath(os.path.join(directory, star, f"{i:04}.txt")), os.path.join(directory, star, f"{i:04}.txt"), star]]
-            csv_list += r
+            row = [[os.path.abspath(os.path.join(directory, c, f"{i:04}.txt")), os.path.join(directory, c, f"{i:04}.txt"), c]]
+            csv_list += row
     return csv_list
 
 
@@ -41,7 +41,7 @@ if __name__ == "__main__":
     parser = argparse.ArgumentParser(description='Input file name for annotation file, path of dataset')
     parser.add_argument('--path', type=str, default='dataset', help='Input path of dataset')
     parser.add_argument('--name', type=str, default='annotation_og', help='Input name for annotation')
-    parser.add_argument('--stars', type=list, default=['1', '2', '3', '4', '5'])
+    parser.add_argument('--classes', type=list, default=['1', '2', '3', '4', '5'])
     args = parser.parse_args()
-    csv_list = create_csv_list(args.path, args.stars)
+    csv_list = create_csv_list(args.path, args.classes)
     write_into_csv(args.name, csv_list)
