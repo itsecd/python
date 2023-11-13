@@ -25,7 +25,7 @@ def copy_with_rand_num(old_dir='dataset',new_dir='dataset_with_rand_num') -> Gen
 
 
 
-def write_csv(path='new_reviews_w_rand_num') -> None:
+def write_csv(path='new_reviews_w_rand_num.csv') -> None:
     """
     the function writes list elements to a csv file.
     ----------

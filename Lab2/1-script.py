@@ -22,7 +22,7 @@ def get_annotation(dir='dataset') -> Generator[list, None, None]:
             yield [relative_path, absolute_path, star]
 
 
-def write_csv(path='reviews') -> None:
+def write_csv(path='reviews.csv') -> None:
     """
     the function writes list elements to a csv file.
     ----------
