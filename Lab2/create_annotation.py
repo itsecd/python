@@ -1,6 +1,5 @@
 import csv
 import os
-import json
 import logging
 
 
@@ -25,3 +24,17 @@ def create_csv_list(directory: str, classes: str) -> list:
             csv_list += r
     return csv_list
 
+
+def write_into_csv(name: str, csv_list: list) -> None:
+    try:
+        create_csv(name)
+        for c in csv_list:
+            with open(f"{name}.csv", "a") as file:
+                write = csv.writer(file, lineterminator="\n")
+                write.writerow(c)
+    except Exception as exc: 
+        logging.error(f"Can not save/write data: {exc.message}\n{exc.args}\n")
+
+
+if __name__ == "__main__":
+    
