@@ -7,7 +7,7 @@ def create_output_folder(folder_name: str) -> None:
     os.makedirs(folder_name, exist_ok=True)
 
 def read_csv_file(file_path: str) -> pd.DataFrame:
-    """ Read data from csv file and returns dataframe"""
+    """Read data from csv file and returns dataframe"""
     return pd.read_csv(file_path, header=None, names=['Date', 'Value'])
 
 def split_dataframes(data: pd.DataFrame) -> Tuple[pd.DataFrame, pd.DataFrame]:
