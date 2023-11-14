@@ -7,6 +7,7 @@ from selenium.webdriver.common.by import By
 import urllib.request
 import csv
 
+
 def make_directory(directory_cat, directory_dog):
     if not os.path.exists('dataset'):
         os.mkdir('dataset')
