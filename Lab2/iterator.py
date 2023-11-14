@@ -29,6 +29,6 @@ class PathIterator:
 if __name__ == "__main__":
     with open(os.path.join("Lab2", "settings.json"), "r") as settings:
         settings = json.load(settings)
-    iter = PathIterator(f"{settings["csv"]}/{settings["copy"]}.csv", f"{settings["classes"][0]}")
+    iter = PathIterator(os.path.join(settings["csv"], settings["random_csv"]), settings["classes"][0])
     for i in iter:
         print(i)

@@ -38,4 +38,4 @@ if __name__ == "__main__":
     with open(os.path.join("Lab2", "settings.json"), "r") as settings:
         settings = json.load(settings)
     copy_folder(settings["main_folder"], settings["copy"], settings["classes"], \
-                f"{settings["csv"]}/{settings["copy"]}")
+                os.path.join(settings["csv"], settings["copy"]))

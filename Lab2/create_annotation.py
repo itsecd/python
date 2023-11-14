@@ -45,5 +45,5 @@ def write_into_csv(csv_name: str, csv_list: list) -> None:
 if __name__ == "__main__":
     with open(os.path.join("Lab2", "settings.json"), "r") as settings:
         settings = json.load(settings)
-    l = create_csv_list(settings["main_folder"], settings["classes"])
-    write_into_csv(f"{settings["csv"]}/{settings["main_folder"]}", l)
+    csv_list = create_csv_list(settings["main_folder"], settings["classes"])
+    write_into_csv(os.path.join(settings["csv"], settings["main_folder"]), csv_list)

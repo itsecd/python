@@ -9,18 +9,21 @@ import create_annotation
 logging.basicConfig(level=logging.INFO)
 
 
-def get_random_list() -> list:
+def get_random_list(end_el: int) -> list:
     """This function gets random list filled with int numbers
+
+    Parametres:
+        end_el(int): last element of the rand_list
 
     Returns: 
 
         list: list of the random int numbers"""
-    rand_list = list(i for i in range(0, 10000))
+    rand_list = [i for i in range(0, end_el)]
     random.shuffle(rand_list)
     return rand_list
 
 
-def copy_random(old_dir: str, new_dir: str, classes: list, csv_name: str) -> None:
+def copy_random(old_dir: str, new_dir: str, classes: list, csv_name: str, end_el: int) -> None:
     """This function copies txt files from old directory to new, renames files \
     to random numbers and creates annotation
     
@@ -35,7 +38,7 @@ def copy_random(old_dir: str, new_dir: str, classes: list, csv_name: str) -> Non
         """
     try:
         csv_list = list()
-        rand_list = get_random_list()
+        rand_list = get_random_list(end_el)
         j = 0
         for c in classes:
             count = len(os.listdir(os.path.join(old_dir, c)))
@@ -55,4 +58,4 @@ if __name__ == "__main__":
     with open(os.path.join("Lab2", "settings.json"), "r") as settings:
         settings = json.load(settings)
     copy_random(settings["main_folder"], settings["random"], settings["classes"], \
-                 f"{settings["csv"]}/{settings["random"]}")
+                 (os.path.join(settings["csv"], settings["random"])), settings["default_number"])
