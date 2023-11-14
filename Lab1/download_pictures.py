@@ -73,7 +73,7 @@ def dowload_images(queries: str,
 
 
 if __name__ == "__main__":
-    with open(os.path.join("options.json"), "r") as options_file:
+    with open(os.path.join("Lab1/options.json"), "r") as options_file:
         options = json.load(options_file)
 
     dowload_images(options["queries"], options["count"],

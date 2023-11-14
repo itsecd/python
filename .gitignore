@@ -127,3 +127,10 @@ dmypy.json
 
 # Pyre type checker
 .pyre/
+dataset/
+Lab1/README.md
+annotations.csv
+annotation.csv
+Lab1/
+Lab1/download_pictures.py
+
