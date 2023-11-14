@@ -2,6 +2,7 @@ import os
 import shutil
 import csv
 import random
+import logging
 
 
 def replace_images_and_randomize(class_name: str, 
@@ -11,22 +12,25 @@ def replace_images_and_randomize(class_name: str,
     This function renames images by combining the image number, class name, and random number in the format class_name_number.jpg,
     transfers the images to the destination directory, and deletes the folder where the class images were stored.
     """
-    class_path = os.path.join(source_path, class_name)
-    image_names = os.listdir(class_path)
-    image_rel_paths = [os.path.join(class_path, name) for name in image_names]
-    
-    new_names = [f'{class_name}_{i}.jpg' for i in range(len(image_names))]
-    new_rel_paths = [os.path.join(dest_path, name) for name in new_names]
+    try:
+        class_path = os.path.join(source_path, class_name)
+        image_names = os.listdir(class_path)
+        image_rel_paths = [os.path.join(class_path, name) for name in image_names]
+        
+        new_names = [f'{class_name}_{i}.jpg' for i in range(len(image_names))]
+        new_rel_paths = [os.path.join(dest_path, name) for name in new_names]
 
-    for old_name, new_name in zip(image_rel_paths, new_rel_paths):
-        os.replace(old_name, new_name)
+        for old_name, new_name in zip(image_rel_paths, new_rel_paths):
+            os.replace(old_name, new_name)
 
-    os.chdir(source_path)
+        os.chdir(source_path)
 
-    if os.path.isdir(class_name):
-        shutil.rmtree(class_name)
+        if os.path.isdir(class_name):
+            shutil.rmtree(class_name)
 
-    os.chdir('..')
+        os.chdir('..')
+    except:
+        logging.error(f"Failed to write")
 
 
 def main() -> None:

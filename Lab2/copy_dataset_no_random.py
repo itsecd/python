@@ -1,7 +1,7 @@
 import os
 import shutil
 import csv
-
+import logging
 
 def get_full_paths1(class_name: str) -> list:
     """
@@ -34,22 +34,25 @@ def replace_images(class_name: str) -> list:
     This function changes the names of images by combining the image number and class in the format class_number.jpg ,
     transfers the images to the dataset directory and deletes the folder where the class images were stored
     """
-    rel_path = os.path.relpath('dataset1')
-    class_path = os.path.join(rel_path, class_name)
-    image_names = os.listdir(class_path)
-    image_rel_paths = list(
-        map(lambda name: os.path.join(class_path, name), image_names))
-    new_rel_paths = list(
-        map(lambda name: os.path.join(rel_path, f'{class_name}_{name}'), image_names))
-    for old_name, new_name in zip(image_rel_paths, new_rel_paths):
-        os.replace(old_name, new_name)
+    try:
+        rel_path = os.path.relpath('dataset1')
+        class_path = os.path.join(rel_path, class_name)
+        image_names = os.listdir(class_path)
+        image_rel_paths = list(
+            map(lambda name: os.path.join(class_path, name), image_names))
+        new_rel_paths = list(
+            map(lambda name: os.path.join(rel_path, f'{class_name}_{name}'), image_names))
+        for old_name, new_name in zip(image_rel_paths, new_rel_paths):
+            os.replace(old_name, new_name)
 
-    os.chdir('dataset1')
+        os.chdir('dataset1')
 
-    if os.path.isdir(class_name):
-        os.rmdir(class_name)
+        if os.path.isdir(class_name):
+            os.rmdir(class_name)
 
-    os.chdir('..')
+        os.chdir('..')
+    except:
+        logging.error(f"Failed to write")
 
 
 def main() -> None:
