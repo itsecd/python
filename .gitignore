@@ -129,5 +129,6 @@ dmypy.json
 .pyre/
 Lab1/lab1.py
 Lab2/years
+Lab2/weeks
 Lab2/X_and_Y
 .gitignore
