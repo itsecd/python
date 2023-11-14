@@ -2,11 +2,11 @@
     "headers": {"User-Agent": "Mozilla/5.0"},
     "folder": "dataset",
     "folder_an": "Lab2\\set\\dataset_another",
+    "folder_choice": "Lab2\\set\\dataset_choice",
     "folder_new": "Lab2\\set\\dataset_another_new",
     "folder_random": "Lab2\\set\\dataset_another_random",
     "search": ["cat","dog"], 
     "url": "https://www.bing.com/images/search?q={search}&first=1",
     "max_file": 40,
     "pages": 10
-    
 }
