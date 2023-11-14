@@ -2,6 +2,7 @@ import os
 import random
 import csv
 
+
 def copy_with_random_filename(source_path: str, destination_folder: str) -> str:
     random_filename = f"{random.randint(0, 10000)}.jpg"
     destination_path_random = os.path.join(destination_folder, random_filename)
