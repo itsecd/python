@@ -1,63 +1,79 @@
 import os
-import logging
-import argparse
-import requests
-from bs4 import BeautifulSoup
+from site import abs_paths
+import time
+from tkinter import image_names
+from selenium import webdriver
+from selenium.webdriver.common.by import By
+import urllib.request
+import csv
+
+def make_directory(directory_cat, directory_dog):
+    if not os.path.exists('dataset'):
+        os.mkdir('dataset')
+    if not os.path.exists(directory_cat):
+        os.mkdir('dataset/cat')
+    if not os.path.exists(directory_dog):
+        os.mkdir('dataset/dog')
 
 
-logging.basicConfig(level=logging.INFO)
-logger = logging.getLogger(__name__)
+def scroll_driver(driver, height):
+    scroll_range = 0
+    while scroll_range < height:
+        driver.execute_script(f"window.scrollTo(0, {scroll_range});") 
+        scroll_range += 10
+    
+
+list_cat=[]
+list_dog=[]
+
+def make_driver(link, path_name, name):
+    global list_cat,  list_dog
+    driver = webdriver.Chrome()
+    driver.get(link)
+    time.sleep(4)
+    scroll_driver(driver, 20000)
+    list_pictures = driver.find_elements(By.XPATH, path_name)
+    if name=="cat":
+        list_cat += list_pictures
+    if name=="dog":
+        list_dog += list_pictures
+    print(len(list_cat),len(list_dog))
 
 
-SEARCH_URL = "https://www.bing.com/images/search"
+def make_name(value):
+    return '0'*(4-len(str(value))) + str(value)
 
-def create_directory(directory: str) -> None:
-    """The function creates a folder if it does not exist"""
-    try:
-        if not os.path.exists(directory):
-            os.makedirs(directory)
-    except Exception as e:
-        logger.exception(f"Can't create folder: {e}")
+def save_image():
+    global list_cat,  list_dog
+    directory_cat = "dataset/cat"
+    directory_dog = "dataset/dog"
+    make_directory(directory_cat, directory_dog)
+    print(f'lens: {len(list_cat)}, {len(list_dog)}')
+
+    for elem in range(len(list_cat)):
+        img = urllib.request.urlopen(list_cat[elem].get_attribute('src')).read()
+        out = open(f"{directory_cat}/{make_name(elem)}.jpg", "wb")
+        out.write(img)
+        out.close
+    for elem in range(len(list_dog)):
+        img = urllib.request.urlopen(list_dog[elem].get_attribute('src')).read()
+        out = open(f"{directory_dog}/{make_name(elem)}.jpg", "wb")
+        out.write(img)
+        out.close
+
+def main():
+    for i in range(6):
+        if len(list_cat) < 1000:
+            make_driver(f"https://yandex.ru/images/search?p={i}&from=tabbar&text=cat&lr=51&rpt=image", "//img[@class='serp-item__thumb justifier__thumb']","cat")
+            time.sleep(10)
+    for i in range(6):        
+        if len(list_dog) < 1000:
+            make_driver(f"https://yandex.ru/images/search?p={i}&from=tabbar&text=dog&lr=51&rpt=image", "//img[@class='serp-item__thumb justifier__thumb']", "dog")
+            time.sleep(10)
+    save_image()
 
 
-def download_images(query: str,
-                    num_images: int,
-                    dataset_directory) -> None:
-    """This function uploads images to the selected directory"""   
-    create_directory(dataset_directory)
-    count = 0
-    page = 1
-    while count < num_images:
-        search_params = {"q": query, "form": "HDRSC2", "first": page}
-        headers = {
-            "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/58.0.3029.110 Safari/537.3"
-        }
-        response = requests.get(SEARCH_URL, params=search_params, headers=headers)
-        soup = BeautifulSoup(response.text, "lxml")
-        img_tags = soup.find_all('img', {"src": True}, class_='mimg')
-
-        for img_tag in img_tags:
-            img_url = img_tag["src"]
-            if img_url and img_url.startswith("http"):
-                try:
-                    img_data = requests.get(img_url, headers=headers, timeout=10).content
-                    class_folder = os.path.join(dataset_directory, query)
-                    create_directory(class_folder)
-                    with open(os.path.join(class_folder, f"{count:04}.jpg"), "wb") as img_file:
-                        img_file.write(img_data)
-                        count += 1
-                        logger.info(f"Downloaded {count}/{num_images} images for '{query}'")
-                except Exception as e:
-                        logger.exception(f"Error downloading image: {str(e)}")
-        page += 1
-    logger.info(f"Downloaded {num_images} images for '{query}'")    
 
 if __name__ == "__main__":
-    parser = argparse.ArgumentParser(description="Download images in classes")
-    parser.add_argument("classes", nargs='+', default=["cat", "dog"], help="List of classes to download images for.")
-    parser.add_argument("--num_images_per_class", type=int, default=1000, help="Number of images to download per class.")
-    parser.add_argument("--dataset_directory", default="dataset", help="Path to the dataset directory.")
-    args = parser.parse_args()
-
-    for class_name in args.classes:
-        download_images(class_name, args.num_images_per_class, args.dataset_directory)
+   
+    main()
