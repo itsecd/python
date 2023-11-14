@@ -35,7 +35,7 @@ def copy_dataset(old_dir: str, tags: str, new_dir: str, name_csv:str, bool:bool)
                     shutil.copy(b, a)
                     img = [[a, os.path.realpath(a), tag]]
                     img_list += img
-        csv_.write_scv(name_csv, img_list)
+        csv_.write_csv(name_csv, img_list)
         logging.info("copy with random num done")
     except Exception as e:
         logging.error(f"copy_with_random_num error{e}")

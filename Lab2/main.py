@@ -9,7 +9,7 @@ if __name__ == "__main__":
         settings = json.load(f)
     if settings["mode"] == "normal":
         l = csv_.make_list(settings["main_folder"], settings["tags"])
-        csv_.write_scv(os.path.join(settings["directory"], settings["normal"]), l)
+        csv_.write_csv(os.path.join(settings["directory"], settings["normal"]), l)
     if settings["mode"] == "copy":
         copy_dataset.copy_dataset(
             settings["main_folder"],

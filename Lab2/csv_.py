@@ -22,7 +22,7 @@ def make_list(directory: str, tags: list) -> list:
     return img_list
 
 
-def write_scv(name_csv: str, img_list: list) -> None:
+def write_csv(name_csv: str, img_list: list) -> None:
     """Function get data for each img in list
     and writes them to csv file"""
     try:
@@ -45,4 +45,4 @@ if __name__ == "__main__":
     l = [tiger, leopard]
     logging.info("start")
     list = make_list(os.path.join("Lab1", "dataset"), l)
-    write_scv("Lab2\\file", list)
+    write_csv("Lab2\\file", list)
