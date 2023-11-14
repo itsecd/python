@@ -26,9 +26,9 @@ def save_group_to_csv(output_folder: str, year: int, group: pd.DataFrame) -> Non
     start_date = group['Date'].min().strftime('%Y%m%d')
     end_date = group['Date'].max().strftime('%Y%m%d')
     file_name = f"{start_date}_{end_date}.csv"
-    
+
     file_path = os.path.join(output_folder, file_name)
-    group.to_csv(file_path, index=False, header=False)
+    group.to_csv(file_path, index=False)
 
 if __name__ == "__main__":
     output_folder = 'script2_files'

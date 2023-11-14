@@ -47,4 +47,4 @@ if __name__ == "__main__":
         file_name = f"{start_date_str}_{end_date_str}.csv"
         
         file_path = os.path.join(output_folder, file_name)
-        week_data.to_csv(file_path, index=False, header=False)
+        week_data.to_csv(file_path, index=False)
