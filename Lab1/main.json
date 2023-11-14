@@ -3,6 +3,7 @@
     "folder": "dataset",
     "folder_an": "Lab2\\set\\dataset_another",
     "folder_choice": "Lab2\\set\\dataset_choice",
+    "folder_iterator": "Lab2\\set\\dataset_iterator",
     "folder_new": "Lab2\\set\\dataset_another_new",
     "folder_random": "Lab2\\set\\dataset_another_random",
     "search": ["cat","dog"], 
