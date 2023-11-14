@@ -1,0 +1,8 @@
+{
+    "directory": "Lab2",
+    "classes": ["1", "2", "3", "4", "5"],
+    "csv_folder": "Lab2\\csv",
+    "dataset_folder": "dataset",
+    "mode": "pathfile",
+    "pathfile_csv": "dataset.csv"
+}
