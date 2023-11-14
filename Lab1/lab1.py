@@ -41,10 +41,13 @@ def make_lists(start_date: date,
                 usd_rates = data["Valute"]["USD"]["Value"]
                 list_usd.append(usd_rates)
                 list_dates.append(str(start_date))
+            else:
+                list_usd.append("data not found")
+                list_dates.append(str(start_date))
             start_date -= delta
         return list_dates, list_usd
     except Exception as ex:
-        logging.error(f"can't get data: {ex.message}\n{ex.args}\n")
+        logging.error(f"can't get data: {ex}\n{ex.args}\n")
 
 
 def write_to_f(filename: str,
