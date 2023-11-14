@@ -17,7 +17,7 @@ def parse_arguments():
     parser.add_argument("--pages", type=int, default=3, help="Количество страниц для обхода")
     return parser.parse_args()
 
-""""""""
+
 def generate_random_user_agent() -> str:
     """
     Генерирует случайный User-Agent.
