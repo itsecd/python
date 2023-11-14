@@ -27,3 +27,28 @@ def get_rel_paths(class_name: str) -> List[str]:
     image_rel_paths = list(
         map(lambda name: os.path.join(class_path, name).replace("\\","/"), image_names))
     return image_rel_paths
+
+
+def main() -> None:
+    class1 = 'polar bear'
+    class2 = 'brown bear'
+
+    polarbear_full_paths = get_full_paths(class1)
+    polarbear_rel_paths = get_rel_paths(class1)
+    brownbear_full_paths = get_full_paths(class2)
+    brownbear_rel_paths = get_rel_paths(class2)
+
+    with open('paths.csv', 'w', newline='') as csv_file:  
+        writer = csv.writer(csv_file, delimiter=';')
+        
+        # Записываем пути для первого класса
+        for full_path, rel_path in zip(polarbear_full_paths, polarbear_rel_paths):
+            writer.writerow([full_path, rel_path, class1])
+        
+        # Записываем пути для второго класса
+        for full_path, rel_path in zip(brownbear_full_paths, brownbear_rel_paths):
+            writer.writerow([full_path, rel_path, class2])
+
+
+if __name__ == "__main__":
+    main()
