@@ -1,8 +1,13 @@
 {
     "directory": "Lab2",
-    "classes": ["1", "2", "3", "4", "5"],
+    "classes": ["0", "1", "2", "3", "4", "5"],
     "csv_folder": "Lab2\\csv",
     "dataset_folder": "dataset",
-    "mode": "pathfile",
-    "pathfile_csv": "dataset.csv"
+    "random_dataset": "random_dataset",
+    "unified_dataset": "unified_dataset",
+    "mode": "randomize",
+    "pathfile_csv": "dataset.csv",
+    "randomized_csv": "randomized.csv",
+    "unified_csv": "unified.csv",
+    "default_size": 1257
 }
