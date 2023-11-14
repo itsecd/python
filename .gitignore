@@ -128,4 +128,6 @@ dmypy.json
 # Pyre type checker
 .pyre/
 Lab1/lab1.py
+Lab2/years
+Lab2/X_and_Y
 .gitignore

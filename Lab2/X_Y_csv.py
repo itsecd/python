@@ -57,9 +57,4 @@ if __name__ == "__main__":
     script_dir = os.path.dirname(os.path.abspath(__file__))
     input_csv = os.path.join(script_dir, "../Lab1/dataset/dataset.csv")
 
-    try:
-        if os.path.exists(input_csv):
-            split_csv(input_csv, output_csv_x, output_csv_y)
-            logging.info("files successfully created.")
-    except Exception as ex:
-        logging.exception(f"Can't create files: {ex}\n{ex.args}\n") 
+    split_csv(input_csv, output_csv_x, output_csv_y)
