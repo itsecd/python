@@ -1,56 +1,41 @@
 import os
 import csv
+from pathlib import Path
 import logging
-from typing import List
 
 
-logging.basicConfig(level=logging.INFO)
-logger = logging.getLogger(__name__)
+logging.basicConfig(filename='annotation.log', level=logging.INFO)
 
 
-def get_absolute_path(name: str) -> List[str]:
+def get_paths(name: str) -> tuple[list[Path], list[Path]]:
     """
-    This function returns a list of absolute paths for all images 
-    the specific name of the animal passed to the function
+    This function returns a tuple of absolute and relative paths for all images 
+    of the specific name of the animal passed to the function.
     """
-    name_absolute_path = os.path.abspath(f"dataset/{name}")
-    image_names = os.listdir(name_absolute_path)
+    absolute_path = os.path.abspath(os.path.join('dataset', name))
+    image_paths = [os.path.join(absolute_path, img) for img in os.listdir(absolute_path)]
 
-    image_absolute_paths = list(map(lambda img: os.path.join(name_absolute_path, img), image_names))
-    
-    return image_absolute_paths
+    relative_path = os.path.relpath(os.path.join('dataset', name))
+    relative_paths = [os.path.join(relative_path, img) for img in os.listdir(relative_path)]
 
-def get_relative_path(name: str) -> List[str]:
-    """
-    This function returns a list of relative paths for all images 
-    the specific name of the animal passed to the function
-    """
-    name_relative_path = os.path.relpath(f"dataset/{name}")
-    image_names = os.listdir(name_relative_path)
+    return image_paths, relative_paths
 
-    image_relative_paths = list(map(lambda img: os.path.join(name_relative_path, img), image_names))
-
-    return image_relative_paths
-    
 def main() -> None:
-    cat = 'cat'
-    dog = 'dog'
+    cat, dog = 'cat', 'dog'
 
-    cat_absolute_paths = get_absolute_path(cat)
-    cat_relative_paths = get_relative_path(cat)
-    dog_absolute_paths = get_absolute_path(dog)
-    dog_relative_paths = get_relative_path(dog)
+    cat_absolute_paths, cat_relative_paths = get_paths(cat)
+    dog_absolute_paths, dog_relative_paths = get_paths(dog)
 
-    with open('annotation.csv', 'w') as csv_file:
-        writer = csv.writer(csv_file, delimiter=',', lineterminator='\r')
+    with open('annotation.csv', 'w', newline='') as csv_file:
+        writer = csv.writer(csv_file)
 
-        for absolute_path, relative_path in zip(cat_absolute_paths, cat_relative_paths):
-            writer.writerow([absolute_path, relative_path, cat])
-            logger.info(f"Added annotation for image: {relative_path}")
+        for absolute_path, relative_path, label in zip(cat_absolute_paths, cat_relative_paths, [cat] * len(cat_absolute_paths)):
+            writer.writerow([absolute_path, relative_path, label])
+            logging.info(f"Added entry for {label}: {absolute_path}")
 
-        for absolute_path, relative_path in zip(dog_absolute_paths, dog_relative_paths):
-            writer.writerow([absolute_path, relative_path, dog])
-            logger.info(f"Added annotation for image: {relative_path}")
+        for absolute_path, relative_path, label in zip(dog_absolute_paths, dog_relative_paths, [dog] * len(dog_absolute_paths)):
+            writer.writerow([absolute_path, relative_path, label])
+            logging.info(f"Added entry for {label}: {absolute_path}")
 
 if __name__ == "__main__":
     main()
