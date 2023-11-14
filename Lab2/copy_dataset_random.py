@@ -3,6 +3,7 @@ import shutil
 import csv
 import random
 
+
 def replace_images_and_randomize(class_name: str, 
                                  source_path: str, 
                                  dest_path: str) -> None:
@@ -26,6 +27,7 @@ def replace_images_and_randomize(class_name: str,
         shutil.rmtree(class_name)
 
     os.chdir('..')
+
 
 def main() -> None:
     if os.path.isdir('dataset1'):
@@ -65,6 +67,7 @@ def main() -> None:
             class_name = old_rel_path.split("_")[0].replace("dataset2\\", "")
             writer.writerow([full_path, rel_path, class_name])
     shutil.rmtree('dataset1')
+
 
 if __name__ == "__main__":
     main()
