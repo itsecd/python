@@ -41,10 +41,6 @@ if __name__ == "__main__":
                         type=str, default='years',
                         help='The path to the data file'
                         )
-    parser.add_argument('--output',
-                        type=str, default='years.csv',
-                        help='Names of output files, separated by years'
-                        )
     
     args = parser.parse_args()
 
