@@ -8,5 +8,7 @@
 
     "normal":"file",
     "copy":"new_file",
-    "random":"random_file"
+    "random":"random_file",
+
+    "bool":true
 }

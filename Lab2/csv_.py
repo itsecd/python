@@ -8,18 +8,6 @@ os.chdir("C:\\Users\\Yana\\Documents\\python-v6\\")
 logging.basicConfig(filename="Lab2\\py_log1.log", filemode="a", level=logging.INFO)
 
 
-def make_csv(name_csv: str) -> None:
-    """This function creates a csv
-    file with specific name"""
-    logging.info("in function make_csv")
-    try:
-        if not os.path.exists(name_csv):
-            with open(f"Lab2\\{name_csv}.csv", "w") as f:
-                csv.writer(f)
-    except Exception as e:
-        logging.error(f"file not created:{e}")
-
-
 def make_list(directory: str, tags: list) -> list:
     """Function creates list with
     parametrs for csv file"""
@@ -38,7 +26,7 @@ def write_scv(name_csv: str, img_list: list) -> None:
     """Function get data for each img in list
     and writes them to csv file"""
     try:
-        make_csv(name_csv)
+        logging.info("in function make_csv")
         logging.info("make_csv")
         for img in img_list:
             with open(f"{name_csv}.csv", "a") as f:

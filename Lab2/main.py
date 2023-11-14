@@ -2,7 +2,6 @@ import os
 import json
 import csv_
 import copy_dataset
-import copy_random_num
 
 
 if __name__ == "__main__":
@@ -17,11 +16,13 @@ if __name__ == "__main__":
             settings["tags"],
             settings["folder"],
             (os.path.join(settings["directory"], settings["copy"])),
+            settings["bool"]
         )
     if settings["mode"] == "random":
-        copy_random_num.copy_with_random_num(
+        copy_dataset.copy_dataset(
             settings["main_folder"],
             settings["tags"],
             settings["folder"],
             (os.path.join(settings["directory"], settings["random"])),
+            settings['bool']
         )
