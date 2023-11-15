@@ -5,6 +5,7 @@ import random
 import logging
 from util import write_annotation_to_csv
 
+
 logging.basicConfig(filename='annotation3.log', level=logging.INFO)
 
 

@@ -5,6 +5,7 @@ import csv
 from typing import List
 from util import write_annotation_to_csv
 
+
 logging.basicConfig(filename='annotation2.log', level=logging.INFO)
 
 
