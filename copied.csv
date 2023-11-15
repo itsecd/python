@@ -1,0 +1,11 @@
+Original Path,New Path,Class
+dataset\brown_bear\0000.jpg,copied_dataset\brown_bear_0000.jpg,brown_bear
+dataset\brown_bear\0001.jpg,copied_dataset\brown_bear_0001.jpg,brown_bear
+dataset\brown_bear\0002.jpg,copied_dataset\brown_bear_0002.jpg,brown_bear
+dataset\brown_bear\0003.jpg,copied_dataset\brown_bear_0003.jpg,brown_bear
+dataset\brown_bear\0004.jpg,copied_dataset\brown_bear_0004.jpg,brown_bear
+dataset\polar_bear\0000.jpg,copied_dataset\polar_bear_0000.jpg,polar_bear
+dataset\polar_bear\0001.jpg,copied_dataset\polar_bear_0001.jpg,polar_bear
+dataset\polar_bear\0002.jpg,copied_dataset\polar_bear_0002.jpg,polar_bear
+dataset\polar_bear\0003.jpg,copied_dataset\polar_bear_0003.jpg,polar_bear
+dataset\polar_bear\0004.jpg,copied_dataset\polar_bear_0004.jpg,polar_bear

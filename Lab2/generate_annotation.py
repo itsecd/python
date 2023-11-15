@@ -2,6 +2,7 @@ import os
 import csv
 import json
 
+
 def generate_annotation_file(dataset_path: str, annotation_file_path: str) -> None:
     with open(annotation_file_path, 'w', newline='') as csv_file:
         csv_writer = csv.writer(csv_file)

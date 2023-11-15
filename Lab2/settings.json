@@ -5,5 +5,7 @@
     "default_csv": "annotation.csv",
     "randomized_csv": "randomized.csv",
     "randomized_dataset": "randomized_dataset",
-    "default_size": 10
+    "default_size": 10,
+    "copied_dataset": "copied_dataset",
+    "copied_csv": "copied.csv"
 }

@@ -6,7 +6,6 @@ import csv
 import json
 
 
-
 logging.basicConfig(level=logging.INFO)
 
 
