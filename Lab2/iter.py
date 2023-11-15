@@ -4,7 +4,7 @@ class DirectoryIterator:
     def __init__(self, directory):
         self._counter = 0
         self._directory = directory
-        self._data = os.listdir(os.path.join('dataset', directory))
+        self._data = os.listdir(os.path.abspath(os.path.join('dataset', directory)))
         self._limit = len(self._data)
 
     def __iter__(self):
