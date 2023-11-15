@@ -1,20 +1,21 @@
-import os
+import csv
 
 
-def get_path(class_name: str) -> str:
+def get_paths(class_name: str, csv_path: str) -> list:
     """
-    This function returns the relative path for the class object passed
-    to the function
+    This function returns the relative paths for the class objects passed
+    to the function using information from a CSV file.
     """
-    path = os.path.join('dataset', class_name)
-    class_names = os.listdir(path)
-    class_names.append(None)
-    for i in range(len(class_names)):
-        if class_names[i] is not None:
-            yield os.path.join(path, class_names[i])
-        elif class_names[i] is None:
-            yield None   
+    paths = []
+
+    with open(csv_path, 'r') as csv_file:
+        reader = csv.reader(csv_file, delimiter=';')
+        for row in reader:
+            if class_name in row[2]:
+                paths.append(row[1])
+
+    return paths if paths else None 
 
 
-print(*get_path('polar bear'))
-print(*get_path('brown bear'))
+if __name__ == "__main__":
+    print(get_paths("polar bear", "paths.csv"))
