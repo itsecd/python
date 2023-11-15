@@ -1,14 +1,15 @@
 {
-    "directory": "Lab2",
+    "directory": "python-v8",
     "classes": ["good","bad"],
     "csv": "csv",
-    "main_folder": "dataset",
+    "main_dataset": "dataset",
     "mode": "normal",
-    "normal": "dataset",
-    "random": "random_dataset",
-    "copy": "copy_dataset",
-    "normal_csv": "annotation.csv",
+    "dataset_normal": "normal_dataset",
+    "dataset_random": "random_dataset",
+    "dataset_copy": "copy_dataset",
+    "normal_csv": "normal_dataset.csv",
     "random_csv": "random_dataset.csv",
     "copy_csv": "copy_dataset.csv",
     "default_number": 1000
 }
+
