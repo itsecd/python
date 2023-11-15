@@ -5,7 +5,7 @@ import json
 
 
 def copy_dataset_with_annotation(dataset_path: str, destination_path: str, annotation_file_path: str) -> None:
-   
+    """Copies files from dataset to copied_dataset with renaming by format {class}_{number}"""
     if not os.path.exists(destination_path):
         os.makedirs(destination_path)
 
