@@ -7,7 +7,6 @@ import json
 class DatasetIterator:
     """Returns a path to a file belonging of the class"""
     def __init__(self, dataset_path: str, class_name: str):
-        """Returns a path to a file belonging of the class"""
         self.data = list()
         self.count = 0
         self.mark = class_name

@@ -11,7 +11,6 @@ logging.basicConfig(level=logging.INFO)
 
 def make_random_list(top: int) -> list:
     """Creates a list filled with random numbers from 0 to {top}"""
-    """Creates a list filled with random numbers from 0 to {top}"""
     rand_list = []
     for i in range(0, top):
         rand_list.append(i)
