@@ -2,6 +2,7 @@ import os
 import pandas as pd
 from typing import Tuple
 
+
 def create_output_folder(folder_name: str) -> None:
     """Create new folder"""
     os.makedirs(folder_name, exist_ok=True)

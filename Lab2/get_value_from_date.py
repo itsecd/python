@@ -4,7 +4,7 @@ import os
 import csv
 from typing import Generator, Tuple, Union
 
-# Пути к папкам с файлами csv
+
 folder_paths = [
     'csv_files',
     'script1_files',
@@ -140,25 +140,32 @@ def get_data_for_date(date: datetime) -> str:
 
     return data
 
-def next_date() -> Generator[Tuple[datetime, Union[str, None]], None, None]:
-    """Generates valid date and corresponding data tuples."""
-    current_date = datetime(1998, 1, 2)
-    end_date = datetime(2023, 10, 14)
+class DateDataIterator:
+    def __init__(self, start_date: datetime, end_date: datetime) -> None:
+        """Initializing the iterator class"""
+        self.current_date = start_date
+        self.end_date = end_date
 
-    def get_next_valid_date(current_date):
-        while current_date <= end_date:
+    def get_next_valid_date(self, current_date: datetime) -> Tuple[Union[datetime, None], Union[str, None]]:
+        """Gets the next valid date and the corresponding data"""
+        while current_date <= self.end_date:
             data = get_data_for_date(current_date)
             current_date += timedelta(days=1)
             if data is not None and data != "Page not found":
                 return current_date - timedelta(days=1), data
         return None, None
 
-    while current_date <= end_date:
-        date, data = get_next_valid_date(current_date)
+    def __iter__(self) -> "DateDataIterator":
+        """Returns itself as an iterator"""
+        return self
+
+    def __next__(self) -> Tuple[Union[datetime, None], Union[str, None]]:
+        """Returns data for the next date"""
+        date, data = self.get_next_valid_date(self.current_date)
         if date is None:
-            break
-        yield date, data
-        current_date = date + timedelta(days=1)
+            raise StopIteration
+        self.current_date = date + timedelta(days=1)
+        return date, data
 
 if __name__ == "__main__": 
     date_to_find = datetime(2023, 10, 5)
@@ -166,12 +173,16 @@ if __name__ == "__main__":
     data_for_date = get_data_for_date(date_to_find)
     print(f"Value for: {date_to_find}: {data_for_date}")
 
-    data_iterator = next_date()
+    iterator = DateDataIterator(datetime(1998, 1, 2), datetime(2023, 10, 14))
 
-    for _ in range(5):
-        next_date, next_data_value = next(data_iterator)
-        if next_date is not None:
-            print(f"Date: {next_date}, Value: {next_data_value}")
-        else:
-            print("No more data.")
+    for _ in range(50):
+        try:
+            next_date, next_data_value = next(iterator)
+            if next_date is not None:
+                print(f"Date: {next_date}, Value: {next_data_value}")
+            else:
+                print("No more data")
+                break
+        except StopIteration:
+            print("No more data")
             break
