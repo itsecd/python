@@ -39,7 +39,7 @@ def copy_dataset_with_annotation(main_folder: str, new_copy_name: str) -> None:
                 destination_folder = os.path.join(new_copy_name, query)
                 create_folder(destination_folder)
 
-                new_filename = f"{query}_{len(os.listdir(destination_folder)) + 1:04d}.jpg"
+                new_filename = f"{query}_{len(os.listdir(destination_folder)) + 0:04d}.jpg"
                 source_filepath = os.path.join(root, file)
                 destination_filepath = os.path.join(destination_folder, new_filename)
                 shutil.copyfile(source_filepath, destination_filepath)
