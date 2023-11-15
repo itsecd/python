@@ -13,10 +13,18 @@ def get_full_paths(class_name: str,
     try:
         full_path = os.path.abspath(dataset_path)
         class_path = os.path.join(full_path, class_name).replace("\\", "/")
-        image_names = os.listdir(class_path)
-        image_full_paths = list(
-            map(lambda name: os.path.join(class_path, name).replace("\\", "/"), image_names))
-        return image_full_paths
+        if os.path.exists(class_path):
+            image_names = os.listdir(class_path)
+            image_full_paths = list(
+                map(lambda name: os.path.join(class_path, name).replace("\\", "/"), image_names))
+            return image_full_paths
+        else:
+            image_names = os.listdir(full_path)
+            image_class_names = [name for name in image_names if class_name in name]
+            image_full_paths = list(
+                map(lambda name: os.path.join(full_path, name), image_class_names))
+            return image_full_paths
+
     except Exception as e:
         logging.error(f"Failed to write_abs: {e}")
 
@@ -30,10 +38,17 @@ def get_rel_paths(class_name: str,
     try:
         rel_path = os.path.relpath(dataset_path)
         class_path = os.path.join(rel_path, class_name).replace("\\", "/")
-        image_names = os.listdir(class_path)
-        image_rel_paths = list(
-            map(lambda name: os.path.join(class_path, name).replace("\\", "/"), image_names))
-        return image_rel_paths
+        if os.path.exists(class_path):
+            image_names = os.listdir(class_path)
+            image_rel_paths = list(
+                map(lambda name: os.path.join(class_path, name).replace("\\", "/"), image_names))
+            return image_rel_paths
+        else:
+            image_names = os.listdir(rel_path)
+            image_class_names = [name for name in image_names if class_name in name]
+            image_rel_paths = list(
+                map(lambda name: os.path.join(rel_path, name), image_class_names))
+            return image_rel_paths
     except Exception as e:
         logging.error(f"Failed to write_rel: {e}")
 

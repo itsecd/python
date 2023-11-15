@@ -39,7 +39,7 @@ if __name__ == "__main__":
     if os.path.isdir(dataset_path):
         shutil.rmtree(dataset_path)
 
-    old = os.path.relpath('dataset')
+    old = os.path.relpath(old_path)
     new = os.path.relpath(dataset_path)
     shutil.copytree(old, new)
 
@@ -47,8 +47,8 @@ if __name__ == "__main__":
     replace_images(class2, dataset_path)
 
     polarbear_full_paths = get_full_paths(class1, old_path)
-    polarbear_rel_paths = get_rel_paths(class1, dataset_path.replace("/f{class1}",""))
+    polarbear_rel_paths = get_rel_paths(class1, dataset_path)
     brownbear_full_paths = get_full_paths(class2, old_path)
-    brownbear_rel_paths = get_rel_paths(class2, dataset_path.replace("/f{class2}",""))
+    brownbear_rel_paths = get_rel_paths(class2, dataset_path)
     write_to_csv('paths1.csv', polarbear_full_paths, polarbear_rel_paths, class1)
     write_to_csv('paths1.csv', brownbear_full_paths, brownbear_rel_paths, class2)

@@ -1,9 +1,10 @@
 import os
 import shutil
-import csv
 import random
 import logging
-
+from make_rel_abs_path import get_full_paths
+from make_rel_abs_path import get_rel_paths
+from make_rel_abs_path import write_to_csv
 
 def replace_images_and_randomize(class_name: str, 
                                  source_path: str, 
@@ -33,23 +34,11 @@ def replace_images_and_randomize(class_name: str,
         logging.error(f"Failed to write: {e}")
 
 
-def write_to_csv(
-        file_path: str, 
-        full_paths: list, 
-        rel_paths: list, 
-        dataset_path: str) -> None:
-    """
-    This function writes the paths to a CSV file.
-    """
-    with open(file_path, 'w') as csv_file:
-        writer = csv.writer(csv_file, delimiter=';', lineterminator='\r')
-        for full_path, rel_path in zip(full_paths, rel_paths):
-            class_name = rel_path.split("_")[0].replace(os.path.join(dataset_path, ""), "")
-            writer.writerow([full_path, rel_path, class_name])    
-
-
-
 if __name__ == "__main__":
+
+    class1 = 'polar bear'
+    class2 = 'brown bear'
+
     if os.path.isdir('dataset1'):
         shutil.rmtree('dataset1')
 
@@ -58,19 +47,17 @@ if __name__ == "__main__":
 
     shutil.copytree(old_path, new_path)
 
-    replace_images_and_randomize('brown bear', new_path, new_path)
-    replace_images_and_randomize('polar bear', new_path, new_path)
+    replace_images_and_randomize(class1, new_path, new_path)
+    replace_images_and_randomize(class2, new_path, new_path)
 
     if os.path.isdir('dataset2'):
         shutil.rmtree('dataset2')
 
-    old_path = os.path.relpath('dataset1')
-    new_path = os.path.relpath('dataset2')
+    dataset_path = 'dataset'
+    polarbear_full_paths = get_full_paths(class1, dataset_path)
+    polarbear_rel_paths = get_rel_paths(class1, dataset_path)
+    brownbear_full_paths = get_full_paths(class2, dataset_path)
+    brownbear_rel_paths = get_rel_paths(class2, dataset_path)
 
-    shutil.copytree(old_path, new_path)
-
-    new_names = os.listdir(new_path)
-    new_rel_paths = [os.path.join(new_path, name) for name in new_names]
-    new_full_paths = [os.path.join(os.path.abspath(new_path), name) for name in new_names]
-
-    write_to_csv('paths2.csv', new_full_paths, new_rel_paths, new_path)
+    write_to_csv('paths2.csv', polarbear_full_paths, polarbear_rel_paths, class1)
+    write_to_csv('paths2.csv', brownbear_full_paths, brownbear_rel_paths, class2)
