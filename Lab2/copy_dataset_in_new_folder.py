@@ -7,7 +7,7 @@ from typing import List, Tuple
 logging.basicConfig(filename='annotation2.log', level=logging.INFO)
 
 
-def get_paths2(name: str) -> Tuple[List[str], List[str]]:
+def get_paths(name: str) -> Tuple[List[str], List[str]]:
     """
     This function returns a tuple of absolute and relative paths for all images
     of the specific name of the animal passed to the function,
@@ -22,7 +22,7 @@ def get_paths2(name: str) -> Tuple[List[str], List[str]]:
     return image_paths, relative_paths
 
 
-def replace_images2(name: str) -> None:
+def rename_and_move_images(name: str) -> None:
     """
     This function changes the names of images by combining the image number and class
     in the format class_number.jpg,
@@ -61,11 +61,11 @@ if __name__ == "__main__":
 
     cat, dog = 'cat', 'dog'
 
-    replace_images2(cat)
-    replace_images2(dog)
+    rename_and_move_images(cat)
+    rename_and_move_images(dog)
 
-    cat_absolute_paths, cat_relative_paths = get_paths2(cat)
-    dog_absolute_paths, dog_relative_paths = get_paths2(dog)
+    cat_absolute_paths, cat_relative_paths = get_paths(cat)
+    dog_absolute_paths, dog_relative_paths = get_paths(dog)
 
     with open('annotation2.csv', 'w', newline='') as csv_file:
         writer = csv.writer(csv_file, delimiter=',', lineterminator='\r')
