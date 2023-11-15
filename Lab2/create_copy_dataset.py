@@ -4,7 +4,7 @@ import csv
 import json
 import logging
 import random
-from create_annotation import create_annotation_file 
+from create_annotation import create_annotation_file
 
 logging.basicConfig(level=logging.INFO)
 
@@ -20,7 +20,7 @@ def create_folder(folder_name: str) -> None:
 
 def copy_dataset(main_folder: str, new_copy_name: str, copy_type: str = "numbered") -> None:
     """Copy the dataset with annotations to a new directory and create an annotation file.
-    
+
     main_folder (str): The path to the main folder where the dataset is located.
     new_copy_name (str): The name of the new directory to which the dataset will be copied.
     copy_type (str): Type of data copy. Options: "random" or "numbered".
@@ -48,7 +48,8 @@ def copy_dataset(main_folder: str, new_copy_name: str, copy_type: str = "numbere
                 elif copy_type == "numbered":
                     new_filename = f"{query}_{len(os.listdir(destination_folder)) + 0:04d}.jpg"
                 else:
-                    logging.error("Invalid copy_type. Use 'default' or 'numbered'.")
+                    logging.error(
+                        "Invalid copy_type. Use 'default' or 'numbered'.")
                     return
 
                 source_filepath = os.path.join(root, file)
@@ -71,6 +72,6 @@ if __name__ == "__main__":
     with open("Lab2/options.json", "r") as options_file:
         options = json.load(options_file)
         copy_dataset(
-            options["main_folder"], options["new_copy_name"],"numbered")
+            options["main_folder"], options["new_copy_name"], "numbered")
         copy_dataset(
-            options["main_folder"], options["random_copy_name"],"random")
+            options["main_folder"], options["random_copy_name"], "random")

@@ -1,5 +1,6 @@
 import csv
-import shutil  
+import shutil
+
 
 def get_next_instance(csv_file: str, class_label: str) -> str:
     """Retrieves the next instance (path to it) of the specified class from the CSV file.
@@ -19,14 +20,14 @@ def get_next_instance(csv_file: str, class_label: str) -> str:
     if instances:
         next_instance = instances.pop(0)
         new_data = [row for row in data if row[0] != next_instance]
-        
+
         temp_file = csv_file + '.tmp'
         with open(temp_file, "w", newline='') as file:
             writer = csv.writer(file)
             writer.writerows(new_data)
-        
+
         shutil.move(temp_file, csv_file)
-        
+
         return next_instance
     else:
         return None

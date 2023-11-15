@@ -25,7 +25,8 @@ def generate_annotation(main_folder: str) -> list:
     main_folder (str): The path to the main folder where the files are located.
     list(str): A list of annotations for each file with the absolute path, relative path, and query label.
     """
-    file_list = list_files_in_directory(main_folder, allowed_extensions=[".jpg", ".png", ".gif"])
+    file_list = list_files_in_directory(
+        main_folder, allowed_extensions=[".jpg", ".png", ".gif"])
     annotations = []
     for file in file_list:
         absolute_path_from_project = os.path.abspath(file)
