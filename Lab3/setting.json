@@ -1,0 +1,13 @@
+{
+    "mode" : "normal",
+    "objects" : ["rose", "tulip"],
+
+    "name-normal" : "dataset", 
+    "name-together" : "dataset_together", 
+    "name-random" : "dataset_random",
+
+    "name-dir" : "app",
+    "name-csv-dir" : "csv",
+    "name-data-dir" : "data",
+    "name-json-dir" : "json"
+}
