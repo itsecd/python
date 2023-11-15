@@ -7,7 +7,7 @@ import pandas as pd
 logging.basicConfig(level=logging.INFO)
 
 
-def create_folder(base_folder: str = "years") -> None:
+def create_folder(base_folder: str) -> None:
     """The function form a folder"""
     try:
         if not os.path.exists(base_folder):

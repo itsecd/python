@@ -7,7 +7,7 @@ import pandas as pd
 logging.basicConfig(level=logging.INFO)
 
 
-def create_folder(base_folder: str = "X_and_Y") -> None:
+def create_folder(base_folder: str) -> None:
     """The function form a folder"""
     try:
         if not os.path.exists(base_folder):
@@ -28,8 +28,8 @@ def split_csv(input_file: str,
         df_x = df.iloc[:, 0]
         df_y = df.iloc[:, 1]
 
-        df_x.to_csv(output_file_x, index=False, header=False)
-        df_y.to_csv(output_file_y, index=False, header=False)
+        df_x.to_csv(output_file_x, index=False, header=['Date'])
+        df_y.to_csv(output_file_y, index=False, header=['Value'])
     except Exception as ex:
         logging.exception(f"Can't split csv to X and Y: {ex}\n{ex.args}\n") 
 
@@ -40,11 +40,11 @@ if __name__ == "__main__":
                         type=str, default='X_and_Y',
                         help='The path to the data file'
                         )
-    parser.add_argument('--outputX',
+    parser.add_argument('--output_x',
                         type=str, default='X.csv',
                         help='Output file name X'
                         )
-    parser.add_argument('--outputY',
+    parser.add_argument('--output_y',
                         type=str, default='Y.csv',
                         help='Output file name Y'
                         )

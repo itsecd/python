@@ -7,7 +7,7 @@ import pandas as pd
 logging.basicConfig(level=logging.INFO)
 
 
-def create_folder(base_folder: str = "weeks") -> None:
+def create_folder(base_folder: str) -> None:
     """The function form a folder"""
     try:
         if not os.path.exists(base_folder):
@@ -17,7 +17,7 @@ def create_folder(base_folder: str = "weeks") -> None:
 
 
 def split_by_week(input_file: str,
-                  output_path
+                  output_path: str
                   ) -> None:
     """The function takes path to the input file and split file to weeks"""
     try:
@@ -26,15 +26,17 @@ def split_by_week(input_file: str,
 
         df['Date'] = pd.to_datetime(df['Date'])
 
-        grouped = df.groupby([df['Date'].dt.year, df['Date'].dt.isocalendar().week])
+        # Используем strftime('%U') для определения номера недели и strftime('%Y') для определения года
+        grouped = df.groupby([df['Date'].dt.strftime('%Y'), df['Date'].dt.strftime('%U')])
 
         for (year, week), group in grouped:
-            start_date = group['Date'].min().strftime('%Y%m%d')
-            end_date = group['Date'].max().strftime('%Y%m%d')
+            if not group.empty:  # Проверка на наличие данных в группе
+                start_date = group['Date'].min().strftime('%Y%m%d')
+                end_date = group['Date'].max().strftime('%Y%m%d')
 
-            output_file = f"{start_date}_{end_date}.csv"
+                output_file = f"{start_date}_{end_date}.csv"
 
-            group.to_csv(os.path.join(output_path,output_file), index=False)
+                group.to_csv(os.path.join(output_path,output_file), index=False)
     except Exception as ex:
         logging.exception(f"Can't split data to weeks: {ex}\n{ex.args}\n")
 
@@ -45,7 +47,7 @@ if __name__ == "__main__":
                         type=str, default='weeks',
                         help='The path to the data file'
                         )
-    
+
     args = parser.parse_args()
 
     script_dir = os.path.dirname(os.path.abspath(__file__))
