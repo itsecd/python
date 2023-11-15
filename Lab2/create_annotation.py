@@ -1,6 +1,8 @@
 import csv
 from pathlib import Path
 import logging
+from util import write_annotation_to_csv
+
 
 logging.basicConfig(filename='annotation.log', level=logging.INFO)
 
@@ -13,12 +15,6 @@ def get_absolute_paths(name: str) -> list[Path]:
 def get_relative_paths(name: str) -> list[Path]:
     relative_path = Path('dataset') / name
     return list(relative_path.glob('*'))
-
-
-def write_annotation_to_csv(csv_writer, absolute_paths, relative_paths, label):
-    for absolute_path, relative_path in zip(absolute_paths, relative_paths):
-        csv_writer.writerow([str(absolute_path), str(relative_path), label])
-        logging.info(f"Added entry for {label}: {absolute_path}")
 
 
 if __name__ == "__main__":

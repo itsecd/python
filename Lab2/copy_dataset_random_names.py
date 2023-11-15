@@ -3,7 +3,7 @@ import shutil
 import csv
 import random
 import logging
-
+from util import write_annotation_to_csv
 
 logging.basicConfig(filename='annotation3.log', level=logging.INFO)
 
@@ -13,15 +13,6 @@ def generate_random_numbers(num_items: int) -> list[int]:
     Generate a list of unique random numbers in the range [0, 10000].
     """
     return random.sample(range(0, 10001), num_items)
-
-
-def write_annotation_to_csv(file_path: str, data: list[list[str]]) -> None:
-    """
-    Write annotation data to a CSV file.
-    """
-    with open(file_path, 'w', newline='') as csv_file:
-        writer = csv.writer(csv_file, delimiter=',', lineterminator='\r')
-        writer.writerows(data)
 
 
 def process_images(src_path: str, dest_path: str) -> tuple[list[str], list[str]]:

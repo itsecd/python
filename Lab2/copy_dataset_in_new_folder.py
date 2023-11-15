@@ -3,6 +3,7 @@ import shutil
 import csv
 import logging
 from typing import List, Tuple
+from util import write_annotation_to_csv
 
 logging.basicConfig(filename='annotation2.log', level=logging.INFO)
 
@@ -39,16 +40,8 @@ def rename_and_move_images(name: str) -> None:
     for old_name, new_name in zip(image_relative_paths, new_img_relative_paths):
         os.replace(old_name, new_name)
 
-    os.chdir('dataset2')
-    if os.path.isdir(name):
-        os.rmdir(name)
-    os.chdir('..')
-
-
-def write_annotation_to_csv(csv_writer, absolute_paths, relative_paths, label):
-    for absolute_path, relative_path in zip(absolute_paths, relative_paths):
-        csv_writer.writerow([absolute_path, relative_path, label])
-        logging.info(f"Added entry for {label}: {absolute_path}")
+    if os.path.isdir(class_path):
+        shutil.rmtree(class_path)
 
 
 if __name__ == "__main__":
