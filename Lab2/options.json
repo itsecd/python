@@ -1,6 +1,5 @@
 {
     "queries":["tiger","leopard"],
-    "folder":"Lab2",
     "main_folder":"dataset",
     "annotation_file":"annotation"
 }
