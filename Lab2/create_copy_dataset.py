@@ -28,6 +28,7 @@ def copy_dataset(main_folder: str, new_copy_name: str, copy_type: str = "numbere
     create_folder(new_copy_name)
 
     annotations = []
+    existing_random_numbers = set()
 
     for root, dirs, files in os.walk(main_folder):
         for file in files:
@@ -38,6 +39,11 @@ def copy_dataset(main_folder: str, new_copy_name: str, copy_type: str = "numbere
 
                 if copy_type == "random":
                     random_number = random.randint(0, 10000)
+                    while random_number in existing_random_numbers:
+                        random_number = random.randint(0, 10000)
+
+                    existing_random_numbers.add(random_number)
+
                     new_filename = f"{random_number}.jpg"
                 elif copy_type == "numbered":
                     new_filename = f"{query}_{len(os.listdir(destination_folder)) + 0:04d}.jpg"
