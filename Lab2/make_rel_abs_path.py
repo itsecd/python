@@ -34,7 +34,8 @@ def get_rel_paths(class_name: str) -> List[str]:
         logging.error(f"Failed to write")
 
 
-def main() -> None:
+if __name__ == "__main__":
+    
     class1 = 'polar bear'
     class2 = 'brown bear'
 
@@ -53,7 +54,3 @@ def main() -> None:
         # Записываем пути для второго класса
         for full_path, rel_path in zip(brownbear_full_paths, brownbear_rel_paths):
             writer.writerow([full_path, rel_path, class2])
-
-
-if __name__ == "__main__":
-    main()

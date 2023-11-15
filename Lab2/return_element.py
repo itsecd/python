@@ -1,7 +1,7 @@
 import os
 
 
-def get_next(class_name: str) -> str:
+def get_path(class_name: str) -> str:
     """
     This function returns the relative path for the class object passed
     to the function
@@ -16,5 +16,5 @@ def get_next(class_name: str) -> str:
             yield None   
 
 
-print(*get_next('polar bear'))
-print(*get_next('brown bear'))
+print(*get_path('polar bear'))
+print(*get_path('brown bear'))

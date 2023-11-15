@@ -1,8 +1,8 @@
 import os
 
 
-class Iterator:
-    def __init__(self, class_name):
+class ElementIterator:
+    def __init__(self, class_name:str) -> None:
         self.counter = 0
         self.class_name = class_name
         self.data = os.listdir(os.path.join('dataset', self.class_name))
@@ -22,8 +22,8 @@ class Iterator:
 
 if __name__ == "__main__":
 
-    polarbears = Iterator('polar bear')
-    brownbears = Iterator('brown bear')
+    polarbears = ElementIterator('polar bear')
+    brownbears = ElementIterator('brown bear')
 
     print(next(polarbears))
     print(next(polarbears))
