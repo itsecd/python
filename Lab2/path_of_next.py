@@ -6,13 +6,15 @@ def get_next(name: str) -> str:
     """
     path = os.path.join('dataset', name)
     img_names = os.listdir(path)
-    
+
     for img_name in img_names:
         yield os.path.join(path, img_name)
 
 if __name__ == "__main__":
     cat_generator = get_next('cat')
 
-    print(next(cat_generator))
+    next_cat_image = next(cat_generator)
+    print(next_cat_image)
 
-    print(next(cat_generator))
+    next_cat_image = next(cat_generator)
+    print(next_cat_image)

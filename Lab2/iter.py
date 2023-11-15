@@ -18,17 +18,20 @@ class DirectoryIterator:
         else:
             raise StopIteration
 
-    # Методы для доступа к полям
-    def get_counter(self):
+    @property
+    def counter(self):
         return self._counter
 
-    def get_directory(self):
+    @property
+    def directory(self):
         return self._directory
 
-    def get_data(self):
+    @property
+    def data(self):
         return self._data
 
-    def get_limit(self):
+    @property
+    def limit(self):
         return self._limit
 
 if __name__ == "__main__":
@@ -40,3 +43,8 @@ if __name__ == "__main__":
 
     for _ in range(3):
         print(next(dog_iterator))
+
+print(cat_iterator.counter)
+print(cat_iterator.directory)
+print(cat_iterator.data)
+print(cat_iterator.limit)
