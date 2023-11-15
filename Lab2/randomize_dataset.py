@@ -19,6 +19,7 @@ def make_random_list(top: int) -> list:
 
 
 def randomize_dataset_with_annotation(dataset: str, path: str, rand_dataset: str, classes: list, size: int) -> list:
+    """Creates a folder where files from randomized_dataset get random names."""
     path_list = list()
     rand_list = make_random_list(size)
     if not os.path.exists(os.path.join(rand_dataset)):
