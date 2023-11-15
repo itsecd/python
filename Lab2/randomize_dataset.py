@@ -1,24 +1,47 @@
 import os
+import logging
+import shutil
 import random
 import csv
+import json
 
 
-def copy_with_random_filename(source_path: str, destination_folder: str) -> str:
-    random_filename = f"{random.randint(0, 10000)}.jpg"
-    destination_path_random = os.path.join(destination_folder, random_filename)
 
-    with open(source_path, 'rb') as source_file, open(destination_path_random, 'wb') as destination_file:
-        destination_file.write(source_file.read())
+logging.basicConfig(level=logging.INFO)
 
-    return destination_path_random
 
-def randomize_dataset(dataset_path: str, destination_path: str) -> None:
-    with open('annotation.csv', newline='') as csv_file:
-        csv_reader = csv.reader(csv_file)
-        for row in csv_reader:
-            _, relative_path, _ = row
-            source_path = os.path.join(dataset_path, relative_path)
-            copy_with_random_filename(source_path, destination_path)
+def make_random_list(top: int) -> list:
+    rand_list = []
+    for i in range(0, top):
+        rand_list.append(i)
+    random.shuffle(rand_list)
+    return rand_list
+
+
+def randomize_dataset(dataset: str, path: str, rand_dataset: str, classes: list, size: int) -> list:
+    path_list = list()
+    rand_list = make_random_list(size)
+    if not os.path.exists(os.path.join(rand_dataset)):
+        os.mkdir(os.path.join(rand_dataset))
+    cnt = 0
+    for cls in classes:
+        files_count = len(os.listdir(os.path.join(dataset, cls)))
+        for i in range(files_count):
+            normal = os.path.abspath(os.path.join(dataset, cls, f'{i:04}.jpg'))
+            randomized = os.path.abspath(os.path.join(rand_dataset, f'{rand_list[cnt]:04}.jpg'))
+            shutil.copy(normal, randomized)
+            path_set = [[randomized, os.path.relpath(randomized),cls,] ]
+            path_list += path_set
+            cnt += 1
+
+            csv_file_path = os.path.join(os.getcwd(), path)
+            with open(csv_file_path, 'w', newline='') as csv_file:
+                csv_writer = csv.writer(csv_file)
+                csv_writer.writerow(['Absolute Path', 'Relative Path', 'Class'])
+                csv_writer.writerows(path_list)
 
 if __name__ == "__main__":
-    randomize_dataset('dataset', 'randomized_dataset')
+    with open(os.path.join('Lab2', 'settings.json'), 'r') as settings:
+        settings = json.load(settings)
+    randomize_dataset( settings['dataset_folder'], settings['randomized_csv'], settings['randomized_dataset'], settings['classes'],  settings['default_size'])
+    

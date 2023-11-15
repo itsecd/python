@@ -1,6 +1,6 @@
 import os
 import csv
-
+import json
 
 def generate_annotation_file(dataset_path: str, annotation_file_path: str) -> None:
     with open(annotation_file_path, 'w', newline='') as csv_file:
@@ -15,4 +15,6 @@ def generate_annotation_file(dataset_path: str, annotation_file_path: str) -> No
                 csv_writer.writerow([absolute_path, relative_path, class_name])
 
 if __name__ == "__main__":
-    generate_annotation_file('dataset', 'annotation.csv')
+    with open(os.path.join('Lab2', 'settings.json'), 'r') as settings:
+        settings = json.load(settings)
+    generate_annotation_file(settings['dataset_folder'], settings['default_csv'])
