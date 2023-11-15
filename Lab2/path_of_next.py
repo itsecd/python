@@ -1,14 +1,16 @@
 import os
+from typing import Generator
 
-def get_next(name: str) -> str:
+def get_next(name: str) -> Generator[str, None, None]:
     """
-    This function returns the relative path for the next object in the specified directory.
+    This function yields the relative path for each object in the specified directory.
     """
-    path = os.path.join('dataset', name)
-    img_names = os.listdir(path)
+    path: str = os.path.join('dataset', name)
+    img_names = os.listdir(path)  # Не указываем тип явно
 
     for img_name in img_names:
         yield os.path.join(path, img_name)
+
 
 if __name__ == "__main__":
     cat_generator = get_next('cat')
