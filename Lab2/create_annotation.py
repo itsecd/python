@@ -33,13 +33,13 @@ def generate_annotation(main_folder: str) -> list:
 
 
 def create_annotation_file(annotation_file: str) -> None:
-    """The function takes folder name and create folder,  if it does not exist"""
+    """The function takes file name and create file,  if it does not exist"""
     try:
         if not os.path.exists(annotation_file):
              with open(f"{annotation_file}.csv", "w", newline='') as file:
                 pass
     except Exception as ex:
-        logging.error(f"Failed to create folder:: {ex}\n")
+        logging.error(f"Failed to create file:: {ex}\n")
 
 # Запись аннотаций в CSV-файл
 def write_annotation_to_csv(main_folder: str, annotation_file: str) -> None:

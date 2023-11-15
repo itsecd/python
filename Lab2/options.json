@@ -1,5 +1,6 @@
 {
     "queries":["tiger","leopard"],
     "main_folder":"dataset",
+    "new_copy_name":"copy_dataset",
     "annotation_file":"annotation"
 }

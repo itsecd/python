@@ -134,3 +134,5 @@ annotation.csv
 Lab1/
 Lab1/download_pictures.py
 
+copy_dataset/
+copy_dataset.csv
