@@ -1,5 +1,4 @@
 {
-    "directory":"Lab2",
     "classes": ["brown_bear", "polar_bear"],
     "dataset_folder": "dataset",
     "default_csv": "annotation.csv",

@@ -30,7 +30,7 @@ class DatasetIterator:
 if __name__ == "__main__":
     with open(os.path.join("Lab2", "settings.json"), "r") as settings:
         settings = json.load(settings)
-    iter = DatasetIterator(os.path.join(settings["directory"], settings["randomized_csv"]), settings["classes"][0])
+    iterator = DatasetIterator(settings["randomized_csv"], settings["classes"][0])
     for i in iter:
         print(i)
        
