@@ -1,14 +1,14 @@
 {
     "directory": "Lab2",
-    "classes": ["good","bed"],
+    "classes": ["good","bad"],
     "csv": "csv",
     "main_folder": "dataset",
     "mode": "normal",
     "normal": "dataset",
     "random": "random_dataset",
     "copy": "copy_dataset",
-    "normal_csv": "dataset.csv",
+    "normal_csv": "annotation.csv",
     "random_csv": "random_dataset.csv",
     "copy_csv": "copy_dataset.csv",
-    "default_number": 10000
+    "default_number": 1000
 }
