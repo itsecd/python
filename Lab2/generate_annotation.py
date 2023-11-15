@@ -4,6 +4,7 @@ import json
 
 
 def generate_annotation_file(dataset_path: str, annotation_file_path: str) -> None:
+    """Creates annotations in annotation.csv"""
     with open(annotation_file_path, 'w', newline='') as csv_file:
         csv_writer = csv.writer(csv_file)
         csv_writer.writerow(['Absolute Path', 'Relative Path', 'Class'])
