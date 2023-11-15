@@ -17,7 +17,7 @@ def make_random_list(top: int) -> list:
     return rand_list
 
 
-def randomize_dataset(dataset: str, path: str, rand_dataset: str, classes: list, size: int) -> list:
+def randomize_dataset_with_annotation(dataset: str, path: str, rand_dataset: str, classes: list, size: int) -> list:
     path_list = list()
     rand_list = make_random_list(size)
     if not os.path.exists(os.path.join(rand_dataset)):
@@ -42,5 +42,5 @@ def randomize_dataset(dataset: str, path: str, rand_dataset: str, classes: list,
 if __name__ == "__main__":
     with open(os.path.join('Lab2', 'settings.json'), 'r') as settings:
         settings = json.load(settings)
-    randomize_dataset( settings['dataset_folder'], settings['randomized_csv'], settings['randomized_dataset'], settings['classes'],  settings['default_size'])
+    randomize_dataset_with_annotation( settings['dataset_folder'], settings['randomized_csv'], settings['randomized_dataset'], settings['classes'],  settings['default_size'])
     

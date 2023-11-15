@@ -7,5 +7,6 @@
     "randomized_dataset": "randomized_dataset",
     "default_size": 10,
     "copied_dataset": "copied_dataset",
-    "copied_csv": "copied.csv"
+    "copied_csv": "copied.csv",
+    "mode": "copy"
 }
