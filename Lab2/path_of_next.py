@@ -2,7 +2,7 @@ import os
 
 def get_next(name: str) -> str:
     """
-    This function returns the relative path for the object passed to the function
+    This function returns the relative path for the next object in the specified directory.
     """
     path = os.path.join('dataset', name)
     img_names = os.listdir(path)
@@ -11,4 +11,8 @@ def get_next(name: str) -> str:
         yield os.path.join(path, img_name)
 
 if __name__ == "__main__":
-    print(*get_next('cat'))
+    cat_generator = get_next('cat')
+
+    print(next(cat_generator))
+
+    print(next(cat_generator))
