@@ -1,11 +1,9 @@
 import pandas as pd
-from datetime import datetime, timedelta
+from datetime import datetime
 import os
-import csv
-from typing import Tuple, Union
-from division_by_week import read_data_from_Weeks
-from division_by_year import read_data_from_Years
-from splitting_into_two_files import read_data_from_XY
+from division_by_week import read_data_from_weeks
+from division_by_year import read_data_from_years
+from splitting_into_two_files import read_data_from_xy
 
 
 def read_data_from_dataset(date: datetime, file_path: str) -> str:
@@ -60,15 +58,15 @@ def get_data_for_date(date: datetime) -> str:
 
             try:
                 if is_one_week_difference(start_date_str, end_date_str):
-                    data = read_data_from_Weeks(date, folder_path)
+                    data = read_data_from_weeks(date, folder_path)
                     break
                 elif file_name.endswith("X.csv"):
-                    data = read_data_from_XY(date, folder_path)
+                    data = read_data_from_xy(date, folder_path)
                     break
                 elif file_name.endswith("Y.csv"):
                     continue
                 elif is_one_year_difference(start_date_str, end_date_str):
-                    data = read_data_from_Years(date, folder_path)
+                    data = read_data_from_years(date, folder_path)
                     break
                 elif file_name == "data.csv":
                     data = read_data_from_dataset(date, folder_path)

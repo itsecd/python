@@ -1,8 +1,8 @@
 import os
 import pandas as pd
 from typing import Tuple
-from datetime import datetime, timedelta
-from division_by_week import create_output_folder, read_csv_file, convert_to_datetime
+from datetime import datetime
+from file_manipulation import create_output_folder, read_csv_file, convert_to_datetime
 
 
 def group_data_by_year(data: pd.DataFrame) -> Tuple[int, pd.DataFrame]:
@@ -10,6 +10,7 @@ def group_data_by_year(data: pd.DataFrame) -> Tuple[int, pd.DataFrame]:
     grouped = data.groupby(data['Date'].dt.year)
     for year, group in grouped:
         yield year, group
+
 
 def save_group_to_csv(output_folder: str, year: int, group: pd.DataFrame) -> None:
     """Saves a group of data to a csv file"""
@@ -21,7 +22,7 @@ def save_group_to_csv(output_folder: str, year: int, group: pd.DataFrame) -> Non
     group.to_csv(file_path, index=False)
 
 
-def read_data_from_Years(date: datetime, folder_path: str) -> str:
+def read_data_from_years(date: datetime, folder_path: str) -> str:
     """Reading data from the Years folder"""
     data = None
 

@@ -1,7 +1,7 @@
 import os
 import pandas as pd
 from typing import Tuple
-from division_by_week import create_output_folder, read_csv_file                                                                       
+from file_manipulation import create_output_folder, read_csv_file                                                                       
 from datetime import datetime
 
 def split_dataframes(data: pd.DataFrame) -> Tuple[pd.DataFrame, pd.DataFrame]:
@@ -24,7 +24,7 @@ def generate_and_save_files(output_folder: str, dates_df: pd.DataFrame, values_d
     save_to_csv(dates_df, dates_file_path)
     save_to_csv(values_df, values_file_path)
 
-def read_data_from_XY(date: datetime, dates_file_path: str, values_file_path: str) -> str:
+def read_data_from_xy(date: datetime, dates_file_path: str, values_file_path: str) -> str:
     """Reading data from the XY folder"""
 
     data = None

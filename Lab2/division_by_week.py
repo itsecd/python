@@ -2,20 +2,8 @@ import os
 import pandas as pd
 from datetime import datetime, timedelta
 from typing import Tuple
+from file_manipulation import create_output_folder, read_csv_file, convert_to_datetime
 
-
-def create_output_folder(folder_name: str) -> None:
-    """Create new folder"""
-    os.makedirs(folder_name, exist_ok=True)
-
-def read_csv_file(file_path: str) -> pd.DataFrame:
-    """Read data from csv file and returns dataframe"""
-    return pd.read_csv(file_path, header=None, names=['Date', 'Value'])
-
-def convert_to_datetime(data: pd.DataFrame) -> pd.DataFrame:
-    """Converts the 'Date' column to datetime format"""
-    data['Date'] = pd.to_datetime(data['Date'])
-    return data
 
 def split_data_by_weeks(data: pd.DataFrame) -> Tuple[datetime, datetime, pd.DataFrame]:
     """Splits the data into separate weeks."""
@@ -34,7 +22,8 @@ def split_data_by_weeks(data: pd.DataFrame) -> Tuple[datetime, datetime, pd.Data
         if end_date > max_date:
             end_date = max_date
 
-def read_data_from_Weeks(date: datetime, folder_path: str) -> str:
+
+def read_data_from_weeks(date: datetime, folder_path: str) -> str:
     """Reading data from the Weeks folder"""
     data = None
 
@@ -65,6 +54,7 @@ def read_data_from_Weeks(date: datetime, folder_path: str) -> str:
                     data = value
 
     return data
+
 
 if __name__ == "__main__":
     output_folder = 'script3_files'
