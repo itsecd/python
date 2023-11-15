@@ -163,27 +163,41 @@ def get_data_for_date(date: datetime,
         logging.exception(f"Can't read data from files: {ex}\n{ex.args}\n")
 
 
-def next_date(start_date: datetime,
-              end_date: datetime,
-              input_csv:str,
-              dates_file_path: str,
-              values_file_path: str
-              ) -> Generator[Tuple[datetime, Union[str, None]], None, None]:
-    """the function move date to the next"""
-    def get_next_valid_date(start_date):
-        while start_date <= end_date:
-            data = get_data_for_date(start_date,input_csv,dates_file_path,values_file_path)
-            start_date += timedelta(days=1)
+class DateIterator:
+    def __init__(self,
+                start_date: datetime,
+                end_date: datetime,
+                input_csv:str,
+                dates_file_path: str,
+                values_file_path: str
+                ) -> None:
+        """the function initializing the iterator class"""
+        self.start_date = start_date
+        self.end_date = end_date
+        self.input = input_csv
+        self.date_path = dates_file_path
+        self.value_path = values_file_path
+
+    def get_next_valid_date(self, current_date: datetime) -> Tuple[Union[datetime, None], Union[str, None]]:
+        """the function gets the next valid date and the required data"""
+        while current_date <= self.end_date:
+            data = get_data_for_date(current_date,self.input,self.date_path,self.value_path)
+            current_date += timedelta(days=1)
             if data is not None and data != "data not found":
-                return start_date - timedelta(days=1), data
+                return current_date - timedelta(days=1), data
         return None, None
 
-    while start_date <= end_date:
-        date, data = get_next_valid_date(start_date)
+    def __iter__(self) -> "DateIterator":
+        """the function returns itself as an iterator"""
+        return self
+
+    def __next__(self) -> Tuple[Union[datetime, None], Union[str, None]]:
+        """the function returns data for the next date"""
+        date, data = self.get_next_valid_date(self.start_date)
         if date is None:
-            break
-        yield date, data
-        start_date = date + timedelta(days=1)
+            raise StopIteration
+        self.start_date = date + timedelta(days=1)
+        return date, data
 
 
 if __name__ == "__main__":
@@ -222,7 +236,7 @@ if __name__ == "__main__":
     data_for_date = get_data_for_date(args.date_to_find,input_csv, args.output_x, args.output_y)
     print(f"Value for: {args.date_to_find}: {data_for_date}")
 
-    data_iterator = next_date(args.start_date,args.end_date,input_csv, args.output_x, args.output_y)
+    data_iterator = DateIterator(args.start_date,args.end_date,input_csv, args.output_x, args.output_y)
 
     for _ in range(5):
         next_date, next_data_value = next(data_iterator)
