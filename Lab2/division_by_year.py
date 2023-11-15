@@ -1,20 +1,8 @@
 import os
 import pandas as pd
 from typing import Tuple
+from division_by_week import create_output_folder, read_csv_file, convert_to_datetime
 
-
-def create_output_folder(folder_name: str) -> None:
-    """Create new folder"""
-    os.makedirs(folder_name, exist_ok=True)
-
-def read_csv_file(file_path: str) -> pd.DataFrame:
-    """Read data from csv file and returns dataframe"""
-    return pd.read_csv(file_path, header=None, names=['Date', 'Value'])
-
-def convert_to_datetime(data: pd.DataFrame) -> pd.DataFrame:
-    """Converts the 'Date' column to datetime format"""
-    data['Date'] = pd.to_datetime(data['Date'])
-    return data
 
 def group_data_by_year(data: pd.DataFrame) -> Tuple[int, pd.DataFrame]:
     """Groups data by year"""
@@ -35,7 +23,7 @@ if __name__ == "__main__":
     output_folder = 'script2_files'
     create_output_folder(output_folder)
 
-    file_path = 'csv_files/data.csv'
+    file_path = 'dataset/data.csv'
     data = read_csv_file(file_path)
     data = convert_to_datetime(data)
 

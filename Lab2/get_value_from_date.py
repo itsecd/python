@@ -2,21 +2,13 @@ import pandas as pd
 from datetime import datetime, timedelta
 import os
 import csv
-from typing import Generator, Tuple, Union
+from typing import Tuple, Union
 
 
-folder_paths = [
-    'csv_files',
-    'script1_files',
-    'script2_files',
-    'script3_files'
-]
-
-def read_data_from_folder1(date: datetime) -> str:
-    """Reading data from the first folder"""
+def read_data_from_dataset(date: datetime, file_path: str) -> str:
+    """Reading data from the dataset folder"""
 
     data = None
-    file_path = 'csv_files/data.csv'
     
     if os.path.exists(file_path):
         df = pd.read_csv(file_path)
@@ -31,12 +23,10 @@ def read_data_from_folder1(date: datetime) -> str:
     return data
 
 
-def read_data_from_folder2(date: datetime) -> str:
-    """Reading data from the second folder"""
+def read_data_from_script1_files(date: datetime, dates_file_path: str, values_file_path: str) -> str:
+    """Reading data from the script1_files folder"""
 
     data = None
-    dates_file_path = 'script1_files/X.csv'
-    values_file_path = 'script1_files/Y.csv'
 
     if os.path.exists(dates_file_path) and os.path.exists(values_file_path):
         dates_df = pd.read_csv(dates_file_path)
@@ -54,11 +44,10 @@ def read_data_from_folder2(date: datetime) -> str:
 
     return data
 
-def read_data_from_folder3(date: datetime) -> str:
-    """Reading data from the third folder"""
 
+def read_data_from_script2_files(date: datetime, folder_path: str) -> str:
+    """Reading data from the script2_files folder"""
     data = None
-    folder_path = 'script2_files'
 
     if os.path.exists(folder_path):
         matching_file = None
@@ -88,10 +77,10 @@ def read_data_from_folder3(date: datetime) -> str:
 
     return data
 
-def read_data_from_folder4(date: datetime) -> str:
-    """Reading data from the fourth folder"""
+
+def read_data_from_script3_files(date: datetime, folder_path: str) -> str:
+    """Reading data from the script3_files folder"""
     data = None
-    folder_path = 'script3_files'
 
     if os.path.exists(folder_path):
         matching_file = None
@@ -120,69 +109,66 @@ def read_data_from_folder4(date: datetime) -> str:
                     data = value
 
     return data
+
+
+def is_one_year_difference(start_date_str: str, end_date_str: str) -> bool:
+    """Check date difference in file name(must be one year)"""
+    start_date = datetime.strptime(start_date_str, "%Y%m%d")
+    end_date = datetime.strptime(end_date_str, "%Y%m%d")
+    
+    return abs((end_date - start_date).days) in (365, 366)
+
+
+def is_one_week_difference(start_date_str: str, end_date_str: str) -> bool:
+    """Check date difference in file name(must be one week)"""
+    start_date = datetime.strptime(start_date_str, "%Y%m%d")
+    end_date = datetime.strptime(end_date_str, "%Y%m%d")
+    
+    return abs((end_date - start_date).days) == 7
+
 
 def get_data_for_date(date: datetime) -> str:
     """Getting data for the specified date from files in folders"""
     data = None
 
-    for folder_path in folder_paths:
-        if folder_path == 'csv_files':
-            data = read_data_from_folder1(date)
-        elif folder_path == 'script1_files':
-            data = read_data_from_folder2(date)
-        elif folder_path == 'script2_files':
-            data = read_data_from_folder3(date)
-        elif folder_path == 'script3_files':
-            data = read_data_from_folder4(date)
+    main_directory = os.getcwd()
+    
+    for folder_path, _, files in os.walk(main_directory):
+        for file_name in files:
+            file_path = os.path.join(folder_path, file_name)
+
+            date_range = file_name.split(".")[0].split("_")
+            if len(date_range) != 2:
+                continue
+
+            start_date_str, end_date_str = date_range[0], date_range[1]
+
+            try:
+                if is_one_week_difference(start_date_str, end_date_str):
+                    data = read_data_from_script3_files(date, folder_path)
+                    break
+                elif file_name.endswith("X.csv"):
+                    data = read_data_from_script1_files(date, folder_path)
+                    break
+                elif file_name.endswith("Y.csv"):
+                    continue
+                elif is_one_year_difference(start_date_str, end_date_str):
+                    data = read_data_from_script2_files(date, folder_path)
+                    break
+                elif file_name == "data.csv":
+                    data = read_data_from_dataset(date, folder_path)
+                    break
+            except ValueError:
+                continue
 
         if data is not None:
             break
 
     return data
 
-class DateDataIterator:
-    def __init__(self, start_date: datetime, end_date: datetime) -> None:
-        """Initializing the iterator class"""
-        self.current_date = start_date
-        self.end_date = end_date
 
-    def get_next_valid_date(self, current_date: datetime) -> Tuple[Union[datetime, None], Union[str, None]]:
-        """Gets the next valid date and the corresponding data"""
-        while current_date <= self.end_date:
-            data = get_data_for_date(current_date)
-            current_date += timedelta(days=1)
-            if data is not None and data != "Page not found":
-                return current_date - timedelta(days=1), data
-        return None, None
-
-    def __iter__(self) -> "DateDataIterator":
-        """Returns itself as an iterator"""
-        return self
-
-    def __next__(self) -> Tuple[Union[datetime, None], Union[str, None]]:
-        """Returns data for the next date"""
-        date, data = self.get_next_valid_date(self.current_date)
-        if date is None:
-            raise StopIteration
-        self.current_date = date + timedelta(days=1)
-        return date, data
-
-if __name__ == "__main__": 
-    date_to_find = datetime(2023, 10, 5)
+if __name__ == "__main__":
+    date_to_find = datetime(2023, 9, 5)
 
     data_for_date = get_data_for_date(date_to_find)
     print(f"Value for: {date_to_find}: {data_for_date}")
-
-    iterator = DateDataIterator(datetime(1998, 1, 2), datetime(2023, 10, 14))
-
-    for _ in range(50):
-        try:
-            next_date, next_data_value = next(iterator)
-            if next_date is not None:
-                print(f"Date: {next_date}, Value: {next_data_value}")
-            else:
-                print("No more data")
-                break
-        except StopIteration:
-            print("No more data")
-            break

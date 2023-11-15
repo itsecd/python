@@ -38,7 +38,7 @@ if __name__ == "__main__":
     output_folder = 'script3_files'
     create_output_folder(output_folder)
 
-    file_path = 'csv_files/data.csv'
+    file_path = 'dataset/data.csv'
     data = read_csv_file(file_path)
     data = convert_to_datetime(data)
 
