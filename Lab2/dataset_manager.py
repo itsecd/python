@@ -1,6 +1,12 @@
 import csv
 
 def get_next_instance(csv_file: str, class_label: str) -> str:
+    """Retrieves the next instance (path to it) of the specified class from the CSV file.
+    csv_file (str): The path to the CSV file.
+    class_label (str): The class label.
+    Returns:
+    str: The path to the next instance of the specified class, or None if instances are exhausted.
+    """
     data = []
     with open(csv_file, "r", newline='') as file:
         reader = csv.reader(file)
@@ -19,6 +25,5 @@ def get_next_instance(csv_file: str, class_label: str) -> str:
     else:
         return None
 
-# Пример использования
 if __name__ == "__main__":
     print(get_next_instance("copy_dataset.csv", "tiger"))
