@@ -12,7 +12,7 @@ def make_csv(name_csv: str) -> None:
     with the specified name"""
     try:
         if not os.path.exists(name_csv):
-            with open(f"{name_csv}.csv", "a") as file:
+            with open(f"{name_csv}", "a") as file:
                 csv.writer(file, lineterminator="\n")
     except Exception as ex:
         logging.error(f"Couldn't create file: {ex.message}\n{ex.args}\n")
@@ -26,7 +26,7 @@ def make_list(directory: str, classes: str) -> list:
         for i in range(count_files):
             r = [
                 [os.path.abspath(os.path.join(directory, c, f"{i:04}.jpg")),
-                    os.path.join(directory, c, f"{i:04}.jpg"),
+                    os.path.relpath(os.path.abspath(os.path.join(directory, c, f"{i:04}.jpg"))),
                     c,]
             ]
             img_list += r
@@ -39,15 +39,15 @@ def write_in_file(name_csv: str, img_list: list) -> None:
     try:
         make_csv(name_csv)
         for img in img_list:
-            with open(f"{name_csv}.csv", "a") as file:
+            with open(f"{name_csv}", "a") as file:
                 writer = csv.writer(file, lineterminator="\n")
                 writer.writerow(img)
     except:
-        logging.error(f"Failed to write data: {ex.message}\n{ex.args}\n")
+        logging.error(f"Failed to write data\n")
 
 
 if __name__ == "__main__":
     with open(os.path.join("Lab1", "fcc.json"), "r") as fcc_file:
         fcc = json.load(fcc_file)
 
-    write_in_file("Lab2\csv_files\datasets", make_list("dataset", fcc["classes"]))
+    write_in_file("Lab2\csv_files\datasets.csv", make_list("dataset", fcc["classes"]))

@@ -1,79 +1,95 @@
 import sys
-import os
-import json
-from PyQt5.QtWidgets import (QWidget, QToolTip,
-    QPushButton, QApplication, QFileDialog)
-from PyQt5.QtGui import QFont
-#from ..Lab2.csv_annotation import write_in_file, make_list
-#from ..Lab2.main import *
-import csv_annotation
+from PyQt6.QtCore import QSize
+from PyQt6.QtWidgets import QApplication, QMainWindow, QPushButton, QLabel, QFileDialog
+from PyQt6 import QtGui, QtWidgets
+
+
+from csv_annotation import make_list, write_in_file
 from new_name_copy import copy_in_new_directory
 from random_of_copy import copy_with_random
 
-with open(os.path.join("Lab2", "settings.json"), "r") as settings:
-        settings = json.load(settings)
 
-
-class Example(QWidget):
-
-    def __init__(self):
+class MainWindow(QMainWindow):
+    def __init__(self) -> None:
         super().__init__()
 
-        self.initUI()
-
-
-    def initUI(self):
-
-        QToolTip.setFont(QFont('SansSerif', 10))
-
-        self.setToolTip('This is a <b>QWidget</b> widget')
-        self.basic_path=None
-        base_path = QPushButton('Basic path', self)
-        base_path.resize(base_path.sizeHint())
-        base_path.move(500, 500)
-        base_path.setCheckable(True)
-        base_path.clicked.connect(lambda:select_path(self))
-
-        btn = QPushButton('Mode Normal', self)
-        btn.resize(btn.sizeHint())
-        btn.move(50, 50)
-        btn.setCheckable(True)
-        btn.clicked.connect(lambda:csv_annotation.write_in_file((os.path.join(settings["directory"], settings["folder"], settings["normal"])), (csv_annotation.make_list(self.basic_path, settings["classes"]))))
-        rtn = QPushButton('Mode Copy', self)
-        rtn.resize(rtn.sizeHint())
-        rtn.move( 50, 200)
-        rtn.setCheckable(True)
-        rtn.clicked.connect(lambda:copy_in_new_directory(
-        self.basic_path,
-        settings["classes"],
-        settings["main_folder"],
-        (os.path.join(settings["directory"],
-         settings["folder"], settings["new_name"]))))
-        ttn = QPushButton('Random', self)
-        ttn.resize(ttn.sizeHint())
-        ttn.move(50, 350)
-        ttn.setCheckable(True)
-        ttn.clicked.connect(lambda:copy_with_random(
-        self.basic_path,
-        settings["classes"],
-        self.basic_path,
-        (os.path.join(settings["directory"],
-         settings["folder"], settings["random"]))))
-
-
         self.setGeometry(400, 100, 1000, 1000)
-        self.setWindowTitle('Tooltips')
+        self.setWindowTitle("Tooltips")
+
+        # кнопки
+        self.btn_create_of_annotation = self.add_button(
+            "Создать аннотацию", 250, 50, 630, 50
+        )
+        self.btn_copy = self.add_button("Копирование датасета", 250, 50, 630, 100)
+        self.btn_random = self.add_button(
+            "Датасет с рандомными числами", 250, 50, 630, 150
+        )
+        self.btn_next_rose = self.add_button("Следующая роза-->", 150, 50, 630, 250)
+        self.btn_next_tulip = self.add_button("Следующий тюльпан-->", 150, 50, 630, 350)
+        self.go_to_exit = self.add_button("Выйти из программы", 150, 50, 630, 500)
+
+        self.setWindowTitle("Main window")
+        self.dataset_path = QFileDialog.getExistingDirectory(
+            self, "Путь к папке базового датасет"
+        )
+        src = QLabel(f"Базовый датасет:\n{self.dataset_path}", self)
+        src.setFixedSize(QSize(800, 50))
+        self.classes = ["rose", "tulip"]
+
+        # создание аннотации, копия + рандом
+        self.btn_create_of_annotation.clicked.connect(self.create_annotation)
+        self.btn_copy.clicked.connect(self.copy)
+        self.btn_random.clicked.connect(self.random)
+
+        # выход из программы
+        self.go_to_exit.clicked.connect(self.close)
+
         self.show()
 
-        def select_path(self):
-            file_path = QFileDialog.getExistingDirectory()
-            path=os.path.basename(os.path.normpath(file_path))
-            self.basic_path=path
-            
+    def add_button(self, name: str, size_x: int, size_y: int, x: int, y: int):
+        button = QPushButton(name, self)
+        button.resize(button.sizeHint())
+        button.move(x, y)
+        button.setFixedSize(QSize(size_x, size_y))
+        return button
+
+    def create_annotation(self):
+        try:
+            directory = QFileDialog.getSaveFileName(
+                self, "Выберите папку для создания файла аннотации:"
+            )[0]
+            l = make_list(self.dataset_path, self.classes)
+            write_in_file(directory, l)
+        except OSError:
+            print("error")
+
+    def copy(self):
+        try:
+            directory = QFileDialog.getSaveFileName(
+                self, "Выберите папку для создания файла аннотации:"
+            )[0]
+            folder = QFileDialog.getExistingDirectory(
+                self, "Выберите папку для копирования датасета аннотации:"
+            )
+            copy_in_new_directory(self.dataset_path, self.classes, folder, directory)
+
+        except OSError:
+            print("error")
+
+    def random(self):
+        try:
+            directory = QFileDialog.getSaveFileName(
+                self, "Выберите папку для создания файла аннотации:"
+            )[0]
+            folder = QFileDialog.getExistingDirectory(
+                self, "Выберите папку для копирования датасета аннотации:"
+            )
+            copy_with_random(self.dataset_path, self.classes, folder, directory)
+        except OSError:
+            print("error")
 
 
-if __name__ == '__main__':
-
+if __name__ == "__main__":
     app = QApplication(sys.argv)
-    ex = Example()
-    sys.exit(app.exec_())
+    window = MainWindow()
+    app.exec()
