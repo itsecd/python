@@ -1,5 +1,6 @@
 import csv
 
+
 def get_next_instance(csv_file: str, class_label: str) -> str:
     """Retrieves the next instance (path to it) of the specified class from the CSV file.
     csv_file (str): The path to the CSV file.
@@ -20,10 +21,11 @@ def get_next_instance(csv_file: str, class_label: str) -> str:
         new_data = [row for row in data if row[0] != next_instance]
         with open(csv_file, "w", newline='') as file:
             writer = csv.writer(file)
-            writer.writerows(new_data)  
+            writer.writerows(new_data)
         return next_instance
     else:
         return None
+
 
 if __name__ == "__main__":
     print(get_next_instance("copy_dataset.csv", "tiger"))

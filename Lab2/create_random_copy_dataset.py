@@ -7,6 +7,7 @@ import random
 
 logging.basicConfig(level=logging.INFO)
 
+
 def create_annotation_file(annotations: list, file_path: str) -> None:
     """Create an annotation file.
     annotations (list): List of annotations to be written to the file.
@@ -18,6 +19,7 @@ def create_annotation_file(annotations: list, file_path: str) -> None:
             writer.writerows(annotations)
     except Exception as ex:
         logging.error(f"Failed to write the annotation file: {ex}\n")
+
 
 def copy_dataset_with_annotation(main_folder: str, random_copy_name: str) -> None:
     """Copy the dataset with annotations to a new directory and create an annotation file.
@@ -38,17 +40,22 @@ def copy_dataset_with_annotation(main_folder: str, random_copy_name: str) -> Non
                     query = os.path.basename(root)
                     destination_folder = os.path.join(random_copy_name, query)
                     os.makedirs(destination_folder, exist_ok=True)
-                    destination_filepath = os.path.join(destination_folder, new_filename)
+                    destination_filepath = os.path.join(
+                        destination_folder, new_filename)
                     shutil.copyfile(source_filepath, destination_filepath)
-                    annotations.append([source_filepath, destination_filepath, query])
+                    annotations.append(
+                        [source_filepath, destination_filepath, query])
 
-        annotation_file_path = os.path.join(random_copy_name, "annotations.csv")
+        annotation_file_path = os.path.join(
+            random_copy_name, "annotations.csv")
         create_annotation_file(annotations, annotation_file_path)
 
     except Exception as ex:
         logging.error(f"Error while copying the dataset: {ex}\n")
 
+
 if __name__ == "__main__":
     with open("Lab2/options.json", "r") as options_file:
         options = json.load(options_file)
-        copy_dataset_with_annotation(options["main_folder"], options["random_copy_name"])
+        copy_dataset_with_annotation(
+            options["main_folder"], options["random_copy_name"])
