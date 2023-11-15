@@ -2,6 +2,7 @@ import argparse
 import os
 import logging
 import csv
+import re
 from datetime import datetime
 from X_Y_csv import read_data_from_x_y
 from year_csv import read_data_from_years
@@ -47,28 +48,27 @@ def read_data_from_original_file(date: datetime,
     except Exception as ex:
         logging.exception(f"Can't read data from original file: {ex}\n{ex.args}\n")
 
+
 def get_data_for_date(date: datetime,
-                      input_csv:str,
+                      input_csv: str,
                       dates_file_path: str,
                       values_file_path: str,
                       ) -> str:
-    """the function tries to use 4 different methods to get the data"""
+    """The function tries to use 4 different methods to get the data."""
     data = None
     try:
         for folder_path in folder_paths:
-            if folder_path == 'csv_files':
+            if re.match(r"dataset\.csv$", os.path.basename(input_csv)):
                 data = read_data_from_original_file(date, input_csv)
-            elif folder_path == 'X_and_Y':
-                data = read_data_from_x_y(date, dates_file_path,values_file_path)
-            elif folder_path == 'years':
+            elif re.match(r"[XY]\.csv$", os.path.basename(dates_file_path)) and re.match(r"[XY]\.csv$", os.path.basename(values_file_path)):
+                data = read_data_from_x_y(date, dates_file_path, values_file_path)
+            elif re.match(r"\d{8}_\d{8}\.csv$", os.path.basename(dates_file_path)) and re.match(r"\d{8}_\d{8}\.csv$", os.path.basename(values_file_path)):
                 data = read_data_from_years(date, folder_path)
-            elif folder_path == 'weeks':
+            elif re.match(r"\d{8}_\d{8}\.csv$", os.path.basename(dates_file_path)) and re.match(r"\d{8}_\d{8}\.csv$", os.path.basename(values_file_path)):
                 data = read_data_from_weeks(date, folder_path)
 
-            if data is not None:
-                break
-
         return data
+
     except Exception as ex:
         logging.exception(f"Can't read data from files: {ex}\n{ex.args}\n")
 
