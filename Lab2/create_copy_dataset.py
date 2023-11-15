@@ -66,3 +66,5 @@ if __name__ == "__main__":
         options = json.load(options_file)
         copy_dataset(
             options["main_folder"], options["new_copy_name"],"numbered")
+        copy_dataset(
+            options["main_folder"], options["random_copy_name"],"random")

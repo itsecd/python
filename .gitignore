@@ -137,3 +137,5 @@ Lab1/download_pictures.py
 copy_dataset/
 copy_dataset.csv
 random_copy_dataset
+Lab2/create_random_copy_dataset.py
+random_copy_dataset.csv
