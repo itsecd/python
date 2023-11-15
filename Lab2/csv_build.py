@@ -25,9 +25,8 @@ def make_pathlist(dir: str, classes: list) -> list:
 def write_into_file(name: str, path_list: list) -> None:
     """Writes a list of reviews {path_list} into a {name} file"""
     try:
-        if not os.path.exists(name):
-            with open(f'{name}', 'a') as file:
-                csv.writer(file, lineterminator='\n')
+        with open(f'{name}', 'a') as file:
+            csv.writer(file, lineterminator='\n')
         for review in path_list:
             with open(f'{name}', 'a') as file:
                 writer = csv.writer(file, lineterminator='\n')
