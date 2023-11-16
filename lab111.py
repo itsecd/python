@@ -103,7 +103,7 @@ def create_directories():
         logging.exception(f"Ошибка при создании папки: {e.args}")
 
 
-def save_review_to_file(review_text: str, status_review: bool, review_number_good: int, review_number_bad: int, output_dir: str):
+def save_review_to_file(review_text: str, status_review: bool, review_number_good: int, review_number_bad: int, output_dir: str, name: str):
     if status_review :
         folder_name = "good"
         file_name = f"{review_number_good:04d}.txt"
@@ -115,6 +115,7 @@ def save_review_to_file(review_text: str, status_review: bool, review_number_goo
 
     try:
         with open(file_path, "w", encoding="utf-8") as file:
+            file.write(name)
             file.write(review_text)
     except Exception as e:
         logging.exception(f"Ошибка при сохранении рецензии : {e}")
@@ -135,7 +136,7 @@ if __name__ == "__main__":
                 for review in rev:
                     txt = review_text(review)
                     status = status_review(review)
-                    save_review_to_file(txt, status, review_n_g, review_n_b, output_dir)
+                    save_review_to_file(txt, status, review_n_g, review_n_b, output_dir, name)
                     if status == 'good':
                         review_n_g += 1
                         number += 1

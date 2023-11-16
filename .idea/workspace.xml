@@ -4,7 +4,7 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="362df899-5350-4e59-93d4-b3668c1b0b9d" name="Changes" comment="Made a function  get_name of parser project">
+    <list default="true" id="362df899-5350-4e59-93d4-b3668c1b0b9d" name="Changes" comment="Made a function  create_directories andsave_review_to_file , now i can save all reviews in fail">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/lab111.py" beforeDir="false" afterPath="$PROJECT_DIR$/lab111.py" afterDir="false" />
     </list>
@@ -215,7 +215,15 @@
       <option name="project" value="LOCAL" />
       <updated>1700141749694</updated>
     </task>
-    <option name="localTasksCounter" value="13" />
+    <task id="LOCAL-00013" summary="Made a function  create_directories andsave_review_to_file , now i can save all reviews in fail">
+      <option name="closed" value="true" />
+      <created>1700153207741</created>
+      <option name="number" value="00013" />
+      <option name="presentableId" value="LOCAL-00013" />
+      <option name="project" value="LOCAL" />
+      <updated>1700153207742</updated>
+    </task>
+    <option name="localTasksCounter" value="14" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -247,6 +255,7 @@
     <MESSAGE value="Made a function get_reviews" />
     <MESSAGE value="Made a function  get_html_code  and from html code get txt revie and status of it" />
     <MESSAGE value="Made a function  get_name of parser project" />
-    <option name="LAST_COMMIT_MESSAGE" value="Made a function  get_name of parser project" />
+    <MESSAGE value="Made a function  create_directories andsave_review_to_file , now i can save all reviews in fail" />
+    <option name="LAST_COMMIT_MESSAGE" value="Made a function  create_directories andsave_review_to_file , now i can save all reviews in fail" />
   </component>
 </project>
