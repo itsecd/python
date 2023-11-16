@@ -4,7 +4,7 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="362df899-5350-4e59-93d4-b3668c1b0b9d" name="Changes" comment="Made a function get_reviews">
+    <list default="true" id="362df899-5350-4e59-93d4-b3668c1b0b9d" name="Changes" comment="Made a function  get_html_code  and from html code get txt revie and status of it">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/lab111.py" beforeDir="false" afterPath="$PROJECT_DIR$/lab111.py" afterDir="false" />
     </list>
@@ -199,7 +199,15 @@
       <option name="project" value="LOCAL" />
       <updated>1700087092354</updated>
     </task>
-    <option name="localTasksCounter" value="11" />
+    <task id="LOCAL-00011" summary="Made a function  get_html_code  and from html code get txt revie and status of it">
+      <option name="closed" value="true" />
+      <created>1700139971574</created>
+      <option name="number" value="00011" />
+      <option name="presentableId" value="LOCAL-00011" />
+      <option name="project" value="LOCAL" />
+      <updated>1700139971574</updated>
+    </task>
+    <option name="localTasksCounter" value="12" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -229,6 +237,7 @@
     <MESSAGE value="Сделал  пользавотельский интерфейс" />
     <MESSAGE value="Made a function get_html_code and reworked user_intarface and do users agent and use sleep for bypass captcha" />
     <MESSAGE value="Made a function get_reviews" />
-    <option name="LAST_COMMIT_MESSAGE" value="Made a function get_reviews" />
+    <MESSAGE value="Made a function  get_html_code  and from html code get txt revie and status of it" />
+    <option name="LAST_COMMIT_MESSAGE" value="Made a function  get_html_code  and from html code get txt revie and status of it" />
   </component>
 </project>

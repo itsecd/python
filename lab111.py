@@ -65,6 +65,15 @@ def review_text(review: BeautifulSoup) -> str:
     except Exception as e:
         logging.exception("Ошибка при получении текста рецензии:", e)
 
+def get_name(soup:BeautifulSoup) -> str:
+    try:
+        name_txt=soup.find('h1',class_="largeHeader")
+        if name_txt is not None:
+            return name_txt.get_text()
+        else:
+            return "Текст названия не найден"
+    except Exception as e:
+        logging.exception("Ошибка при получении текста названия:", e)
 
 def status_review(review: BeautifulSoup) -> bool:
     try:
@@ -86,6 +95,7 @@ if __name__ == "__main__":
         urls: list = user_interface()
         pages: int = set_pages()
         for url in urls:
+            name: str = get_name(get_html_code(1, url))
             for page in range(pages):
                 rev=get_reviews(get_html_code(page,url))
                 for review in rev:
