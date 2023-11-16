@@ -30,7 +30,7 @@ def set_pages() -> int:
     return tmp_page
 
 
-def get_html_code(page:int , url:str)->BeautifulSoup:
+def get_html_code(page: int , url: str) -> BeautifulSoup:
     try:
         tmp_url = url+str(page)
         sleep_time = random.uniform(1, 3)
@@ -65,15 +65,17 @@ def review_text(review: BeautifulSoup) -> str:
     except Exception as e:
         logging.exception("Ошибка при получении текста рецензии:", e)
 
+
 def get_name(soup:BeautifulSoup) -> str:
     try:
-        name_txt=soup.find('h1',class_="largeHeader")
+        name_txt = soup.find('h1',class_="largeHeader")
         if name_txt is not None:
             return name_txt.get_text()
         else:
             return "Текст названия не найден"
     except Exception as e:
         logging.exception("Ошибка при получении текста названия:", e)
+
 
 def status_review(review: BeautifulSoup) -> bool:
     try:
@@ -91,12 +93,54 @@ def random_user_agent() -> str:
     return u.random
 
 
+def create_directories():
+    try:
+        for folder_name in ["good", "bad"]:
+            folder_path = os.path.join("dataset", folder_name)
+            if not os.path.exists(folder_path):
+                os.makedirs(folder_path)
+    except Exception as e:
+        logging.exception(f"Ошибка при создании папки: {e.args}")
+
+
+def save_review_to_file(review_text: str, status_review: bool, review_number_good: int, review_number_bad: int, output_dir: str):
+    if status_review :
+        folder_name = "good"
+        file_name = f"{review_number_good:04d}.txt"
+    else:
+        folder_name = "bad"
+        file_name = f"{review_number_bad:04d}.txt"
+
+    file_path = os.path.join(output_dir, folder_name, file_name)
+
+    try:
+        with open(file_path, "w", encoding="utf-8") as file:
+            file.write(review_text)
+    except Exception as e:
+        logging.exception(f"Ошибка при сохранении рецензии : {e}")
+
+
 if __name__ == "__main__":
         urls: list = user_interface()
         pages: int = set_pages()
+        create_directories()
+        output_dir: str = "dataset"
+        number = 0
+        review_n_b = 1
+        review_n_g = 1
         for url in urls:
             name: str = get_name(get_html_code(1, url))
             for page in range(pages):
-                rev=get_reviews(get_html_code(page,url))
+                rev = get_reviews(get_html_code(page,url))
                 for review in rev:
+                    txt = review_text(review)
+                    status = status_review(review)
+                    save_review_to_file(txt, status, review_n_g, review_n_b, output_dir)
+                    if status == 'good':
+                        review_n_g += 1
+                        number += 1
+                    else:
+                        review_n_b += 1
+                        number += 1
+        print("Было успешно сохранено", number ,"рецензий")
 
