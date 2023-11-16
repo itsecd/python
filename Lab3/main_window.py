@@ -52,30 +52,24 @@ class MainWindow(QMainWindow):
         self.image_label.setScaledContents(True)
 
         # Пример абсолютного пути к изображению
-        self.image_path = "D:/Lab on python/Lab_1_var_4/dataset/tulip/0031.jpg"
+        self.image_path = "D:/Lab on python/Lab_1_var_4/dataset/rose/0000.jpg"
 
         # Загрузка изображения и отображение в QLabel
         pixmap = QPixmap(self.image_path)
         self.image_label.setPixmap(pixmap)
 
-       # self.classes_iterator = ClassesIterator(self.image_path, self.classes[0], self.classes[1])
+        self.classes_iterator = ClassesIterator(self.path,self.classes[0], self.classes[1])
 
-        #self.btn_next_rose.clicked.connect(self.next_first)
-        #self.btn_next_tulip.clicked.connect(self.next_second)
-
-    #def next_first(self):
-        #element = self.classes_iterator.next_first()
-        #print(element)
-
-    #def next_second(self):
-        #element = self.classes_iterator.next_second()
-        #print(element) 
 
         # создание аннотации, копия + рандом
         self.btn_create_of_annotation.clicked.connect(self.create_annotation)
         self.btn_copy.clicked.connect(self.copy)
         self.btn_random.clicked.connect(self.random)
 
+        #кнопки итератора
+        self.btn_next_rose.clicked.connect(self.next_first)
+        self.btn_next_tulip.clicked.connect(self.next_second)
+        
 
         # выход из программы
         self.go_to_exit.clicked.connect(self.close)
@@ -126,7 +120,19 @@ class MainWindow(QMainWindow):
         except OSError:
             print("error")
 
+    def next_first(self):
+        element = (self.classes_iterator.next_first()).replace("\\", "/")
+        self.image_path=element
+        pixmap = QPixmap(element)
+        self.image_label.setPixmap(pixmap)
+       
 
+    def next_second(self):
+        element = (self.classes_iterator.next_second()).replace("\\", "/")
+        self.image_path=element
+        pixmap = QPixmap(element)
+        self.image_label.setPixmap(pixmap)
+    
 
 
 
