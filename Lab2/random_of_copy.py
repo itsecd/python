@@ -16,7 +16,7 @@ def copy_with_random(
     try:
         img_list = list()
         numbers = set()
-        count_files = len(os.listdir(os.path.join(old_directory, classes[0])))
+        count_files = len(os.listdir(os.path.join(old_directory, classes[0])))- len(classes)
         while len(numbers) <= (count_files * len(classes)):
             numbers.add(random.randint(0, 10000))
         number = list(numbers)

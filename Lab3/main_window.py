@@ -13,7 +13,7 @@ from PyQt6.QtWidgets import (
     QWidget,
 )
 from PyQt6.QtGui import QPixmap
-
+sys.path.insert(1, 'D:\Lab on python\Lab_1_var_4\Lab2')
 from iterator import ClassesIterator
 from csv_annotation import make_list, write_in_file
 from new_name_copy import copy_in_new_directory
