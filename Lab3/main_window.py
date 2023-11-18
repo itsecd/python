@@ -1,19 +1,21 @@
 import sys
+import os
 import logging
 from PyQt6.QtCore import QSize
 from PyQt6.QtWidgets import (
     QApplication,
     QMainWindow,
     QPushButton,
+    QMessageBox,
     QLabel,
     QFileDialog,
-    QMainWindow,
     QVBoxLayout,
-    QHBoxLayout,
     QWidget,
+    QGridLayout,
 )
 from PyQt6.QtGui import QPixmap
-sys.path.insert(1, 'D:\Lab on python\Lab_1_var_4\Lab2')
+
+sys.path.insert(1, "D:\Lab on python\Lab_1_var_4\Lab2")
 from iterator import ClassesIterator
 from csv_annotation import make_list, write_in_file
 from new_name_copy import copy_in_new_directory
@@ -30,16 +32,22 @@ class MainWindow(QMainWindow):
         self.setWindowTitle("Tooltips")
         main_widget = QWidget()
         button_layout = QVBoxLayout()
-        image_layout = QHBoxLayout()
+        layout = QGridLayout()
+
+        self.setWindowTitle("Main window")
+        self.dataset_path = os.path.abspath("dataset")
+        src = QLabel(f"Базовый датасет:\n{self.dataset_path}", self)
+        src.setFixedSize(QSize(250, 40))
+        button_layout.addWidget(src)
 
         # кнопки
-        self.btn_create_of_annotation = self.add_button("Создать аннотацию", 250, 50)
-        self.btn_copy = self.add_button("Копирование датасета", 250, 50)
-        self.btn_random = self.add_button("Датасет с рандомными числами", 250, 50)
-        self.btn_iterator = self.add_button("Начать итерацию", 150, 50)
-        self.btn_next_rose = self.add_button("Следующая роза-->", 150, 50)
-        self.btn_next_tulip = self.add_button("Следующий тюльпан-->", 150, 50)
-        self.go_to_exit = self.add_button("Выйти из программы", 150, 50)
+        self.btn_create_of_annotation = self.add_button("Создать аннотацию", 250, 40)
+        self.btn_copy = self.add_button("Копирование датасета", 250, 40)
+        self.btn_random = self.add_button("Датасет с рандомными числами", 250, 40)
+        self.btn_iterator = self.add_button("Начать итерацию", 150, 40)
+        self.btn_next_rose = self.add_button("Следующая роза-->", 150, 40)
+        self.btn_next_tulip = self.add_button("Следующий тюльпан-->", 150, 40)
+        self.go_to_exit = self.add_button("Выйти из программы", 150, 40)
 
         # изображение
         self.image_label = QLabel(self)
@@ -47,6 +55,7 @@ class MainWindow(QMainWindow):
         self.image_label.setScaledContents(True)
 
         # делаем виджеты адаптивными по размер окна
+
         button_layout.addWidget(self.btn_create_of_annotation)
         button_layout.addWidget(self.btn_copy)
         button_layout.addWidget(self.btn_random)
@@ -54,18 +63,13 @@ class MainWindow(QMainWindow):
         button_layout.addWidget(self.btn_next_rose)
         button_layout.addWidget(self.btn_next_tulip)
         button_layout.addWidget(self.go_to_exit)
-        image_layout.addLayout(button_layout)
-        image_layout.addWidget(self.image_label)
-        main_widget.setLayout(image_layout)
+        button_layout.addStretch()
+        layout.addWidget(self.image_label, 0, 0)
+        layout.addLayout(button_layout, 0, 1)
+
+        main_widget.setLayout(layout)
 
         self.setCentralWidget(main_widget)
-
-        self.setWindowTitle("Main window")
-        self.dataset_path = QFileDialog.getExistingDirectory(
-            self, "Путь к папке базового датасет"
-        )
-        src = QLabel(f"Базовый датасет:\n{self.dataset_path}", self)
-        src.setFixedSize(QSize(800, 50))
         self.classes = ["rose", "tulip"]
 
         self.classes_iterator = None
@@ -97,10 +101,16 @@ class MainWindow(QMainWindow):
         """The function creates a csv file at the specified path"""
         try:
             directory = QFileDialog.getSaveFileName(
-                self, "Выберите папку для создания файла аннотации:"
+                self,
+                "Выберите папку для создания файла аннотации:",
+                "",
+                "CSV File(*.csv)",
             )[0]
+            if directory == "":
+                return
             l = make_list(self.dataset_path, self.classes)
             write_in_file(directory, l)
+            QMessageBox.information(None, "Успешно", "Аннотация была успешно создана!")
         except Exception as ex:
             logging.error(f"Couldn't create annotation: {ex.message}\n{ex.args}\n")
 
@@ -109,12 +119,21 @@ class MainWindow(QMainWindow):
         and creates a csv file at the specified path"""
         try:
             directory = QFileDialog.getSaveFileName(
-                self, "Выберите путь для создания файла-аннотации:"
+                self,
+                "Выберите путь для создания файла-аннотации:",
+                "",
+                "CSV File(*.csv)",
             )[0]
             folder = QFileDialog.getExistingDirectory(
                 self, "Выберите папку для копирования датасета:"
             )
+            if (folder == "") or (directory == ""):
+                QMessageBox.information(
+                    None, "Не указан путь", "Не был выбран файл или папка"
+                )
+                return
             copy_in_new_directory(self.dataset_path, self.classes, folder, directory)
+            QMessageBox.information(None, "Успешно", "Датасет скопирован!")
         except Exception as ex:
             logging.error(f"Couldn't create copy: {ex.message}\n{ex.args}\n")
 
@@ -123,12 +142,18 @@ class MainWindow(QMainWindow):
         and creates a csv file at the specified path"""
         try:
             directory = QFileDialog.getSaveFileName(
-                self, "Выберите путь для создания файла аннотации:"
+                self, "Выберите файл для создания аннотации:", "", "CSV File(*.csv)"
             )[0]
             folder = QFileDialog.getExistingDirectory(
-                self, "Выберите папку для копирования датасета аннотации:"
+                self, "Выберите папку для копирования датасета:"
             )
+            if (folder == "") or (directory == ""):
+                QMessageBox.information(
+                    None, "Не указан путь", "Не был выбран файл или папка"
+                )
+                return
             copy_with_random(self.dataset_path, self.classes, folder, directory)
+            QMessageBox.information(None, "Успешно", "Датасет скопирован!")
         except Exception as ex:
             logging.error(f"Couldn't create randon copy: {ex.message}\n{ex.args}\n")
 
@@ -136,6 +161,8 @@ class MainWindow(QMainWindow):
         """Function requests the path for the iteration file and creates an iterator"""
         try:
             path = QFileDialog.getOpenFileName(self, "Выберите файл для итерации:")[0]
+            if path == "":
+                return
             self.classes_iterator = ClassesIterator(
                 path, self.classes[0], self.classes[1]
             )
@@ -145,6 +172,11 @@ class MainWindow(QMainWindow):
     def next_first(self):
         """Function returns the path to the next element of the first class
         and opens this image in the widget"""
+        if self.classes_iterator == None:
+            QMessageBox.information(
+                None, "Не выбран файл", "Не выбран файл для итерации"
+            )
+            return
         element = self.classes_iterator.next_first()
         self.image_path = element
         self.image_label.update()
@@ -156,6 +188,11 @@ class MainWindow(QMainWindow):
     def next_second(self):
         """Function returns the path to the next element of the second class
         and opens this image in the widget"""
+        if self.classes_iterator == None:
+            QMessageBox.information(
+                None, "Не выбран файл", "Не выбран файл для итерации"
+            )
+            return
         element = self.classes_iterator.next_second()
         self.image_path = element
         self.image_label.update()

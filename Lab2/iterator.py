@@ -30,8 +30,15 @@ class ElementIterator:
     def __next__(self) -> str:
         """Returns the absolute path to the next class element"""
         if self.count < self.limit:
-            if self.mark == self.data[self.count + 1][2]:
-                self.count += 1
+            if self.mark == self.data[self.count][2]:
+                if (self.count+1==self.limit):
+                        return None
+                self.count += 1 
+            if self.mark != self.data[self.count][2]:
+                while(self.mark!=self.data[self.count][2]):
+                    if (self.count+1==self.limit):
+                        return None
+                    self.count+=1
             return self.data[self.count][0]
         else:
             return None
