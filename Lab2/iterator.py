@@ -1,39 +1,47 @@
 import csv
-from dataset_manager import get_next_instance
+import os
+from itertools import cycle
 
 
-class ClassIterator:
-    def __init__(self, csv_file: str, class_labels: list):
-        """Initialize a ClassIterator object.
-        Parameters:
-        - csv_file (str): The path to the CSV file.
-        - class_labels (str): List of class labels.
-        """
-        self.csv_file = csv_file
-        self.class_labels = class_labels
-        self.current_label_index = 0
+class ImageIterator:
+    def __init__(self, annotation_file):
+        self.annotation_file = annotation_file
+        self.class_instances = self.load_annotation_file()
+        self.class_cycle = cycle(self.class_instances)
+        self.prev_instances = set()
 
-    def get_next_instance(csv_file: str, current_label: str) -> str:
-        return get_next_instance(csv_file, current_label)
+    def load_annotation_file(self):
+        instances = []
+        with open(self.annotation_file, 'r') as csvfile:
+            csvreader = csv.reader(csvfile)
+            for row in csvreader:
+                if len(row) == 3:
+                    instances.append(row[1])
+        return instances
 
-    def get_next_instance_for_current_label(self) -> str:
-        """
-        Get the next instance for the current class label.
-        Returns:
-        Optional[str]: The path to the next instance of the current class label, or None if instances are exhausted.
-        """
-        if not self.class_labels or self.current_label_index >= len(self.class_labels):
-            return None
-
-        current_label = self.class_labels[self.current_label_index]
-        next_instance = self.get_next_instance(self.csv_file, current_label)
-
-        if next_instance is not None:
-            self.current_label_index += 1
-            return next_instance
-        else:
-            return None
+    def get_next_instance(self, target_class):
+        for instance in self.class_cycle:
+            _, instance_name = os.path.split(instance)
+            parts = instance_name.split("_")
+            if len(parts) >= 2:
+                instance_class = parts[0]
+                instance_class = instance_class.split(".")[0]
+                if instance_class == target_class and instance not in self.prev_instances:
+                    self.prev_instances.add(instance)
+                    return instance
+        return None
 
 
 if __name__ == "__main__":
-    iterator = ClassIterator("copy_dataset.csv", ["tiger", "leopard"])
+    annotation_file = 'copy_dataset.csv'
+    target_class = 'leopard'
+
+    image_iterator = ImageIterator(annotation_file)
+
+    while True:
+        next_instance = image_iterator.get_next_instance(target_class)
+        if next_instance is not None:
+            print(next_instance)
+        else:
+            print("No more instances for the specified class.")
+            break

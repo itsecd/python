@@ -4,6 +4,7 @@ import csv
 import json
 import logging
 import random
+from enum import Enum
 from create_annotation import create_annotation_file
 
 logging.basicConfig(level=logging.INFO)
@@ -16,6 +17,11 @@ def create_folder(folder_name: str) -> None:
             os.makedirs(folder_name)
     except Exception as ex:
         logging.error(f"Failed to create folder:{ex.message}\n{ex.args}\n")
+
+
+class CopyType(Enum):
+    RANDOM = "random"
+    NUMBERED = "numbered"
 
 
 def copy_dataset(main_folder: str, new_copy_name: str, copy_type: str = "numbered") -> None:
@@ -37,7 +43,7 @@ def copy_dataset(main_folder: str, new_copy_name: str, copy_type: str = "numbere
                 destination_folder = os.path.join(new_copy_name, query)
                 create_folder(destination_folder)
 
-                if copy_type == "random":
+                if copy_type == CopyType.RANDOM:
                     random_number = random.randint(0, 10000)
                     while random_number in existing_random_numbers:
                         random_number = random.randint(0, 10000)
@@ -45,11 +51,11 @@ def copy_dataset(main_folder: str, new_copy_name: str, copy_type: str = "numbere
                     existing_random_numbers.add(random_number)
 
                     new_filename = f"{random_number}.jpg"
-                elif copy_type == "numbered":
+                elif copy_type == CopyType.NUMBERED:
                     new_filename = f"{query}_{len(os.listdir(destination_folder)) + 0:04d}.jpg"
                 else:
                     logging.error(
-                        "Invalid copy_type. Use 'default' or 'numbered'.")
+                        "Invalid copy_type. Use CopyType.RANDOM or CopyType.NUMBERED.")
                     return
 
                 source_filepath = os.path.join(root, file)
@@ -72,6 +78,6 @@ if __name__ == "__main__":
     with open("Lab2/options.json", "r") as options_file:
         options = json.load(options_file)
         copy_dataset(
-            options["main_folder"], options["new_copy_name"], "numbered")
+            options["main_folder"], options["new_copy_name"], CopyType.NUMBERED)
         copy_dataset(
-            options["main_folder"], options["random_copy_name"], "random")
+            options["main_folder"], options["random_copy_name"], CopyType.RANDOM)
