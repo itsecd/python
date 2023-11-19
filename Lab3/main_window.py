@@ -1,7 +1,6 @@
 """Module providing a function printing python version 3.11.5."""
 import sys
 import os
-# from PyQt5 import  QtGui, QtCore
 from PyQt5.QtWidgets import QApplication, QMessageBox, QMainWindow, QLabel, QVBoxLayout, QWidget, QPushButton, QFileDialog
 from PyQt5.QtGui import QPixmap, QFont
 from PyQt5.QtCore import QRect
@@ -60,6 +59,10 @@ class MainWindow(QMainWindow):
         self.next_button_leopard.clicked.connect(partial(self.next_leopard))
         self.layout.addWidget(self.next_button_leopard)
 
+        self.update_iterators_buttton = QPushButton("Update iterators")
+        self.update_iterators_buttton.clicked.connect(partial(self.update_iterators_with_message))
+        self.layout.addWidget(self.update_iterators_buttton)
+
         self.go_to_exit = QPushButton("Exit")
         self.go_to_exit.clicked.connect(self.close)
         self.layout.addWidget(self.go_to_exit)
@@ -70,17 +73,20 @@ class MainWindow(QMainWindow):
     def create_annotation(self):
         '''This function create standart type if annotation'''
         self.folderpath_dataset = QFileDialog.getExistingDirectory(self, 'Select Folder to dataset')
-        if self.folderpath_dataset:
+        try:
             save_filepath, _ = QFileDialog.getSaveFileName(self, 'Save Annotation File', '', '')
             folder_path = os.path.dirname(save_filepath)
             name = os.path.basename(save_filepath).rsplit('.', 1)[0]
-            if save_filepath:
+            if save_filepath & name != "":
                 create_annotation.create_csv_annotation(self.folderpath_dataset, name ,folder_path)
                 QMessageBox.information(self,
-                                                  "Success",
-                                                  "Annotation file created successfully!")
-        else:
-            QMessageBox.warning(self, "Error", "Please select a folder")
+                                        "Success",
+                                        "Annotation file created successfully!")
+            else:
+                QMessageBox.warning(self, "Error", f"Please select a correct folder next time")
+        except Exception:
+            QMessageBox.warning(self, "Error", f"Please select a correct folder\n {Exception}")
+            self.folderpath_dataset = None
 
 
     def create_new_dataset(self):
@@ -94,11 +100,11 @@ class MainWindow(QMainWindow):
                 "",
                 QFileDialog.ShowDirsOnly
                 )
-        if folder_new_dataset:
+        try:
             save_filepath, _ = QFileDialog.getSaveFileName(self, 'Save Annotation File', '', '')
             folder_path = os.path.dirname(save_filepath)
             name = os.path.basename(save_filepath).rsplit('.', 1)[0]
-            if save_filepath:
+            if save_filepath & name != "":
                 copy_dataset_in_new_folder.copy_dataset_in_new_folder(
                     folder_new_dataset,
                     "dataset",
@@ -106,9 +112,11 @@ class MainWindow(QMainWindow):
                     folder_path
                     )
                 QMessageBox.information(self, "Success", "Dataset created successfully!")
-            QMessageBox.information(self, "Success", "Dataset created successfully!")
-        else:
-            QMessageBox.warning(self, "Error", "Please select a folder")
+            else:
+                QMessageBox.warning(self, "Error",
+                                f"Please select a correct folder or annotation next time")
+        except Exception:
+            QMessageBox.warning(self, "Error", f"Please select a correct folder\n {Exception}")
 
 
     def create_new_random_dataset(self):
@@ -122,31 +130,40 @@ class MainWindow(QMainWindow):
             "",
             QFileDialog.ShowDirsOnly
             )
-        if save_folderpath:
+        try:
             save_filepath, _ = QFileDialog.getSaveFileName(self, 'Save annotation file', '', '')
             annotation_folder_path = os.path.dirname(save_filepath)
             name = os.path.basename(save_filepath).rsplit('.', 1)[0]
-            copy_dataset_random_names.copy_dataset_in_new_folder(
-                save_folderpath,
-                "dataset",
-                name,
-                annotation_folder_path
-                )
-            QMessageBox.information(self, "Success", "Dataset created successfully!")
-        else:
-            QMessageBox.warning(self, "Error", "Please select a folder")
+            if name != "" & save_filepath:
+                copy_dataset_random_names.copy_dataset_in_new_folder(
+                    save_folderpath,
+                    "dataset",
+                    name,
+                    annotation_folder_path
+                    )
+                QMessageBox.information(self, "Success", "Dataset created successfully!")
+            else:
+                QMessageBox.warning(self, "Error",
+                                f"Please select a correct annotation name next time")
+        except Exception:
+            QMessageBox.warning(self, "Error",
+                                f"Please select a correct folder or annotation\n {Exception}")
 
 
     def next_tiger(self):
         '''Iterator for tiger'''
         if self.annotation_to_iterate:
-            if not self.tiger_iterator:
-                self.tiger_iterator = class_iterator.PhotoIterator(self.annotation_to_iterate,
-                                                                   "tiger")
-            pixmap = QPixmap(next(self.tiger_iterator))
-            self.image.update()
-            self.image.setPixmap(pixmap)
-            self.layout.addWidget(self.image)
+            try:
+                if not self.tiger_iterator:
+                    self.tiger_iterator = class_iterator.PhotoIterator(self.annotation_to_iterate,
+                                                                    "tiger")
+                pixmap = QPixmap(next(self.tiger_iterator))
+                self.image.update()
+                self.image.setPixmap(pixmap)
+                self.layout.addWidget(self.image)
+            except Exception:
+                QMessageBox.warning(self, "Error", f"Please select a correct folder\n {Exception}")
+                self.update_iterators()
         else:
             self.annotation_to_iterate = QFileDialog.getOpenFileName(self, 'Open file', '/home')[0]
 
@@ -154,15 +171,34 @@ class MainWindow(QMainWindow):
     def next_leopard(self):
         '''Iterator for leopard'''
         if self.annotation_to_iterate:
-            if not self.leopard_iterator:
-                self.leopard_iterator = class_iterator.PhotoIterator(self.annotation_to_iterate,
-                                                                     "leopard")
-            pixmap = QPixmap(next(self.leopard_iterator))
-            self.image.update()
-            self.image.setPixmap(pixmap)
-            self.layout.addWidget(self.image)
+            try:
+                if not self.leopard_iterator:
+                    self.leopard_iterator = class_iterator.PhotoIterator(self.annotation_to_iterate,
+                                                                        "leopard")
+                pixmap = QPixmap(next(self.leopard_iterator))
+                self.image.update()
+                self.image.setPixmap(pixmap)
+                self.layout.addWidget(self.image)
+            except Exception:
+                QMessageBox.warning(self, "Error", f"Please select a correct folder next time\n {Exception}")
+                self.update_iterators()
         else:
             self.annotation_to_iterate = QFileDialog.getOpenFileName(self, 'Open file', '/home')[0]
+
+
+    def update_iterators(self):
+        '''Removes iterators and the path to the annotation'''
+        self.annotation_to_iterate = None
+        self.leopard_iterator = None
+        self.tiger_iterator = None
+
+
+    def update_iterators_with_message(self):
+        '''Calls the update_iterators function and gives the user a message'''
+        self.update_iterators()
+        QMessageBox.information(self,
+                                "Success",
+                                "Iterators updated!")
 
 
 if __name__ == "__main__":
