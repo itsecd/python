@@ -60,6 +60,10 @@ class MainWindow(QMainWindow):
         self.next_button_leopard.clicked.connect(partial(self.next_leopard))
         self.layout.addWidget(self.next_button_leopard)
 
+        self.go_to_exit = QPushButton("Exit")
+        self.go_to_exit.clicked.connect(self.close)
+        self.layout.addWidget(self.go_to_exit)
+
         self.show()
 
 
