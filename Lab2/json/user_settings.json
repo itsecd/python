@@ -5,8 +5,9 @@
     "new_folder_for_data": "D:/new_folder_for_data",
     "copy_name_csv_file": "new_data_annotation",
     "random_new_folder_for_data":"D:/random_new_folder_for_data",
+    "folder_for_csv_rand": "D:/python",
     "random_copy_name_csv_file": "random_new_data_annotation",
-    "annotation_for_iterating": "new_data_annotation.csv",
+    "annotation_for_iterating": "random_new_data_annotation.csv",
     "number_of_iteration": 285,
     "class": "tiger"
 }

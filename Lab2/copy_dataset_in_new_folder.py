@@ -73,6 +73,6 @@ if __name__ == "__main__":
     with open(os.path.join("Lab2","json","user_settings.json"), "r", newline='') as f:
         settings = json.load(f)
     copy_dataset_in_new_folder(settings["new_folder_for_data"],
-                               settings['dataset'],
+                               settings["dataset"],
                                settings["copy_name_csv_file"],
                                settings["folder_for_csv_copy"])
