@@ -1,6 +1,7 @@
 {
     "folder_for_csv":"D:/python",
-    "dataset": "dataset", 
+    "folder_for_csv_copy": "D:/python",
+    "dataset": "D:/python/dataset", 
     "name_csv_file": "annotation_dataset",
     "new_folder_for_data": "D:/new_folder_for_data",
     "copy_name_csv_file": "new_data_annotation",

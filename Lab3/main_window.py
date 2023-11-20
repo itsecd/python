@@ -72,7 +72,7 @@ class MainWindow(QMainWindow):
 
     def create_annotation(self):
         '''This function create standart type if annotation'''
-        folderpath_dataset = QFileDialog.getExistingDirectory(self, 'Select Folder to dataset')
+        folderpath_dataset = QFileDialog.getExistingDirectory(self, 'Select folder with dataset')
         try:
             save_filepath, _ = QFileDialog.getSaveFileName(self, 'Save Annotation File', '', '')
             folder_path = os.path.dirname(save_filepath)
@@ -94,9 +94,10 @@ class MainWindow(QMainWindow):
         The function creates a dataset without included folders,
         as well as an annotation to it
         '''
+        folderpath_dataset = QFileDialog.getExistingDirectory(self, 'Select folder with origin dataset')
         folder_new_dataset = QFileDialog.getExistingDirectory(
                 None,
-                "Select a folder",
+                "Select a folder for new dataset",
                 "",
                 QFileDialog.ShowDirsOnly
                 )
@@ -107,7 +108,7 @@ class MainWindow(QMainWindow):
             if save_filepath and name != "":
                 copy_dataset_in_new_folder.copy_dataset_in_new_folder(
                     folder_new_dataset,
-                    "dataset",
+                    folderpath_dataset,
                     name,
                     folder_path
                     )
@@ -125,9 +126,10 @@ class MainWindow(QMainWindow):
         The function creates a dataset without included folders and random names,
         as well as an annotation to it
         '''
+        folderpath_dataset = QFileDialog.getExistingDirectory(self, 'Select folder with origin dataset')
         save_folderpath = QFileDialog.getExistingDirectory(
             None,
-            "Select a folder for dataset",
+            "Select a folder for new dataset with random names",
             "",
             QFileDialog.ShowDirsOnly
             )
@@ -138,7 +140,7 @@ class MainWindow(QMainWindow):
             if name != "" and save_filepath:
                 copy_dataset_random_names.copy_dataset_in_new_folder(
                     save_folderpath,
-                    "dataset",
+                    folderpath_dataset,
                     name,
                     annotation_folder_path
                     )

@@ -27,13 +27,14 @@ def generate_random_array() -> None:
 def copy_dataset_in_new_folder(path_new_folder: str,
                                path_dataset: str,
                                annotation: str,
-                               folder_for_csv: str
+                               folder_for_csv: str,
+                               new_name_dataset:str = 'dataset'
                                ) -> None:
     """
     Main func, that using other functions
     uploads copies of images with new names to a new folder
     """
-    create_empty_folder(path_new_folder, path_dataset)
+    create_empty_folder(path_new_folder, new_name_dataset)
     try:
         create_folder(folder_for_csv)
         csv_file = open(f"{os.path.join(folder_for_csv, annotation)}.csv", 'w')
@@ -48,7 +49,7 @@ def copy_dataset_in_new_folder(path_new_folder: str,
                     for item in paths_filenames:
                         extension = Path(item).name.split('.')[-1]
                         path_new_file = os.path.join(path_new_folder,
-                                                     path_dataset,
+                                                     new_name_dataset,
                                                      f"{arr[arr_iter]}.{extension}"
                                                      )
                         shutil.copyfile(item,

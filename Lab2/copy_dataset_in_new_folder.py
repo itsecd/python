@@ -40,9 +40,10 @@ def get_filenames(path: str) -> None:
 def copy_dataset_in_new_folder(path_new_folder: str,
                                path_dataset: str,
                                annotation: str,
-                               folder_for_csv: str) -> None:
+                               folder_for_csv: str,
+                               new_name_dataset: str = 'dataset') -> None:
     """Main func, that using other functions uploads copies of images with new names to a new folder"""
-    create_empty_folder(path_new_folder, path_dataset)
+    create_empty_folder(path_new_folder, new_name_dataset)
     try:
         create_folder(folder_for_csv)
         csv_file = open(f"{os.path.join(folder_for_csv, annotation)}.csv", 'w', newline='')
@@ -55,7 +56,7 @@ def copy_dataset_in_new_folder(path_new_folder: str,
                     for item in paths_filenames:
                         filename = Path(item).name
                         path_new_file = os.path.join(path_new_folder,
-                                                     path_dataset,
+                                                     new_name_dataset,
                                                      f"{f.name}_{filename}"
                                                      )
                         shutil.copyfile(item,
