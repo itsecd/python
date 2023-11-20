@@ -16,20 +16,17 @@ class MainWindow(QMainWindow):
     def __init__(self):
         super(MainWindow, self).__init__()
 
-        self.setWindowTitle("Lab 2")
-        self.resize(420, 200)
+        self.setWindowTitle("Lab 3")
+        self.resize(500, 250)
         self.move(0, 0)
         font = QFont()
         font.setFamily("Times New Roman")
         font.setPointSize(11)
         self.setFont(font)
 
-
-        self.folderpath_dataset = None
-        self.folderpath_dataset_random = None
         self.annotation_to_iterate = None
         self.image = QLabel(self)
-        self.image.setFixedSize(400, 400)
+        self.image.setFixedSize(500, 500)
 
         self.widget = QWidget()
         self.layout = QVBoxLayout()
@@ -55,11 +52,13 @@ class MainWindow(QMainWindow):
         self.layout.addWidget(self.next_button_tiger)
 
         self.leopard_iterator = None
+        self.leopard_count = 0
         self.next_button_leopard = QPushButton("Next leopard")
         self.next_button_leopard.clicked.connect(partial(self.next_leopard))
         self.layout.addWidget(self.next_button_leopard)
 
         self.update_iterators_buttton = QPushButton("Update iterators")
+        self.tiger_count = 0
         self.update_iterators_buttton.clicked.connect(partial(self.update_iterators_with_message))
         self.layout.addWidget(self.update_iterators_buttton)
 
@@ -67,26 +66,27 @@ class MainWindow(QMainWindow):
         self.go_to_exit.clicked.connect(self.close)
         self.layout.addWidget(self.go_to_exit)
 
+        self.statusBar().showMessage(f"Ready to work!")    
         self.show()
 
 
     def create_annotation(self):
         '''This function create standart type if annotation'''
-        self.folderpath_dataset = QFileDialog.getExistingDirectory(self, 'Select Folder to dataset')
+        folderpath_dataset = QFileDialog.getExistingDirectory(self, 'Select Folder to dataset')
         try:
             save_filepath, _ = QFileDialog.getSaveFileName(self, 'Save Annotation File', '', '')
             folder_path = os.path.dirname(save_filepath)
             name = os.path.basename(save_filepath).rsplit('.', 1)[0]
-            if save_filepath & name != "":
-                create_annotation.create_csv_annotation(self.folderpath_dataset, name ,folder_path)
+            if save_filepath and name != "":
+                create_annotation.create_csv_annotation(folderpath_dataset, name ,folder_path)
                 QMessageBox.information(self,
                                         "Success",
                                         "Annotation file created successfully!")
+                self.statusBar().showMessage(f"Created {save_filepath}.csv for {folderpath_dataset}")                                
             else:
                 QMessageBox.warning(self, "Error", f"Please select a correct folder next time")
         except Exception:
             QMessageBox.warning(self, "Error", f"Please select a correct folder\n {Exception}")
-            self.folderpath_dataset = None
 
 
     def create_new_dataset(self):
@@ -104,7 +104,7 @@ class MainWindow(QMainWindow):
             save_filepath, _ = QFileDialog.getSaveFileName(self, 'Save Annotation File', '', '')
             folder_path = os.path.dirname(save_filepath)
             name = os.path.basename(save_filepath).rsplit('.', 1)[0]
-            if save_filepath & name != "":
+            if save_filepath and name != "":
                 copy_dataset_in_new_folder.copy_dataset_in_new_folder(
                     folder_new_dataset,
                     "dataset",
@@ -112,6 +112,7 @@ class MainWindow(QMainWindow):
                     folder_path
                     )
                 QMessageBox.information(self, "Success", "Dataset created successfully!")
+                self.statusBar().showMessage(f"Created {save_filepath}.csv and {folder_new_dataset}/dataset")                
             else:
                 QMessageBox.warning(self, "Error",
                                 f"Please select a correct folder or annotation next time")
@@ -134,7 +135,7 @@ class MainWindow(QMainWindow):
             save_filepath, _ = QFileDialog.getSaveFileName(self, 'Save annotation file', '', '')
             annotation_folder_path = os.path.dirname(save_filepath)
             name = os.path.basename(save_filepath).rsplit('.', 1)[0]
-            if name != "" & save_filepath:
+            if name != "" and save_filepath:
                 copy_dataset_random_names.copy_dataset_in_new_folder(
                     save_folderpath,
                     "dataset",
@@ -142,6 +143,7 @@ class MainWindow(QMainWindow):
                     annotation_folder_path
                     )
                 QMessageBox.information(self, "Success", "Dataset created successfully!")
+                self.statusBar().showMessage(f"Created {save_filepath}.csv and {save_folderpath}/dataset")
             else:
                 QMessageBox.warning(self, "Error",
                                 f"Please select a correct annotation name next time")
@@ -161,11 +163,13 @@ class MainWindow(QMainWindow):
                 self.image.update()
                 self.image.setPixmap(pixmap)
                 self.layout.addWidget(self.image)
+                self.tiger_count += 1
+                self.statusBar().showMessage(f"{self.tiger_count} iter tiger, {self.leopard_count} iter leopard")
             except Exception:
-                QMessageBox.warning(self, "Error", f"Please select a correct folder\n {Exception}")
+                QMessageBox.warning(self, "Error", f"Please select a correct file next time\n {Exception}")
                 self.update_iterators()
         else:
-            self.annotation_to_iterate = QFileDialog.getOpenFileName(self, 'Open file', '/home')[0]
+            self.annotation_to_iterate = QFileDialog.getOpenFileName(self, 'Annotation file', '/home')[0]
 
 
     def next_leopard(self):
@@ -179,11 +183,13 @@ class MainWindow(QMainWindow):
                 self.image.update()
                 self.image.setPixmap(pixmap)
                 self.layout.addWidget(self.image)
+                self.leopard_count += 1
+                self.statusBar().showMessage(f"{self.tiger_count} iter tiger, {self.leopard_count} iter leopard")
             except Exception:
-                QMessageBox.warning(self, "Error", f"Please select a correct folder next time\n {Exception}")
+                QMessageBox.warning(self, "Error", f"Please select a correct file next time\n {Exception}")
                 self.update_iterators()
         else:
-            self.annotation_to_iterate = QFileDialog.getOpenFileName(self, 'Open file', '/home')[0]
+            self.annotation_to_iterate = QFileDialog.getOpenFileName(self, 'Annotation file', '/home')[0]
 
 
     def update_iterators(self):
@@ -191,6 +197,8 @@ class MainWindow(QMainWindow):
         self.annotation_to_iterate = None
         self.leopard_iterator = None
         self.tiger_iterator = None
+        self.tiger_count = None
+        self.leopard_count = None
 
 
     def update_iterators_with_message(self):
@@ -199,6 +207,8 @@ class MainWindow(QMainWindow):
         QMessageBox.information(self,
                                 "Success",
                                 "Iterators updated!")
+        self.statusBar().showMessage("iterators updated")
+
 
 
 if __name__ == "__main__":
