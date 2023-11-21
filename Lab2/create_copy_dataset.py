@@ -5,7 +5,6 @@ import json
 import logging
 import random
 from enum import Enum
-from create_annotation import create_annotation_file
 
 logging.basicConfig(level=logging.INFO)
 
@@ -66,7 +65,6 @@ def copy_dataset(main_folder: str, new_copy_name: str, copy_type: str = "numbere
                     [source_filepath, destination_filepath, query])
 
     try:
-        create_annotation_file(new_copy_name)
         with open(f"{new_copy_name}.csv", mode='w', newline='') as file:
             writer = csv.writer(file)
             writer.writerows(annotations)

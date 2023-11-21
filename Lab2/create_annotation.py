@@ -37,23 +37,12 @@ def generate_annotation(main_folder: str) -> list:
     return annotations
 
 
-def create_annotation_file(annotation_file: str) -> None:
-    """The function takes file name and create file,  if it does not exist"""
-    try:
-        if not os.path.exists(annotation_file):
-            with open(f"{annotation_file}.csv", "w", newline=''):
-                pass
-    except Exception as ex:
-        logging.error(f"Failed to create file:: {ex}\n")
-
-
 def write_annotation_to_csv(main_folder: str, annotation_file: str) -> None:
     """Write annotations to a CSV file for all files with the .jpg extension in the specified folder and its subfolders.
     main_folder (str): The path to the main folder where the files are located.
     annotation_file (str): The name of the annotation file to be created.
     """
     try:
-        create_annotation_file(annotation_file)
         annotations = generate_annotation(main_folder)
         with open(f"{annotation_file}.csv", mode='w', newline='') as file:
             writer = csv.writer(file)
