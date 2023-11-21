@@ -3,7 +3,7 @@ import sys
 import os
 from PyQt5.QtWidgets import QApplication, QMessageBox, QMainWindow, QLabel, QVBoxLayout, QWidget, QPushButton, QFileDialog
 from PyQt5.QtGui import QPixmap, QFont
-from PyQt5.QtCore import QRect
+from PyQt5.QtCore import QRect, Qt
 from functools import partial
 sys.path.append("D:/python/Lab2")
 import create_annotation
@@ -26,13 +26,11 @@ class MainWindow(QMainWindow):
 
         self.annotation_to_iterate = None
         self.image = QLabel(self)
-        self.image.setFixedSize(500, 500)
-
+        
         self.widget = QWidget()
         self.layout = QVBoxLayout()
         self.widget.setLayout(self.layout)
         self.setCentralWidget(self.widget)
-        self.image.setGeometry(QRect(9, 149, 441, 431))
 
         self.create_annotation_button = QPushButton("Create Annotation")
         self.create_annotation_button.clicked.connect(self.create_annotation)
@@ -57,9 +55,9 @@ class MainWindow(QMainWindow):
         self.next_button_leopard.clicked.connect(partial(self.next_leopard))
         self.layout.addWidget(self.next_button_leopard)
 
-        self.update_iterators_buttton = QPushButton("Update iterators")
+        self.update_iterators_buttton = QPushButton("Erase iterators")
         self.tiger_count = 0
-        self.update_iterators_buttton.clicked.connect(partial(self.update_iterators_with_message))
+        self.update_iterators_buttton.clicked.connect(partial(self.erase_iterators_with_message))
         self.layout.addWidget(self.update_iterators_buttton)
 
         self.go_to_exit = QPushButton("Exit")
@@ -163,13 +161,17 @@ class MainWindow(QMainWindow):
                                                                     "tiger")
                 pixmap = QPixmap(next(self.tiger_iterator))
                 self.image.update()
+                if pixmap.width() > 1500:
+                    pixmap = pixmap.scaled(1500, 1500)
+                elif pixmap.width() > 500:
+                    pixmap = pixmap.scaledToHeight(500)
                 self.image.setPixmap(pixmap)
                 self.layout.addWidget(self.image)
                 self.tiger_count += 1
                 self.statusBar().showMessage(f"{self.tiger_count} iter tiger, {self.leopard_count} iter leopard")
             except Exception:
                 QMessageBox.warning(self, "Error", f"Please select a correct file next time\n {Exception}")
-                self.update_iterators()
+                self.erase_iterators()
         else:
             self.annotation_to_iterate = QFileDialog.getOpenFileName(self, 'Annotation file', '/home')[0]
 
@@ -183,18 +185,22 @@ class MainWindow(QMainWindow):
                                                                         "leopard")
                 pixmap = QPixmap(next(self.leopard_iterator))
                 self.image.update()
+                if pixmap.width() > 1500:
+                    pixmap = pixmap.scaled(1500, 1500)
+                elif pixmap.width() > 500:
+                    pixmap = pixmap.scaledToHeight(500)
                 self.image.setPixmap(pixmap)
                 self.layout.addWidget(self.image)
                 self.leopard_count += 1
                 self.statusBar().showMessage(f"{self.tiger_count} iter tiger, {self.leopard_count} iter leopard")
             except Exception:
                 QMessageBox.warning(self, "Error", f"Please select a correct file next time\n {Exception}")
-                self.update_iterators()
+                self.erase_iterators()
         else:
             self.annotation_to_iterate = QFileDialog.getOpenFileName(self, 'Annotation file', '/home')[0]
 
 
-    def update_iterators(self):
+    def erase_iterators(self):
         '''Removes iterators and the path to the annotation'''
         self.annotation_to_iterate = None
         self.leopard_iterator = None
@@ -203,13 +209,13 @@ class MainWindow(QMainWindow):
         self.leopard_count = None
 
 
-    def update_iterators_with_message(self):
-        '''Calls the update_iterators function and gives the user a message'''
+    def erase_iterators_with_message(self):
+        '''Calls the erase_iterators function and gives the user a message'''
         self.update_iterators()
         QMessageBox.information(self,
                                 "Success",
-                                "Iterators updated!")
-        self.statusBar().showMessage("iterators updated")
+                                "Iterators erased!")
+        self.statusBar().showMessage("iterators erased")
 
 
 
