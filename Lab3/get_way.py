@@ -1,17 +1,4 @@
-import json, os
-
-def json_unpack() -> list:
-    """
-    Open jsons files
-    """
-
-    with open(os.path.join(os.path.dirname(__file__), "json", "setting.json"), 'r') as setting_json:
-        setting = json.load(setting_json)
-
-    return [
-            os.path.join(setting["name-dir"], setting["name-data-dir"], setting["name-together"]), 
-            os.path.join(setting["name-dir"], setting["name-data-dir"], setting["name-random"])]
-
+import os
 
 def get_path_normal(directory : str, object : str, number : int) -> str:
     """
@@ -27,7 +14,7 @@ def get_path_normal(directory : str, object : str, number : int) -> str:
     return os.path.join(directory, object, f"{number:04}.jpg")
 
 
-def get_path_together(object : str, number : int) -> str:
+def get_path_together(save_fold : str, object : str, number : int) -> str:
     """
     Get path in together format
 
@@ -38,10 +25,10 @@ def get_path_together(object : str, number : int) -> str:
     number : int
         Number of object
     """
-    return os.path.join(json_unpack()[0], f"{object}_{number:04}.jpg")
+    return os.path.join(save_fold, f"{object}_{number:04}.jpg")
 
 
-def get_path_random(object : str, number : int) -> str:
+def get_path_random(save_fold : str, number : int) -> str:
     """
     Get path in random format
 
@@ -52,4 +39,4 @@ def get_path_random(object : str, number : int) -> str:
     number : int
         Number of object
     """
-    return os.path.join(json_unpack()[1], f"{number:04}.jpg")
+    return os.path.join(save_fold, f"{number:04}.jpg")

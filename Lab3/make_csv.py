@@ -51,7 +51,7 @@ def write_in_csv(path_to_csv : str, img_class : str, directory : str) -> None:
         logging.error(f"Error of writing row in csv: {ex}")
 
 
-def make_csv(path_to_csv : str, img_classes : list, directory : str, mode : str) -> None:
+def make_csv(path_to_csv : str, img_classes : list, directory : str, mode : str, path_to_data : str = "") -> None:
     """
     Make new csv file
 
@@ -72,12 +72,12 @@ def make_csv(path_to_csv : str, img_classes : list, directory : str, mode : str)
                 if mode == "normal":
                     write_in_csv(path_to_csv, img_class, get_path_normal(directory, img_class, img))
                 elif mode == "together":
-                    shutil.copyfile(get_path_normal(img_class, img), get_path_together(img_class, img))
-                    write_in_csv(path_to_csv, img_class, get_path_together(img_class, img))
+                    shutil.copyfile(get_path_normal(directory, img_class, img), get_path_together(path_to_data, img_class, img))
+                    write_in_csv(path_to_csv, img_class, get_path_together(path_to_data, img_class, img))
                 elif mode == "random":
                     _random = random.randint(0, 10000)
-                    shutil.copyfile(get_path_normal(img_class, img), get_path_random(img_class, _random))
-                    write_in_csv(path_to_csv, img_class, get_path_random(img_class, _random))
+                    shutil.copyfile(get_path_normal(directory, img_class, img), get_path_random(path_to_data, _random))
+                    write_in_csv(path_to_csv, img_class, get_path_random(path_to_data, _random))
                 else:
                     raise Exception("Incorrect mode")
     except Exception as ex:

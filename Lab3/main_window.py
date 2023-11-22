@@ -12,7 +12,8 @@ from PyQt5.QtWidgets import (QApplication,
                              QLineEdit,
                              QHBoxLayout,
                              QVBoxLayout,
-                             QScrollArea)
+                             QScrollArea,
+                             QMessageBox)
 from PyQt5.QtCore import QSize
 from PyQt5.QtGui import QPixmap
 from make_csv import *
@@ -92,8 +93,8 @@ class MainWindow(QWidget):
 
     def select_path(self):
         self.dataset_path = QFileDialog.getExistingDirectory(self, "Select path")
-        self.dataset_path_label.setText(self.dataset_path)
         if self.dataset_path:
+            self.dataset_path_label.setText(self.dataset_path)
             self.create_annotation.setDisabled(False)            
             self.create_together.setDisabled(False)            
             self.create_random.setDisabled(False)            
@@ -114,23 +115,43 @@ class MainWindow(QWidget):
     def make_normal(self):
         try:
             fold = QFileDialog.getExistingDirectory(self, "Select save path")
-            make_csv(os.path.join(fold, "dataset"), img_classes, self.dataset_path, "normal")
+            make_csv(os.path.join(fold, "dataset"), img_classes, self.dataset_path, "normal", "")
         except:
-            print("error")
+            msg = QMessageBox()
+            msg.setWindowTitle("Warning")
+            msg.setText("Всё плохо")
+            msg.setIcon(QMessageBox.Warning)
+            msg.exec_()
 
 
     def make_together(self):
         try:
             fold_data = QFileDialog.getExistingDirectory(self, "Select Path to Dataset")
-            fold_csv = QFileDialog.getExistingDirectory(self, "Select Path to Dataset")
+            fold_csv = QFileDialog.getExistingDirectory(self, "Select Path to CSV")
 
-            make_csv(os.path.join(fold_csv, "dataset_together"), img_classes, self.dataset_path, "together")
+            make_csv(os.path.join(fold_csv, "dataset_together"), img_classes, self.dataset_path, 
+                                    "together", fold_data)
         except:
-            print("error")
+            msg = QMessageBox()
+            msg.setWindowTitle("Warning")
+            msg.setText("Всё плохо")
+            msg.setIcon(QMessageBox.Warning)
+            msg.exec_()
 
 
     def make_random(self):
-        pass
+        try:
+            fold_data = QFileDialog.getExistingDirectory(self, "Select Path to Dataset")
+            fold_csv = QFileDialog.getExistingDirectory(self, "Select Path to CSV")
+
+            make_csv(os.path.join(fold_csv, "dataset_random"), img_classes, self.dataset_path, 
+                                    "random", fold_data)
+        except:
+            msg = QMessageBox()
+            msg.setWindowTitle("Warning")
+            msg.setText("Всё плохо")
+            msg.setIcon(QMessageBox.Warning)
+            msg.exec_()
 
 if __name__ == "__main__":
 
