@@ -3,62 +3,134 @@ import os
 import json
 from PyQt5.QtWidgets import (QApplication, 
                              QMainWindow, 
+                             QWidget,
                              QPushButton, 
                              QFileDialog,
-                             QGridLayout,)
+                             QGridLayout,
+                             QLabel,
+                             QTextEdit,
+                             QLineEdit,
+                             QHBoxLayout,
+                             QVBoxLayout,
+                             QScrollArea)
 from PyQt5.QtCore import QSize
+from PyQt5.QtGui import QPixmap
 from make_csv import *
 
 
-class MainWindow(QMainWindow):
+class MainWindow(QWidget):
     def __init__(self):
         super().__init__()
 
-        self.GUI()
+        self.initUI()
 
-    def GUI(self):
-        self.setWindowTitle("בוריס")
-        self.setMinimumSize(QSize(600, 400))
+    def initUI(self):
+        # Make a grid
+        self.grid = QGridLayout()
+        self.setLayout(self.grid)
 
         # Path to dataset
         self.dataset_path = None
 
         # Button to select fold with dataset
-        self.base_button = self.add_button("Select dataset path")
-        self.base_button.clicked.connect(self.select_path)
+        self.select_dataset = QPushButton("Select Dataset")
+        self.select_dataset.setAutoDefault(True)
+        self.select_dataset.setMaximumSize(400, 100)
 
-        # Button to create annotation
-        self.normal_button = self.add_button("Create annotation")
-        self.normal_button.clicked.connect(self.make_normal_annotation)
+        self.select_dataset.clicked.connect(self.select_path)
 
-        # Button to Next "img_class" element and Next class
-        self.button_next_rose = self.add_button(f"Next {img_classes[0]}")
-        self.button_next_tulip = self.add_button(f"Next {img_classes[1]}")
+        self.dataset_path_label = QLineEdit()
+
+        # Buttons to create annotation and datset
+        self.create_annotation = QPushButton("Create Annotation")
+        self.create_together = QPushButton("Create Together")
+        self.create_random = QPushButton("Create Random")
+
+        self.create_annotation.setDisabled(1)
+        self.create_together.setDisabled(1)
+        self.create_random.setDisabled(1)
+        self.create_annotation.clicked.connect(self.make_normal)
+        self.create_together.clicked.connect(self.make_together)
+        self.create_random.clicked.connect(self.make_random)
+
+        # Buttons to Next "img_class" element and Next class
+        self.button_next_rose = QPushButton(f"Next {img_classes[0]}")
+        self.button_next_tulip = QPushButton(f"Next {img_classes[1]}")
+        self.button_next_rose.setDisabled(1)
+        self.button_next_tulip.setDisabled(1)
 
 
-        # Make a grid
-        self.layout_grid = QGridLayout(self)
-        self.setLayout(self.layout_grid)
+
+
+
+        # Test image in app
+        self.image_ = QLabel()
+        # pixmap = QPixmap("C:/Users/boris/Desktop/web/images/avatar.jpg")
+        # self.image_.setPixmap(pixmap)
+
+        self.scroll_area = QScrollArea() 
+        self.scroll_area.setWidget(self.image_) 
+        self.scroll_area.setWidgetResizable(True)
+        self.scroll_area.setMinimumSize(700, 700)
+
+
+        self.grid.setSpacing(10)
+        self.grid.addWidget(self.select_dataset, 1, 1)
+        self.grid.addWidget(self.dataset_path_label, 2, 1)
+        self.grid.addWidget(self.create_annotation, 3, 1)
+        self.grid.addWidget(self.create_together, 4, 1)
+        self.grid.addWidget(self.create_random, 5, 1)
+        self.grid.addWidget(self.scroll_area, 1, 2, 4, 2)
+        self.grid.addWidget(self.button_next_rose, 5, 2)
+        self.grid.addWidget(self.button_next_tulip, 5, 3)
+
+
+        
+        self.setWindowTitle("Application")
+        self.show()
 
 
     def select_path(self):
         self.dataset_path = QFileDialog.getExistingDirectory(self, "Select path")
+        self.dataset_path_label.setText(self.dataset_path)
+        if self.dataset_path:
+            self.create_annotation.setDisabled(False)            
+            self.create_together.setDisabled(False)            
+            self.create_random.setDisabled(False)            
+            self.button_next_rose.setDisabled(False)   
+            self.button_next_tulip.setDisabled(False)            
+
         # self.dataset_path = os.path.basename(os.path.normpath(folder))
 
-    def add_button(self, text : str, x : int = 0, y : int = 0) -> QPushButton:
-        button = QPushButton(text, self)
-        button.resize(button.sizeHint())
-        button.move(x, y)
-        # button.setFixedSize(QSize(size_x, size_y))
+    # def add_button(self, text : str, x : int = 0, y : int = 0) -> QPushButton:
+    #     button = QPushButton(text, self)
+    #     button.resize(button.sizeHint())
+    #     button.move(x, y)
+    #     # button.setFixedSize(QSize(size_x, size_y))
 
-        return button
-    
-    def make_normal_annotation(self):
+    #     return button
+
+
+    def make_normal(self):
         try:
             fold = QFileDialog.getExistingDirectory(self, "Select save path")
             make_csv(os.path.join(fold, "dataset"), img_classes, self.dataset_path, "normal")
         except:
             print("error")
+
+
+    def make_together(self):
+        try:
+            fold_data = QFileDialog.getExistingDirectory(self, "Select Path to Dataset")
+            fold_csv = QFileDialog.getExistingDirectory(self, "Select Path to Dataset")
+
+            make_csv(os.path.join(fold_csv, "dataset_together"), img_classes, self.dataset_path, "together")
+        except:
+            print("error")
+
+
+    def make_random(self):
+        pass
 
 if __name__ == "__main__":
 
@@ -69,8 +141,5 @@ if __name__ == "__main__":
     
     # Приложение
     app = QApplication(sys.argv)
-    
     window = MainWindow()
-    window.show()
-
     sys.exit(app.exec_())
