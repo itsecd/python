@@ -46,13 +46,13 @@ class MainWindow(QMainWindow):
 
         self.tiger_iterator = None
         self.next_button_tiger = QPushButton("Next tiger")
-        self.next_button_tiger.clicked.connect(partial(self.next_tiger))
+        self.next_button_tiger.clicked.connect(self.next_image("tiger", self.tiger_iterator))
         self.layout.addWidget(self.next_button_tiger)
 
         self.leopard_iterator = None
         self.leopard_count = 0
         self.next_button_leopard = QPushButton("Next leopard")
-        self.next_button_leopard.clicked.connect(partial(self.next_leopard))
+        self.next_button_leopard.clicked.connect(lambda: self.next_image("leopard", self.leopard_iterator))
         self.layout.addWidget(self.next_button_leopard)
 
         self.update_iterators_buttton = QPushButton("Erase iterators")
@@ -152,14 +152,18 @@ class MainWindow(QMainWindow):
                                 f"Please select a correct folder or annotation\n {Exception}")
 
 
-    def next_tiger(self):
-        '''Iterator for tiger'''
+    def next_image(self, label:str, iterator: class_iterator.PhotoIterator)->None:
+        '''Iterator for images'''
         if self.annotation_to_iterate:
             try:
-                if not self.tiger_iterator:
-                    self.tiger_iterator = class_iterator.PhotoIterator(self.annotation_to_iterate,
-                                                                    "tiger")
-                pixmap = QPixmap(next(self.tiger_iterator))
+                if not iterator:
+                    iterator = class_iterator.PhotoIterator(self.annotation_to_iterate,
+                                                                    label)
+                pixmap = QPixmap(next(iterator))
+                if label == 'tiger':
+                    self.tiger_iterator = iterator
+                elif label == 'leopard':
+                    self.leopard_iterator = iterator
                 self.image.update()
                 if pixmap.width() > 1500:
                     pixmap = pixmap.scaled(1500, 1500)
@@ -169,6 +173,7 @@ class MainWindow(QMainWindow):
                 self.layout.addWidget(self.image)
                 self.tiger_count += 1
                 self.statusBar().showMessage(f"{self.tiger_count} iter tiger, {self.leopard_count} iter leopard")
+                return iterator
             except Exception:
                 QMessageBox.warning(self, "Error", f"Please select a correct file next time\n {Exception}")
                 self.erase_iterators()
@@ -176,28 +181,28 @@ class MainWindow(QMainWindow):
             self.annotation_to_iterate = QFileDialog.getOpenFileName(self, 'Annotation file', '/home')[0]
 
 
-    def next_leopard(self):
-        '''Iterator for leopard'''
-        if self.annotation_to_iterate:
-            try:
-                if not self.leopard_iterator:
-                    self.leopard_iterator = class_iterator.PhotoIterator(self.annotation_to_iterate,
-                                                                        "leopard")
-                pixmap = QPixmap(next(self.leopard_iterator))
-                self.image.update()
-                if pixmap.width() > 1500:
-                    pixmap = pixmap.scaled(1500, 1500)
-                elif pixmap.width() > 500:
-                    pixmap = pixmap.scaledToHeight(500)
-                self.image.setPixmap(pixmap)
-                self.layout.addWidget(self.image)
-                self.leopard_count += 1
-                self.statusBar().showMessage(f"{self.tiger_count} iter tiger, {self.leopard_count} iter leopard")
-            except Exception:
-                QMessageBox.warning(self, "Error", f"Please select a correct file next time\n {Exception}")
-                self.erase_iterators()
-        else:
-            self.annotation_to_iterate = QFileDialog.getOpenFileName(self, 'Annotation file', '/home')[0]
+    # def next_leopard(self):
+    #     '''Iterator for leopard'''
+    #     if self.annotation_to_iterate:
+    #         try:
+    #             if not self.leopard_iterator:
+    #                 self.leopard_iterator = class_iterator.PhotoIterator(self.annotation_to_iterate,
+    #                                                                     "leopard")
+    #             pixmap = QPixmap(next(self.leopard_iterator))
+    #             self.image.update()
+    #             if pixmap.width() > 1500:
+    #                 pixmap = pixmap.scaled(1500, 1500)
+    #             elif pixmap.width() > 500:
+    #                 pixmap = pixmap.scaledToHeight(500)
+    #             self.image.setPixmap(pixmap)
+    #             self.layout.addWidget(self.image)
+    #             self.leopard_count += 1
+    #             self.statusBar().showMessage(f"{self.tiger_count} iter tiger, {self.leopard_count} iter leopard")
+    #         except Exception:
+    #             QMessageBox.warning(self, "Error", f"Please select a correct file next time\n {Exception}")
+    #             self.erase_iterators()
+    #     else:
+    #         self.annotation_to_iterate = QFileDialog.getOpenFileName(self, 'Annotation file', '/home')[0]
 
 
     def erase_iterators(self):
@@ -211,7 +216,7 @@ class MainWindow(QMainWindow):
 
     def erase_iterators_with_message(self):
         '''Calls the erase_iterators function and gives the user a message'''
-        self.update_iterators()
+        self.erase_iterators()
         QMessageBox.information(self,
                                 "Success",
                                 "Iterators erased!")
