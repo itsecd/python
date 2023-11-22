@@ -17,6 +17,7 @@ from PyQt5.QtWidgets import (QApplication,
 from PyQt5.QtCore import QSize
 from PyQt5.QtGui import QPixmap
 from make_csv import *
+# from  import *
 
 
 class MainWindow(QWidget):
@@ -59,10 +60,8 @@ class MainWindow(QWidget):
         self.button_next_tulip = QPushButton(f"Next {img_classes[1]}")
         self.button_next_rose.setDisabled(1)
         self.button_next_tulip.setDisabled(1)
-
-
-
-
+        self.button_next_rose.clicked.connect()
+        self.button_next_tulip.clicked.connect()
 
         # Test image in app
         self.image_ = QLabel()
