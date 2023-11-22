@@ -7,11 +7,10 @@ from PyQt5.QtWidgets import (QApplication,
                              QFileDialog,
                              QGridLayout,
                              QLabel,
-                             QLineEdit,
                              QScrollArea,
                              QMessageBox,
                              QPlainTextEdit)
-from PyQt5.QtCore import Qt, QRect
+from PyQt5.QtCore import Qt
 from PyQt5.QtGui import QPixmap
 from make_csv import *
 from iterator import *
