@@ -2,22 +2,18 @@ import sys
 import os
 import json
 from PyQt5.QtWidgets import (QApplication, 
-                             QMainWindow, 
                              QWidget,
                              QPushButton, 
                              QFileDialog,
                              QGridLayout,
                              QLabel,
-                             QTextEdit,
                              QLineEdit,
-                             QHBoxLayout,
-                             QVBoxLayout,
                              QScrollArea,
                              QMessageBox)
-from PyQt5.QtCore import QSize
+from PyQt5.QtCore import Qt
 from PyQt5.QtGui import QPixmap
 from make_csv import *
-# from  import *
+from iterator import *
 
 
 class MainWindow(QWidget):
@@ -42,6 +38,7 @@ class MainWindow(QWidget):
         self.select_dataset.clicked.connect(self.select_path)
 
         self.dataset_path_label = QLineEdit()
+        self.dataset_path_label.setReadOnly(True)
 
         # Buttons to create annotation and datset
         self.create_annotation = QPushButton("Create Annotation")
@@ -60,18 +57,20 @@ class MainWindow(QWidget):
         self.button_next_tulip = QPushButton(f"Next {img_classes[1]}")
         self.button_next_rose.setDisabled(1)
         self.button_next_tulip.setDisabled(1)
-        self.button_next_rose.clicked.connect()
-        self.button_next_tulip.clicked.connect()
+        self.button_next_rose.clicked.connect(self.next_rose)
+        self.button_next_tulip.clicked.connect(self.next_tulip)
 
         # Test image in app
         self.image_ = QLabel()
+        self.image_.setAlignment(Qt.AlignCenter)
         # pixmap = QPixmap("C:/Users/boris/Desktop/web/images/avatar.jpg")
         # self.image_.setPixmap(pixmap)
 
         self.scroll_area = QScrollArea() 
         self.scroll_area.setWidget(self.image_) 
         self.scroll_area.setWidgetResizable(True)
-        self.scroll_area.setMinimumSize(700, 700)
+        self.scroll_area.setMinimumSize(500, 500)
+        self.scroll_area.setMaximumSize(1000, 1000)
 
 
         self.grid.setSpacing(10)
@@ -96,25 +95,17 @@ class MainWindow(QWidget):
             self.dataset_path_label.setText(self.dataset_path)
             self.create_annotation.setDisabled(False)            
             self.create_together.setDisabled(False)            
-            self.create_random.setDisabled(False)            
-            self.button_next_rose.setDisabled(False)   
-            self.button_next_tulip.setDisabled(False)            
-
-        # self.dataset_path = os.path.basename(os.path.normpath(folder))
-
-    # def add_button(self, text : str, x : int = 0, y : int = 0) -> QPushButton:
-    #     button = QPushButton(text, self)
-    #     button.resize(button.sizeHint())
-    #     button.move(x, y)
-    #     # button.setFixedSize(QSize(size_x, size_y))
-
-    #     return button
+            self.create_random.setDisabled(False)                   
 
 
     def make_normal(self):
         try:
-            fold = QFileDialog.getExistingDirectory(self, "Select save path")
-            make_csv(os.path.join(fold, "dataset"), img_classes, self.dataset_path, "normal", "")
+            self.fold = QFileDialog.getExistingDirectory(self, "Select save path")
+            make_csv(os.path.join(self.fold, "dataset"), img_classes, self.dataset_path, "normal", "")
+            self.iter_rose = ImgIterator(os.path.join(self.fold, "dataset.csv"), "rose")
+            self.iter_tulip = ImgIterator(os.path.join(self.fold, "dataset.csv"), "tulip")
+            self.button_next_rose.setDisabled(False)   
+            self.button_next_tulip.setDisabled(False)  
         except:
             msg = QMessageBox()
             msg.setWindowTitle("Warning")
@@ -151,6 +142,23 @@ class MainWindow(QWidget):
             msg.setText("Всё плохо")
             msg.setIcon(QMessageBox.Warning)
             msg.exec_()
+
+    
+    def next_rose(self):
+        try:
+            pixmap = QPixmap(next(self.iter_rose))
+            self.image_.setPixmap(pixmap)
+        except StopIteration:
+            self.iter_rose = ImgIterator(os.path.join(self.fold, "dataset.csv"), "rose")
+
+    
+    def next_tulip(self):
+        try:
+            pixmap = QPixmap(next(self.iter_tulip))
+            self.image_.setPixmap(pixmap)
+        except StopIteration:
+            self.iter_tulip = ImgIterator(os.path.join(self.fold, "dataset.csv"), "tulip")
+
 
 if __name__ == "__main__":
 
