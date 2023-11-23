@@ -13,10 +13,10 @@ from PyQt5.QtWidgets import (QApplication,
 from PyQt5.QtCore import Qt
 from PyQt5.QtGui import QPixmap
 
-sys.path.insert(1, 'C:\Users\\boris\Desktop\unik\python_university_laba\Lab2\\')
+sys.path.insert(1, "C:/Users/boris/Desktop/unik/python_university_laba/Lab2/")
 
-from Lab2.make_csv import make_csv
-from Lab2.iterator import ImgIterator
+from make_csv import make_csv
+from iterator import ImgIterator
 
 
 class MainWindow(QWidget):
