@@ -12,8 +12,11 @@ from PyQt5.QtWidgets import (QApplication,
                              QPlainTextEdit)
 from PyQt5.QtCore import Qt
 from PyQt5.QtGui import QPixmap
-from make_csv import *
-from iterator import *
+
+sys.path.insert(1, 'C:\Users\\boris\Desktop\unik\python_university_laba\Lab2\\')
+
+from Lab2.make_csv import make_csv
+from Lab2.iterator import ImgIterator
 
 
 class MainWindow(QWidget):
@@ -30,10 +33,14 @@ class MainWindow(QWidget):
         # Path to dataset
         self.dataset_path = None
 
+        #Path to save annotation
+        self.fold = None
+
         # Button to select fold with dataset
         self.select_dataset = QPushButton("Select Dataset")
         self.select_dataset.setAutoDefault(True)
         self.select_dataset.setMinimumSize(200, 100)
+        self.select_dataset.setMaximumSize(400, 200)
         self.select_dataset.setStyleSheet("""
             font: bold;
             font-size: 15px;
@@ -44,6 +51,7 @@ class MainWindow(QWidget):
         self.dataset_path_label = QPlainTextEdit()
         self.dataset_path_label.setReadOnly(True)
         self.dataset_path_label.setMinimumSize(200, 100)
+        self.dataset_path_label.setMaximumSize(400, 200)
         self.dataset_path_label.setStyleSheet("""
             font-size: 20px;
         """)
@@ -63,6 +71,9 @@ class MainWindow(QWidget):
         self.create_annotation.setMinimumSize(200, 100)
         self.create_together.setMinimumSize(200, 100)
         self.create_random.setMinimumSize(200, 100)
+        self.create_annotation.setMaximumSize(400, 200)
+        self.create_together.setMaximumSize(400, 200)
+        self.create_random.setMaximumSize(400, 200)
         self.create_annotation.setStyleSheet("""
             font: bold;
             font-size: 15px;
@@ -105,7 +116,7 @@ class MainWindow(QWidget):
         self.scroll_area.setWidget(self.image_) 
         self.scroll_area.setWidgetResizable(True)
         self.scroll_area.setMinimumSize(500, 500)
-        self.scroll_area.setMaximumSize(1000, 1000)
+        # self.scroll_area.setMaximumSize(1000, 1000)
 
         # Add Widget in Grid 
         self.grid.setSpacing(0)
@@ -122,7 +133,7 @@ class MainWindow(QWidget):
         
         self.setWindowTitle("Rose & Tulip")
         self.setGeometry(300, 300, 700, 600)
-        self.setMaximumSize(900, 800)
+        # self.setMaximumSize(900, 800)
         self.show()
 
 
@@ -144,6 +155,9 @@ class MainWindow(QWidget):
         """
         try:
             self.fold = QFileDialog.getExistingDirectory(self, "Select save path")
+
+            if self.fold == "": raise FileExistsError
+
             make_csv(os.path.join(self.fold, "dataset"), img_classes, self.dataset_path, "normal", "")
             self.iter_rose = ImgIterator(os.path.join(self.fold, "dataset.csv"), "rose")
             self.iter_tulip = ImgIterator(os.path.join(self.fold, "dataset.csv"), "tulip")
@@ -151,8 +165,10 @@ class MainWindow(QWidget):
             self.button_next_tulip.setDisabled(False) 
 
             self.msg_ok() 
-        except:
-            self.msg_error()
+        except FileExistsError:
+            self.msg_didnot_choose()
+        except Exception as err:
+            self.msg_error(err)
 
 
     def make_together(self):
@@ -163,11 +179,16 @@ class MainWindow(QWidget):
             fold_data = QFileDialog.getExistingDirectory(self, "Select Path to Dataset")
             fold_csv = QFileDialog.getExistingDirectory(self, "Select Path to CSV")
 
-            make_csv(os.path.join(fold_csv, "dataset_together"), img_classes, self.dataset_path, 
-                                    "together", fold_data)
-            self.msg_ok()
-        except:
-            self.msg_error()
+            if fold_data != "" and fold_csv != "":
+                make_csv(os.path.join(fold_csv, "dataset_together"), img_classes, self.dataset_path, 
+                                        "together", fold_data)
+                self.msg_ok()
+            else: 
+                raise FileExistsError
+        except FileExistsError:
+            self.msg_didnot_choose()
+        except Exception as err:
+            self.msg_error(err)
 
 
     def make_random(self):
@@ -178,12 +199,17 @@ class MainWindow(QWidget):
             fold_data = QFileDialog.getExistingDirectory(self, "Select Path to Dataset")
             fold_csv = QFileDialog.getExistingDirectory(self, "Select Path to CSV")
 
-            make_csv(os.path.join(fold_csv, "dataset_random"), img_classes, self.dataset_path, 
-                                    "random", fold_data)
-            
-            self.msg_ok()
-        except:
-            self.msg_error()
+            if fold_data != "" and fold_csv != "":
+                make_csv(os.path.join(fold_csv, "dataset_random"), img_classes, self.dataset_path, 
+                                        "random", fold_data)
+                
+                self.msg_ok()
+            else:
+                raise FileExistsError
+        except FileExistsError:
+            self.msg_didnot_choose()
+        except Exception as err:
+            self.msg_error(err)
 
     
     def next_rose(self):
@@ -219,15 +245,27 @@ class MainWindow(QWidget):
         )
 
 
-    def msg_error(self):
+    def msg_didnot_choose(self):
         """
-        Create a error message window
+        Create a error message window if person did not choose a fold
         """
         QMessageBox.critical(
             self,
             'Error',
-            'Failed to create'
+            'You did not choose a fold.'
         )
+
+
+    def msg_error(self, err : Exception):
+        """
+        Create a error message in other situations
+        """
+        QMessageBox.critical(
+            self,
+            'Error',
+            f"{err}"
+        )
+
 
 
 if __name__ == "__main__":
