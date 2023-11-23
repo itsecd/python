@@ -1,7 +1,11 @@
-from file_manipulation import read_csv, write_csv
-import logging
-from datetime import datetime, timedelta
+# -*- coding: utf-8 -*-
+
 import os
+import logging
+from datetime import timedelta
+from datetime import datetime
+from file_manipulation import read_csv
+from file_manipulation import write_csv
 
 
 def split_csv_by_weeks(input_file: str, output_folder: str) -> None:

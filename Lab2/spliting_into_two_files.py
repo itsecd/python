@@ -1,6 +1,9 @@
-import logging
-from file_manipulation import read_csv, write_csv
+# -*- coding: utf-8 -*-
+
 import os
+import logging
+from file_manipulation import read_csv
+from file_manipulation import write_csv
 
 
 def split_csv_by_columns(input_file: str, output_file_x: str, output_file_y: str) -> None:

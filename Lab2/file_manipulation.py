@@ -1,5 +1,7 @@
-import csv
+# -*- coding: utf-8 -*-
+
 import logging
+import csv
 
 
 def read_csv(file_path: str) -> tuple:

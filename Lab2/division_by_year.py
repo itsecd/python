@@ -1,7 +1,10 @@
-from file_manipulation import read_csv, write_csv
+# -*- coding: utf-8 -*-
+
+import os
 import logging
 from datetime import datetime
-import os
+from file_manipulation import read_csv
+from file_manipulation import write_csv
 
 
 def split_csv_by_years(input_file: str, output_folder: str) -> None:

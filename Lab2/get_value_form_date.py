@@ -1,5 +1,7 @@
-from datetime import datetime
+# -*- coding: utf-8 -*-
+
 import logging
+from datetime import datetime
 from file_manipulation import read_csv
 
 
