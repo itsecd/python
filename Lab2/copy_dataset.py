@@ -8,7 +8,7 @@ logging.basicConfig(level=logging.INFO)
 
 
 def copy_dataset(dataset: str, copy_dataset: str, classes: list) -> None:
-    """Копирует файлы из dataset в copy_dataset с переименованием по формату {class}_{number}.txt."""
+    """Копирует файлы из dataset в copy_dataset с переименованием по формату {class}_{number}.txt.."""
     path_list = []
     if not os.path.exists(copy_dataset):
         os.mkdir(copy_dataset)
