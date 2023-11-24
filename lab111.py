@@ -1,36 +1,26 @@
-from typing import List, Any
-import requests
-from bs4 import BeautifulSoup
-from time import sleep
+import logging
 import os
 import random
-import logging
+from time import sleep
+
+import argparse
+import requests
+from bs4 import BeautifulSoup
 from fake_useragent import UserAgent
+from typing import List
 
 
 
-def user_interface() -> list:
-    urls: list = []
-    try:
-        print('Введите количество вещей, на которые хотите получить рецензии: ')
-        url_quantity = int(input())
-        for i in range(url_quantity):
-            print('Введите ссылка на ', i+1, '-юу вещь: ')
-            url1 = str(input())
-            urls.append(url1)
-        return(urls)
-    except requests.exceptions.RequestException as e:
-        logging.exception(f"Введены некоректные данные")
-        return None
-
-
-def set_pages() -> int:
-    print("Со скольки страниц брать рецензии?:")
-    tmp_page=int(input())
-    return tmp_page
+def parse_arguments():
+    parser = argparse.ArgumentParser(description="Скрипт для парсинга рецензий с сайта и сортировка их на хорошии и плохие")
+    parser.add_argument("--out_dir", type=str, default="dataset", help="Путь к директории для сохранения датасета")
+    parser.add_argument("--urls", type=str, default="https://irecommend.ru/content/internet-magazin-ozon-kazan-0?page=", help="Базовый URL для сбора данных")
+    parser.add_argument("--pages", type=int, default=3, help="Количество страниц для обхода")
+    return parser.parse_args()
 
 
 def get_html_code(page: int , url: str) -> BeautifulSoup:
+
     try:
         tmp_url = url+str(page)
         sleep_time = random.uniform(1, 3)
@@ -102,46 +92,57 @@ def create_directories():
     except Exception as e:
         logging.exception(f"Ошибка при создании папки: {e.args}")
 
+create_directories()
+def save_review_to_file(review_text: str, status_review: bool, review_n_g: int, review_n_b: int, output_dir: str):
+    """
+    Сохраняем полученный текс ревью в файл нужной директории в зависимости хорошая или плохая рецензия
 
-def save_review_to_file(review_text: str, status_review: bool, review_number_good: int, review_number_bad: int, output_dir: str, name: str):
-    if status_review :
+    """
+    if status_review == "good":
         folder_name = "good"
-        file_name = f"{review_number_good:04d}.txt"
+        file_name = f"{review_n_g:04d}.txt"
     else:
         folder_name = "bad"
-        file_name = f"{review_number_bad:04d}.txt"
+        file_name = f"{review_n_b:04d}.txt"
 
     file_path = os.path.join(output_dir, folder_name, file_name)
 
     try:
         with open(file_path, "w", encoding="utf-8") as file:
-            file.write(name)
             file.write(review_text)
     except Exception as e:
         logging.exception(f"Ошибка при сохранении рецензии : {e}")
 
 
-if __name__ == "__main__":
-        urls: list = user_interface()
-        pages: int = set_pages()
-        create_directories()
-        output_dir: str = "dataset"
+def parsing_review():
+    """
+    итоговая функция которая используя все пердидущие функции  полностью выполняет задачу
+
+    """
+    try:
+        args = parse_arguments()
+        out_dir = args.out_dir
+        urls = args.urls
+        pages = args.pages
         number = 0
         review_n_b = 1
         review_n_g = 1
-        for url in urls:
-            name: str = get_name(get_html_code(1, url))
-            for page in range(pages):
-                rev = get_reviews(get_html_code(page,url))
-                for review in rev:
-                    txt = review_text(review)
-                    status = status_review(review)
-                    save_review_to_file(txt, status, review_n_g, review_n_b, output_dir, name)
-                    if status == 'good':
-                        review_n_g += 1
-                        number += 1
-                    else:
-                        review_n_b += 1
-                        number += 1
-        print("Было успешно сохранено", number ,"рецензий")
+        for page in range(1, pages + 1):
+            rev = get_reviews(get_html_code(page, urls))
+            for review in rev:
+                txt = review_text(review)
+                status = status_review(review)
+                save_review_to_file(txt, status, review_n_g, review_n_b, out_dir)
+                if status == 'good':
+                    review_n_g += 1
+                    number += 1
+                else:
+                    review_n_b += 1
+                    number += 1
+    except Exception as e:
+        logging.exception(f"Ошибка при сохранении рецензии : {e}")
+
+
+if __name__ == "__main__":
+    parsing_review()
 
