@@ -2,7 +2,7 @@
     "directory": "python-v8",
     "classes": ["good","bad"],
     "csv": "csv",
-    "main_dataset": "dataset",
+    "main_dataset": "Lab1/dataset",
     "mode": "normal",
     "dataset_normal": "normal_dataset",
     "dataset_random": "random_dataset",
