@@ -97,7 +97,7 @@ class MainWindow(QWidget):
         self.button_next_tulip = QPushButton(f"Next {img_classes[1]}")
         self.button_next_rose.setDisabled(1)
         self.button_next_tulip.setDisabled(1)
-        self.button_next_rose.clicked.connect(self.next_imagea("rose"))
+        self.button_next_rose.clicked.connect(self.next_rose)
         self.button_next_tulip.clicked.connect(self.next_tulip)
         self.button_next_rose.setMinimumSize(200, 100)
         self.button_next_tulip.setMinimumSize(200, 100)
