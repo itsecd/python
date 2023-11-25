@@ -3,7 +3,7 @@ import sys
 import logging
 sys.path.insert(0, "Lab2")
 from datetime import datetime
-from PyQt6.QtWidgets import QApplication, QMainWindow, QPushButton, QFileDialog, QLineEdit, QVBoxLayout, QWidget, QInputDialog, QLabel
+from PyQt6.QtWidgets import QApplication, QMainWindow, QPushButton, QFileDialog, QLineEdit, QVBoxLayout, QWidget, QInputDialog, QLabel, QMessageBox
 from main import main_function
 from get_data import get_data_for_date
 
@@ -17,10 +17,11 @@ class MainWindow(QMainWindow):
 
         self.setWindowTitle('Курс доллара по дате')
         
-        self.current_folder = ""
+        self.source_folder = ""
+        self.destination_folder = ""
         
-        self.select_folder_btn = QPushButton('Выбрать папку исходного датасета', self)
-        self.select_folder_btn.clicked.connect(self.select_folder)
+        self.select_source_folder_btn = QPushButton('Выбрать папку исходного датасета', self)
+        self.select_source_folder_btn.clicked.connect(self.select_source_folder)
 
         self.create_dataset_btn = QPushButton('Создать датасет', self)
         self.create_dataset_btn.clicked.connect(self.create_dataset)
@@ -35,7 +36,7 @@ class MainWindow(QMainWindow):
         self.data_display.setText("Данные по дате:")
 
         layout = QVBoxLayout()
-        layout.addWidget(self.select_folder_btn)
+        layout.addWidget(self.select_source_folder_btn)
         layout.addWidget(self.create_dataset_btn)
         layout.addWidget(self.date_input)
         layout.addWidget(self.get_data_btn)
@@ -44,24 +45,32 @@ class MainWindow(QMainWindow):
         central_widget.setLayout(layout)
         self.setCentralWidget(central_widget)
 
-    def select_folder(self) -> None:
-        """Opens a dialog for selecting a folder and write the selected folder path to the variable"""
-        folder_path = QFileDialog.getExistingDirectory(self, 'Выберите папку')
-        self.current_folder = folder_path
+
+    def select_source_folder(self) -> None:
+        """Opens a dialog for selecting the source folder and writes the selected folder path to the variable"""
+        folder_path = QFileDialog.getExistingDirectory(self, 'Выберите папку исходного датасета')
+        self.source_folder = folder_path
+
 
     def create_dataset(self) -> None:
-        """Opens a dialog for selecting a mode and then calls the main_function with the selected mode"""
+        """Opens a dialog for selecting a mode, destination folder, and then calls the main_function with the selected mode"""
         modes = ['X_Y', 'years', 'weeks', 'find data']
         mode, ok = QInputDialog.getItem(self, 'Выбор режима', 'Выберите режим:', modes, 0, False)
         if ok and mode:
+            self.destination_folder = QFileDialog.getExistingDirectory(self, 'Выберите папку назначения')
+            while not self.destination_folder:
+                QMessageBox.warning(self, 'Внимание', 'Выберите папку назначения.')
+                self.destination_folder = QFileDialog.getExistingDirectory(self, 'Выберите папку назначения')
             args = {
                 'mode': mode,
-                'path_file': self.select_folder(),
+                'path_file': self.destination_folder,
                 'output_x': 'X.csv',
                 'output_y': 'Y.csv',
                 'date': self.date_input.text()
             }
             main_function(args)
+            
+
 
     def get_data(self) -> None:
         """Converts the date to the desired format, calls the get_data function and set text to the window"""
@@ -73,7 +82,7 @@ class MainWindow(QMainWindow):
             return
         args = {
             'mode': "find data",
-            'path_file': os.path.join(self.current_folder,"dataset.csv"),
+            'path_file': os.path.join(self.source_folder, "dataset.csv"),
             'output_x': 'X.csv',
             'output_y': 'Y.csv',
             'date': date
