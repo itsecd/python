@@ -1,12 +1,12 @@
-from create_copy_dataset import copy_dataset, CopyType
-from create_annotation import write_annotation_to_csv
-from iterator import ClassIterator
 import sys
 import os
 import logging
 from PyQt6 import QtWidgets, QtGui, QtCore
 
 sys.path.insert(1, 'Lab2')
+from iterator import ClassIterator
+from create_annotation import write_annotation_to_csv
+from create_copy_dataset import copy_dataset, CopyType
 
 logging.basicConfig(level=logging.INFO)
 
@@ -41,6 +41,7 @@ class MainWindow(QtWidgets.QMainWindow):
         self.random_copy_dataset_button.clicked.connect(
             self.random_copy_dataset)
         self.show_tiger_button.clicked.connect(self.show_tiger)
+        self.show_leopard_button.clicked.connect(self.show_leopard)
 
         # Layout setup
         layout = QtWidgets.QVBoxLayout()
@@ -48,6 +49,7 @@ class MainWindow(QtWidgets.QMainWindow):
         layout.addWidget(self.copy_dataset_button)
         layout.addWidget(self.random_copy_dataset_button)
         layout.addWidget(self.show_tiger_button)
+        layout.addWidget(self.show_leopard_button)
 
         widget = QtWidgets.QWidget()
         widget.setLayout(layout)
@@ -130,6 +132,29 @@ class MainWindow(QtWidgets.QMainWindow):
         else:
             QtWidgets.QMessageBox.information(
                 self, 'Information', 'No more tiger images in the dataset.')
+
+    def show_leopard(self):
+
+        if not hasattr(self, 'leopard_iterator') or not self.leopard_iterator:
+
+            annotation_file = 'copy_dataset.csv'
+            class_label = ["leopard"]
+
+            self.leopard_iterator = ClassIterator(annotation_file, class_label)
+
+            if not self.leopard_iterator:
+                QtWidgets.QMessageBox.critical(
+                    self, 'Error', 'Failed to initialize image iterator.')
+                return
+
+        leopard_image_path = self.leopard_iterator.next_image()
+
+        if leopard_image_path:
+            print("Showing leopard image:", leopard_image_path)
+            self.display_image(leopard_image_path)
+        else:
+            QtWidgets.QMessageBox.information(
+                self, 'Information', 'No more leopard images in the dataset.')
 
     def display_image(self, image_path):
         print("Displaying image:", image_path)
