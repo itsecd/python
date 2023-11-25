@@ -1,10 +1,9 @@
 import argparse
 import pandas as pd
+from datetime import datetime, date
 
 
-def form_dataframe(file_path: str,
-                   new_name: str
-                   ) -> None:
+def form_dataframe(file_path: str) -> pd.DataFrame:
     df = pd.read_csv(file_path,delimiter=",")
     df.columns = ['Дата', 'Курс']
     df['Курс'] = pd.to_numeric(df['Курс'], errors="coerce")
@@ -21,8 +20,31 @@ def form_dataframe(file_path: str,
     statistics = df[['Курс', 'Отклонение от медианы', 'Отклонение от среднего']].describe()
     print(statistics)
     
-    df.to_csv(new_name, index=False)
-    
+    return df
+
+
+def filter_by_deviation(df: pd.DataFrame,
+                        deviation_value: float
+                        ) -> pd.DataFrame:
+    mean_value = df['Курс'].mean()
+    df['Отклонение от среднего'] = df['Курс'] - mean_value
+
+    filtered_df = df[df['Отклонение от среднего'] >= deviation_value]
+
+    filtered_df.drop(columns=['Отклонение от среднего'], inplace=True)
+
+    return filtered_df
+
+
+def filter_by_date(df: pd.DataFrame,
+                   start_date: date,
+                   end_date: date,
+                   ) -> pd.DataFrame:
+    df['Дата'] = pd.to_datetime(df['Дата'])
+    filtered_df = df[(df['Дата'] >= start_date) & (df['Дата'] <= end_date)]
+    return filtered_df
+
+
 if __name__ == "__main__":
     parser = argparse.ArgumentParser(
         description='get statistics on a csv file')
@@ -31,9 +53,10 @@ if __name__ == "__main__":
                         help='the path to the csv file with the data'
                         )
     parser.add_argument('--new_path',
-                        type=str, default="dataset/stat.csv",
+                        type=str, default="stat.csv",
                         help='new path of modified csv'
                         )
     args = parser.parse_args()
-    form_dataframe(args.path_file,args.new_path)
+    df = form_dataframe(args.path_file)
+    df.to_csv(args.new_path)
     
