@@ -2,11 +2,11 @@ import sys
 import os
 import logging
 from PyQt6 import QtWidgets, QtGui, QtCore
-
 sys.path.insert(1, 'Lab2')
-from iterator import ClassIterator
-from create_annotation import write_annotation_to_csv
 from create_copy_dataset import copy_dataset, CopyType
+from create_annotation import write_annotation_to_csv
+from iterator import ClassIterator
+
 
 logging.basicConfig(level=logging.INFO)
 
@@ -16,26 +16,42 @@ class MainWindow(QtWidgets.QMainWindow):
         super().__init__()
         self.init_ui()
 
-    def init_ui(self):
+    def init_ui(self) -> None:
         self.setWindowTitle("Dataset Annotation App")
+        self.setFixedSize(1000, 540)
 
-        # Create widgets
+        button_size = QtCore.QSize(400, 86)
         self.create_annotation_button = QtWidgets.QPushButton(
-            "Создать аннотацию")
-        self.copy_dataset_button = QtWidgets.QPushButton("Скопировать датасет")
-        self.random_copy_dataset_button = QtWidgets.QPushButton(
-            "Скопировать датасет рандомно")
-        self.show_tiger_button = QtWidgets.QPushButton(
-            "Показать следующего тигра")
-        self.show_leopard_button = QtWidgets.QPushButton(
-            "Показать следующего леопарда")
-        self.exit_button = QtWidgets.QPushButton("Выйти из программы")
+            "Создать аннотацию", self)
+        self.create_annotation_button.setFixedSize(button_size)
 
-        # Create a QLabel to display the images
+        self.copy_dataset_button = QtWidgets.QPushButton(
+            "Скопировать датасет", self)
+        self.copy_dataset_button.setFixedSize(button_size)
+
+        self.random_copy_dataset_button = QtWidgets.QPushButton(
+            "Скопировать датасет рандомно", self)
+        self.random_copy_dataset_button.setFixedSize(button_size)
+
+        self.show_tiger_button = QtWidgets.QPushButton(
+            "Показать следующего тигра", self)
+        self.show_tiger_button.setFixedSize(button_size)
+
+        self.show_leopard_button = QtWidgets.QPushButton(
+            "Показать следующего леопарда", self)
+        self.show_leopard_button.setFixedSize(button_size)
+
+        self.exit_button = QtWidgets.QPushButton("Выйти из программы", self)
+        self.exit_button.setFixedSize(button_size)
+
         self.image_label = QtWidgets.QLabel(self)
         self.image_label.setAlignment(QtCore.Qt.AlignmentFlag.AlignCenter)
 
-        # Connect buttons to functions
+        self.scroll_area = QtWidgets.QScrollArea()
+        self.scroll_area.setWidgetResizable(True)
+        self.scroll_area.setWidget(self.image_label)
+        self.scroll_area.setFixedHeight(524)
+
         self.create_annotation_button.clicked.connect(self.create_annotation)
         self.copy_dataset_button.clicked.connect(self.copy_dataset)
         self.random_copy_dataset_button.clicked.connect(
@@ -44,21 +60,27 @@ class MainWindow(QtWidgets.QMainWindow):
         self.show_leopard_button.clicked.connect(self.show_leopard)
         self.exit_button.clicked.connect(self.close)
 
-        # Layout setup
-        layout = QtWidgets.QVBoxLayout()
-        layout.addWidget(self.create_annotation_button)
-        layout.addWidget(self.copy_dataset_button)
-        layout.addWidget(self.random_copy_dataset_button)
-        layout.addWidget(self.show_tiger_button)
-        layout.addWidget(self.show_leopard_button)
-        layout.addWidget(self.exit_button)
+        left_layout = QtWidgets.QVBoxLayout(self)
+        left_layout.addWidget(self.create_annotation_button)
+        left_layout.addWidget(self.copy_dataset_button)
+        left_layout.addWidget(self.random_copy_dataset_button)
+        left_layout.addWidget(self.show_tiger_button)
+        left_layout.addWidget(self.show_leopard_button)
+        left_layout.addWidget(self.exit_button)
+
+        right_layout = QtWidgets.QVBoxLayout()
+        right_layout.addWidget(self.scroll_area)
+
+        main_layout = QtWidgets.QHBoxLayout()
+        main_layout.addLayout(left_layout, 0)
+        main_layout.addLayout(right_layout, 5)
 
         widget = QtWidgets.QWidget()
-        widget.setLayout(layout)
+        widget.setLayout(main_layout)
 
         self.setCentralWidget(widget)
 
-    def create_annotation(self):
+    def create_annotation(self) -> None:
         dataset_folder = QtWidgets.QFileDialog.getExistingDirectory(
             self, 'Выберите папку для создания аннотации:')
 
@@ -76,7 +98,7 @@ class MainWindow(QtWidgets.QMainWindow):
                     QtWidgets.QMessageBox.critical(
                         self, 'Error', f'Failed to create annotation: {ex}')
 
-    def copy_dataset(self):
+    def copy_dataset(self) -> None:
         main_folder = QtWidgets.QFileDialog.getExistingDirectory(
             self, 'Выберите папку для копирования датасета:')
 
@@ -94,7 +116,7 @@ class MainWindow(QtWidgets.QMainWindow):
                     QtWidgets.QMessageBox.critical(
                         self, 'Error', f'Failed to copy dataset: {ex}')
 
-    def random_copy_dataset(self):
+    def random_copy_dataset(self) -> None:
         main_folder = QtWidgets.QFileDialog.getExistingDirectory(
             self, 'Выберите папку для копирования датасета:')
 
@@ -112,7 +134,7 @@ class MainWindow(QtWidgets.QMainWindow):
                     QtWidgets.QMessageBox.critical(
                         self, 'Error', f'Failed to copy dataset: {ex}')
 
-    def show_tiger(self):
+    def show_tiger(self) -> None:
 
         if not hasattr(self, 'tiger_iterator') or not self.tiger_iterator:
 
@@ -135,7 +157,7 @@ class MainWindow(QtWidgets.QMainWindow):
             QtWidgets.QMessageBox.information(
                 self, 'Information', 'No more tiger images in the dataset.')
 
-    def show_leopard(self):
+    def show_leopard(self) -> None:
 
         if not hasattr(self, 'leopard_iterator') or not self.leopard_iterator:
 
@@ -158,7 +180,7 @@ class MainWindow(QtWidgets.QMainWindow):
             QtWidgets.QMessageBox.information(
                 self, 'Information', 'No more leopard images in the dataset.')
 
-    def display_image(self, image_path):
+    def display_image(self, image_path: str) -> None:
         print("Displaying image:", image_path)
         pixmap = QtGui.QPixmap(image_path)
 
@@ -166,6 +188,9 @@ class MainWindow(QtWidgets.QMainWindow):
             print("Failed to load image:", image_path)
         else:
             print("Image loaded successfully.")
+            pixmap = pixmap.scaledToWidth(self.scroll_area.width())
+            self.image_label.setAlignment(
+                QtCore.Qt.AlignmentFlag.AlignCenter | QtCore.Qt.AlignmentFlag.AlignHCenter)
             self.image_label.setPixmap(pixmap)
             self.image_label.show()
 
