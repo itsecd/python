@@ -36,10 +36,6 @@ class MainWindow(QWidget):
         #Path to save annotation
         self.fold = None
 
-        #Iterators
-        self.iter_rose = None
-        self.iter_tulip = None
-
         # Button to select fold with dataset
         self.select_dataset = QPushButton("Select Dataset")
         self.select_dataset.setAutoDefault(True)
@@ -97,8 +93,8 @@ class MainWindow(QWidget):
         self.button_next_tulip = QPushButton(f"Next {img_classes[1]}")
         self.button_next_rose.setDisabled(1)
         self.button_next_tulip.setDisabled(1)
-        self.button_next_rose.clicked.connect(self.next_rose)
-        self.button_next_tulip.clicked.connect(self.next_tulip)
+        self.button_next_rose.clicked.connect(lambda: self.next_image("rose", self.iter_rose))
+        self.button_next_tulip.clicked.connect(lambda: self.next_image("tulip", self.iter_tulip))
         self.button_next_rose.setMinimumSize(200, 100)
         self.button_next_tulip.setMinimumSize(200, 100)
         self.button_next_rose.setStyleSheet("""
@@ -158,7 +154,6 @@ class MainWindow(QWidget):
         Make annotation to dataset
         """
         try:
-            # self.fold = QFileDialog.getExistingDirectory(self, "Select save path")
             self.fold = QFileDialog.getSaveFileName(
                 self,
                 "Select path to csv file:",
@@ -231,43 +226,38 @@ class MainWindow(QWidget):
         except Exception as err:
             self.msg_error(err)
 
-    # Я НЕ ПОНИМАЮ ПОЧЕМУ ЭТОТ КОД НЕ РАБОТАЕТ(
-    # ОН ПРОСТО НЕ ЗАПУСКАЕТСЯ И ВЫКИДВАЕТ ОШИБКУ
-    # 
-    # def next_image(self, type : str):
+    
+    def next_image(self, type : str, iterator : ImgIterator):
+        try:
+
+            pixmap = QPixmap(next(iterator))
+            self.image_.setPixmap(pixmap)
+            self.image_.update()
+
+        except StopIteration:
+            iterator.counter = 0
+            
+
+    # def next_rose(self):
+    #     """
+    #     Switch image to next
+    #     """
     #     try:
-    #         if type == "rose":
-    #             pixmap = QPixmap(next(self.iter_rose))
-    #         else:
-    #             pixmap = QPixmap(next(self.iter_tulip))
+    #         pixmap = QPixmap(next(self.iter_rose))
     #         self.image_.setPixmap(pixmap)
     #     except StopIteration:
-    #         if type == "rose":
-    #             self.iter_rose = ImgIterator(self.fold, type)
-    #         else:
-    #             self.iter_tulip = ImgIterator(self.fold, type)
-
-
-    def next_rose(self):
-        """
-        Switch image to next
-        """
-        try:
-            pixmap = QPixmap(next(self.iter_rose))
-            self.image_.setPixmap(pixmap)
-        except StopIteration:
-            self.iter_rose = ImgIterator(self.fold, "rose")
+    #         self.iter_rose = ImgIterator(self.fold, "rose")
 
     
-    def next_tulip(self):
-        """
-        Switch image to next
-        """
-        try:
-            pixmap = QPixmap(next(self.iter_tulip))
-            self.image_.setPixmap(pixmap)
-        except StopIteration:
-            self.iter_tulip = ImgIterator(self.fold, "tulip")
+    # def next_tulip(self):
+    #     """
+    #     Switch image to next
+    #     """
+    #     try:
+    #         pixmap = QPixmap(next(self.iter_tulip))
+    #         self.image_.setPixmap(pixmap)
+    #     except StopIteration:
+    #         self.iter_tulip = ImgIterator(self.fold, "tulip")
 
 
     def msg_ok(self):
@@ -299,7 +289,7 @@ class MainWindow(QWidget):
         QMessageBox.critical(
             self,
             'Error',
-            f"{err}"
+            err
         )
 
 
