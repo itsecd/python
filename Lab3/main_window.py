@@ -1,7 +1,7 @@
-from PyQt6 import QtWidgets
-from typing import Optional
 import sys
 from datetime import datetime
+from typing import Optional
+from PyQt6 import QtWidgets
 sys.path.insert(0,"Lab2")
 from sort_csv import split_into_two, sort_by_year, sort_by_week
 from get_value_from_date import get_data_for_date
@@ -18,22 +18,20 @@ class MainWindow(QtWidgets.QMainWindow):
     def init_ui(self) -> None:
         """Initialize the main user interface."""
         self.setWindowTitle("Dataset Organizer")
+        self.setFixedSize(400, 400)
 
         self.label_folder = QtWidgets.QLabel("Select source folder:")
         self.button_select_folder = QtWidgets.QPushButton("Browse")
         self.button_select_folder.clicked.connect(self.get_source_folder)
+        self.selected_folder_label = QtWidgets.QLabel("")
 
-        self.dataset1_folder = QtWidgets.QLabel("Select destination folder for sort by X and Y:")
-        self.button_create_dataset1 = QtWidgets.QPushButton("Create Dataset(X and Y)")
-        self.button_create_dataset1.clicked.connect(self.create_dataset_xy)
+        self.combo_box = QtWidgets.QComboBox(self)
+        self.combo_box.addItem("X and Y")
+        self.combo_box.addItem("Years")
+        self.combo_box.addItem("Weeks")
 
-        self.dataset2_folder = QtWidgets.QLabel("Select destination folder for sort by years:")
-        self.button_create_dataset2 = QtWidgets.QPushButton("Create Dataset(years)")
-        self.button_create_dataset2.clicked.connect(self.create_dataset_years)
-
-        self.dataset3_folder = QtWidgets.QLabel("Select destination folder for sort by weeks:")
-        self.button_create_dataset3 = QtWidgets.QPushButton("Create Dataset(weeks)")
-        self.button_create_dataset3.clicked.connect(self.create_dataset_weeks)
+        self.sort_type = QtWidgets.QLabel("Select sortin type and then folder:")
+        self.combo_box.activated.connect(self.on_combo_box_activated)
 
         self.label = QtWidgets.QLabel('Input date (YYYY/MM/DD):')
         self.date_input = QtWidgets.QLineEdit()
@@ -44,12 +42,9 @@ class MainWindow(QtWidgets.QMainWindow):
         layout = QtWidgets.QVBoxLayout()
         layout.addWidget(self.label_folder)
         layout.addWidget(self.button_select_folder)
-        layout.addWidget(self.dataset1_folder)
-        layout.addWidget(self.button_create_dataset1)
-        layout.addWidget(self.dataset2_folder)
-        layout.addWidget(self.button_create_dataset2)
-        layout.addWidget(self.dataset3_folder)
-        layout.addWidget(self.button_create_dataset3)
+        layout.addWidget(self.selected_folder_label)
+        layout.addWidget(self.sort_type)
+        layout.addWidget(self.combo_box)
         layout.addWidget(self.label)
         layout.addWidget(self.date_input)
         layout.addWidget(self.get_data_button)
@@ -61,9 +56,11 @@ class MainWindow(QtWidgets.QMainWindow):
 
 
     def get_source_folder(self) -> Optional[str]:
-        """Open a dialog to select a source folder."""
         source_folder = QtWidgets.QFileDialog.getExistingDirectory(self, 'Select Source Folder')
-        return source_folder
+        if source_folder:
+            self.selected_folder_label.setText(f"Folder: {source_folder}")
+            return source_folder
+        return None
 
 
     def get_destination_folder(self) -> Optional[str]:
@@ -74,17 +71,32 @@ class MainWindow(QtWidgets.QMainWindow):
 
     def create_dataset_xy(self) -> None:
         """Create dataset 1 by splitting data."""
-        split_into_two(self.get_destination_folder())
-    
+        dest_folder = self.get_destination_folder()
+        if dest_folder:
+            split_into_two(dest_folder)
+            QtWidgets.QMessageBox.information(self, "Success", "Dataset created successfully.")
+        else:
+            QtWidgets.QMessageBox.information(self, "Error", "You dont choose folder")
+
 
     def create_dataset_years(self) -> None:
         """Create dataset 2 by sorting data by years."""
-        sort_by_year(self.get_destination_folder())
+        dest_folder = self.get_destination_folder()
+        if dest_folder:
+            sort_by_year(dest_folder)
+            QtWidgets.QMessageBox.information(self, "Success", "Dataset created successfully.")
+        else:
+            QtWidgets.QMessageBox.information(self, "Error", "You dont choose folder")
 
 
     def create_dataset_weeks(self) -> None:
         """Create dataset 3 by sorting data by weeks."""
-        sort_by_week(self.get_destination_folder())
+        dest_folder = self.get_destination_folder()
+        if dest_folder:
+            sort_by_week(dest_folder)
+            QtWidgets.QMessageBox.information(self, "Success", "Dataset created successfully.")
+        else:
+            QtWidgets.QMessageBox.information(self, "Error", "You dont choose folder")
     
 
     def get_data(self) -> None:
@@ -94,9 +106,20 @@ class MainWindow(QtWidgets.QMainWindow):
         value = get_data_for_date(date)
         self.data_display.setText(f"Данные для даты {date} = {value}")
 
+    
+    def on_combo_box_activated(self):
+        selected_text = self.combo_box.currentText()
+        if selected_text == "X and Y":
+            self.create_dataset_xy()
+        elif selected_text == "Years":
+            self.create_dataset_years()
+        elif selected_text == "Weeks":
+            self.create_dataset_weeks()
+
         
 if __name__ == "__main__":
     app = QtWidgets.QApplication(sys.argv)
     main_window = MainWindow()
+    app.setActiveWindow(main_window)
     main_window.show()
     sys.exit(app.exec())
