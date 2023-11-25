@@ -36,6 +36,10 @@ class MainWindow(QWidget):
         #Path to save annotation
         self.fold = None
 
+        #Iterators
+        self.iter_rose = None
+        self.iter_tulip = None
+
         # Button to select fold with dataset
         self.select_dataset = QPushButton("Select Dataset")
         self.select_dataset.setAutoDefault(True)
@@ -93,7 +97,7 @@ class MainWindow(QWidget):
         self.button_next_tulip = QPushButton(f"Next {img_classes[1]}")
         self.button_next_rose.setDisabled(1)
         self.button_next_tulip.setDisabled(1)
-        self.button_next_rose.clicked.connect(self.next_rose)
+        self.button_next_rose.clicked.connect(self.next_imagea("rose"))
         self.button_next_tulip.clicked.connect(self.next_tulip)
         self.button_next_rose.setMinimumSize(200, 100)
         self.button_next_tulip.setMinimumSize(200, 100)
@@ -154,13 +158,19 @@ class MainWindow(QWidget):
         Make annotation to dataset
         """
         try:
-            self.fold = QFileDialog.getExistingDirectory(self, "Select save path")
+            # self.fold = QFileDialog.getExistingDirectory(self, "Select save path")
+            self.fold = QFileDialog.getSaveFileName(
+                self,
+                "Select path to csv file:",
+                "",
+                "CSV File(*.csv)",
+            )[0]
 
             if self.fold == "": raise FileExistsError
 
-            make_csv(os.path.join(self.fold, "dataset"), img_classes, self.dataset_path, "normal", "")
-            self.iter_rose = ImgIterator(os.path.join(self.fold, "dataset.csv"), "rose")
-            self.iter_tulip = ImgIterator(os.path.join(self.fold, "dataset.csv"), "tulip")
+            make_csv(self.fold, img_classes, self.dataset_path, "normal", "")
+            self.iter_rose = ImgIterator(self.fold, "rose")
+            self.iter_tulip = ImgIterator(self.fold, "tulip")
             self.button_next_rose.setDisabled(False)   
             self.button_next_tulip.setDisabled(False) 
 
@@ -176,11 +186,16 @@ class MainWindow(QWidget):
         Make annotation and copy dataset in another fold
         """
         try:
-            fold_data = QFileDialog.getExistingDirectory(self, "Select Path to Dataset")
-            fold_csv = QFileDialog.getExistingDirectory(self, "Select Path to CSV")
+            fold_data = QFileDialog.getExistingDirectory(self, "Select Path to Dataset:")
+            fold_csv = QFileDialog.getSaveFileName(
+                self,
+                "Select path to csv file:",
+                "",
+                "CSV File(*.csv)",
+            )[0]
 
             if fold_data != "" and fold_csv != "":
-                make_csv(os.path.join(fold_csv, "dataset_together"), img_classes, self.dataset_path, 
+                make_csv(fold_csv, img_classes, self.dataset_path, 
                                         "together", fold_data)
                 self.msg_ok()
             else: 
@@ -196,11 +211,16 @@ class MainWindow(QWidget):
         Make annotation and copy dataset in another fold
         """
         try:
-            fold_data = QFileDialog.getExistingDirectory(self, "Select Path to Dataset")
-            fold_csv = QFileDialog.getExistingDirectory(self, "Select Path to CSV")
+            fold_data = QFileDialog.getExistingDirectory(self, "Select Path to Dataset:")
+            fold_csv = QFileDialog.getSaveFileName(
+                self,
+                "Select path to csv file:",
+                "",
+                "CSV File(*.csv)",
+            )[0]
 
             if fold_data != "" and fold_csv != "":
-                make_csv(os.path.join(fold_csv, "dataset_random"), img_classes, self.dataset_path, 
+                make_csv(fold_csv, img_classes, self.dataset_path, 
                                         "random", fold_data)
                 
                 self.msg_ok()
@@ -211,7 +231,23 @@ class MainWindow(QWidget):
         except Exception as err:
             self.msg_error(err)
 
-    
+    # Я НЕ ПОНИМАЮ ПОЧЕМУ ЭТОТ КОД НЕ РАБОТАЕТ(
+    # ОН ПРОСТО НЕ ЗАПУСКАЕТСЯ И ВЫКИДВАЕТ ОШИБКУ
+    # 
+    # def next_image(self, type : str):
+    #     try:
+    #         if type == "rose":
+    #             pixmap = QPixmap(next(self.iter_rose))
+    #         else:
+    #             pixmap = QPixmap(next(self.iter_tulip))
+    #         self.image_.setPixmap(pixmap)
+    #     except StopIteration:
+    #         if type == "rose":
+    #             self.iter_rose = ImgIterator(self.fold, type)
+    #         else:
+    #             self.iter_tulip = ImgIterator(self.fold, type)
+
+
     def next_rose(self):
         """
         Switch image to next
@@ -220,7 +256,7 @@ class MainWindow(QWidget):
             pixmap = QPixmap(next(self.iter_rose))
             self.image_.setPixmap(pixmap)
         except StopIteration:
-            self.iter_rose = ImgIterator(os.path.join(self.fold, "dataset.csv"), "rose")
+            self.iter_rose = ImgIterator(self.fold, "rose")
 
     
     def next_tulip(self):
@@ -231,7 +267,7 @@ class MainWindow(QWidget):
             pixmap = QPixmap(next(self.iter_tulip))
             self.image_.setPixmap(pixmap)
         except StopIteration:
-            self.iter_tulip = ImgIterator(os.path.join(self.fold, "dataset.csv"), "tulip")
+            self.iter_tulip = ImgIterator(self.fold, "tulip")
 
 
     def msg_ok(self):

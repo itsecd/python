@@ -18,7 +18,7 @@ def create_csv(path_to_csv : str) -> None:
     """
     try:
         # if not os.path.exists(f"{name_csv}.csv"):
-            with open(f"{path_to_csv}.csv", "w", newline='') as file:
+            with open(path_to_csv, "w", newline='') as file:
                 writer = csv.writer(file)
                 writer.writerow(("Absolute path", "Relative path", "Class"))
     except Exception as ex:
@@ -44,7 +44,7 @@ def write_in_csv(path_to_csv : str, img_class : str, directory : str) -> None:
             os.path.relpath(directory),
             img_class
         ]
-        with open(f"{path_to_csv}.csv", "a", newline='') as file:
+        with open(path_to_csv, "a", newline='') as file:
             writer = csv.writer(file)
             writer.writerow(row)
     except Exception as ex:
@@ -67,16 +67,17 @@ def make_csv(path_to_csv : str, img_classes : list, directory : str, mode : str,
     try:
         create_csv(path_to_csv)
         for img_class in img_classes:
-            number_of_img = len(os.listdir(os.path.join(directory, img_class)))
-            for img in range(number_of_img):
+            names_list = os.listdir(os.path.join(directory, img_class))
+            number_of_img = len(names_list)
+            for img, name in zip(range(number_of_img), names_list):
                 if mode == "normal":
-                    write_in_csv(path_to_csv, img_class, get_path_normal(directory, img_class, img))
+                    write_in_csv(path_to_csv, img_class, get_path_normal(directory, img_class, name))
                 elif mode == "together":
-                    shutil.copyfile(get_path_normal(directory, img_class, img), get_path_together(path_to_data, img_class, img))
-                    write_in_csv(path_to_csv, img_class, get_path_together(path_to_data, img_class, img))
+                    shutil.copyfile(get_path_normal(directory, img_class, name), get_path_together(path_to_data, img_class, name))
+                    write_in_csv(path_to_csv, img_class, get_path_together(path_to_data, img_class, name))
                 elif mode == "random":
                     _random = random.randint(0, 10000)
-                    shutil.copyfile(get_path_normal(directory, img_class, img), get_path_random(path_to_data, _random))
+                    shutil.copyfile(get_path_normal(directory, img_class, name), get_path_random(path_to_data, _random))
                     write_in_csv(path_to_csv, img_class, get_path_random(path_to_data, _random))
                 else:
                     raise Exception("Incorrect mode")
