@@ -2,6 +2,7 @@ import sys
 import os
 import logging
 from PyQt6 import QtWidgets, QtGui, QtCore
+from PyQt6.QtWidgets import QFileDialog
 sys.path.insert(1, 'Lab2')
 from create_copy_dataset import copy_dataset, CopyType
 from create_annotation import write_annotation_to_csv
@@ -15,6 +16,7 @@ class MainWindow(QtWidgets.QMainWindow):
     def __init__(self):
         super().__init__()
         self.init_ui()
+        self.recursion_counter = 0
 
     def init_ui(self) -> None:
         self.setWindowTitle("Dataset Annotation App")
@@ -92,60 +94,65 @@ class MainWindow(QtWidgets.QMainWindow):
                 try:
                     write_annotation_to_csv(dataset_folder, annotation_path)
                     QtWidgets.QMessageBox.information(
-                        self, 'Success', 'Annotation file created successfully!')
+                        self, 'Success', 'Файл аннотация успешно создан!')
                 except Exception as ex:
                     logging.error(f"Failed to create annotation: {ex}")
                     QtWidgets.QMessageBox.critical(
-                        self, 'Error', f'Failed to create annotation: {ex}')
+                        self, 'Error', f'Не удалось создать аннотацию.: {ex}')
 
     def copy_dataset(self) -> None:
         main_folder = QtWidgets.QFileDialog.getExistingDirectory(
-            self, 'Выберите папку для копирования датасета:')
+            self, 'Выберите папку для копирования:')
 
         if main_folder:
             new_copy_name, ok = QtWidgets.QInputDialog.getText(
-                self, 'Введите имя для новой копии датасета:', 'Новая копия')
+                self, 'Введите имя для новой копии:', 'Новая копия')
 
             if ok and new_copy_name:
                 try:
                     copy_dataset(main_folder, new_copy_name, CopyType.NUMBERED)
                     QtWidgets.QMessageBox.information(
-                        self, 'Success', 'Dataset copied successfully!')
+                        self, 'Success', 'Набор данных успешно скопирован!')
                 except Exception as ex:
                     logging.error(f"Failed to copy dataset: {ex}")
                     QtWidgets.QMessageBox.critical(
-                        self, 'Error', f'Failed to copy dataset: {ex}')
+                        self, 'Error', f'Не удалось скопировать набор данных: {ex}')
 
     def random_copy_dataset(self) -> None:
         main_folder = QtWidgets.QFileDialog.getExistingDirectory(
-            self, 'Выберите папку для копирования датасета:')
+            self, 'Выберите папку для копирования:')
 
         if main_folder:
             new_copy_name, ok = QtWidgets.QInputDialog.getText(
-                self, 'Введите имя для новой рандом-копии датасета:', 'Новая копия')
+                self, 'Введите имя для новой рандом-копии:', 'Новая копия')
 
             if ok and new_copy_name:
                 try:
                     copy_dataset(main_folder, new_copy_name, CopyType.RANDOM)
                     QtWidgets.QMessageBox.information(
-                        self, 'Success', 'Dataset copied successfully!')
+                        self, 'Success', 'Набор данных успешно скопирован!')
                 except Exception as ex:
                     logging.error(f"Failed to copy dataset: {ex}")
                     QtWidgets.QMessageBox.critical(
-                        self, 'Error', f'Failed to copy dataset: {ex}')
+                        self, 'Error', f'Не удалось скопировать набор данных: {ex}')
 
     def show_tiger(self) -> None:
-
         if not hasattr(self, 'tiger_iterator') or not self.tiger_iterator:
+            csv_file, _ = QFileDialog.getOpenFileName(
+                self, 'Выберите CSV-файл', '', 'CSV Files (*.csv);;All Files (*)')
 
-            annotation_file = 'copy_dataset.csv'
+            if not csv_file.lower().endswith('.csv'):
+                QtWidgets.QMessageBox.critical(
+                    self, 'Error', 'Выбран неверный файл. Пожалуйста, выберите файл CSV.')
+                return
+
             class_label = ["tiger"]
 
-            self.tiger_iterator = ClassIterator(annotation_file, class_label)
+            self.tiger_iterator = ClassIterator(csv_file, class_label)
 
             if not self.tiger_iterator:
                 QtWidgets.QMessageBox.critical(
-                    self, 'Error', 'Failed to initialize image iterator.')
+                    self, 'Error', 'Не удалось инициализировать итератор.')
                 return
 
         tiger_image_path = self.tiger_iterator.next_image()
@@ -155,20 +162,26 @@ class MainWindow(QtWidgets.QMainWindow):
             self.display_image(tiger_image_path)
         else:
             QtWidgets.QMessageBox.information(
-                self, 'Information', 'No more tiger images in the dataset.')
+                self, 'Information', 'В наборе данных больше нет изображений.')
 
     def show_leopard(self) -> None:
-
         if not hasattr(self, 'leopard_iterator') or not self.leopard_iterator:
 
-            annotation_file = 'copy_dataset.csv'
+            csv_file, _ = QFileDialog.getOpenFileName(
+                self, 'Выберите CSV-файл', '', 'CSV Files (*.csv);;All Files (*)')
+
+            if not csv_file.lower().endswith('.csv'):
+                QtWidgets.QMessageBox.critical(
+                    self, 'Error', 'Выбран неверный файл. Пожалуйста, выберите файл CSV.')
+                return
+
             class_label = ["leopard"]
 
-            self.leopard_iterator = ClassIterator(annotation_file, class_label)
+            self.leopard_iterator = ClassIterator(csv_file, class_label)
 
             if not self.leopard_iterator:
                 QtWidgets.QMessageBox.critical(
-                    self, 'Error', 'Failed to initialize image iterator.')
+                    self, 'Error', 'В наборе данных больше нет изображений.')
                 return
 
         leopard_image_path = self.leopard_iterator.next_image()
@@ -178,16 +191,16 @@ class MainWindow(QtWidgets.QMainWindow):
             self.display_image(leopard_image_path)
         else:
             QtWidgets.QMessageBox.information(
-                self, 'Information', 'No more leopard images in the dataset.')
+                self, 'Information', 'В наборе данных больше нет изображений.')
 
     def display_image(self, image_path: str) -> None:
         print("Displaying image:", image_path)
         pixmap = QtGui.QPixmap(image_path)
 
         if pixmap.isNull():
-            print("Failed to load image:", image_path)
+            print("Не удалось загрузить изображение:", image_path)
         else:
-            print("Image loaded successfully.")
+            print("Изображение успешно загружено.")
             pixmap = pixmap.scaledToWidth(self.scroll_area.width())
             self.image_label.setAlignment(
                 QtCore.Qt.AlignmentFlag.AlignCenter | QtCore.Qt.AlignmentFlag.AlignHCenter)
