@@ -3,13 +3,15 @@ import os
 import X_Y_csv
 import year_csv
 import week_csv
+from datetime import datetime
 from create_folder import create_folder
 from get_data import input_csv
+from get_data import get_data_for_date
 
 if __name__ == "__main__":
     parser = argparse.ArgumentParser(description='Split csv file for weeks.')
     parser.add_argument('--mode',
-                        type=str, default='weeks',
+                        type=str, default='find data',
                         help='mode selection'
                         )
     parser.add_argument('--path_file',
@@ -22,6 +24,10 @@ if __name__ == "__main__":
                         )
     parser.add_argument('--output_y',
                         type=str, default='Y.csv',
+                        help='Output file name Y'
+                        )
+    parser.add_argument('--date',
+                        type=datetime, default=datetime(2023,10,5),
                         help='Output file name Y'
                         )
 
@@ -37,3 +43,6 @@ if __name__ == "__main__":
     if (args.mode == "weeks"):
         create_folder(args.path_file)
         week_csv.split_by_week(input_csv,args.path_file)
+    if (args.mode == "find data"):
+        data_for_date = get_data_for_date(args.date,input_csv,args.output_x, args.output_y)
+        print(f"Value for: {args.date}: {data_for_date}")
