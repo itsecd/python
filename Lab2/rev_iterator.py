@@ -27,4 +27,6 @@ if __name__ == "__main__":
     args = parser.parse_args()
     iter = RevIterator(args.csv, args.label)
     for i in iter:
+        if i==None:
+            break
         print(i)

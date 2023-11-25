@@ -11,7 +11,7 @@ def get_path_of_next(class_label: int, ind: int, csv_path='reviews.csv'):
         files = [row for row in csv.reader(csvfile, delimiter=',') if class_label == int(row[-1])]
         return None if ind >= len(files) else files[ind][0]  
              
-
+#D:\pythonlabs\Lab3\dataset\1
 if __name__ == '__main__':
     parser = argparse.ArgumentParser(description="Input csv path, label of class, index, label of annotation")
     parser.add_argument("-c", "--csv", help="Input csv path", type=str)
@@ -22,5 +22,6 @@ if __name__ == '__main__':
     parser.add_argument("-o", "--old", help="Input path to old dir", type=str)
     args = parser.parse_args()
     #-c review.csv -l 1 -i 3 -a 2 -n new_dataset -o dataset
-    print(get_path_of_next(args.label,args.index,(write_csv(args.csv,args.annotation,args.new,args.old))))
+    write_csv(args.csv,args.annotation,args.new,args.old)
+    #print(get_path_of_next(args.label,args.index,(write_csv(args.csv,args.annotation,args.new,args.old))))
     

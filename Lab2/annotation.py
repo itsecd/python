@@ -41,10 +41,10 @@ def get_annotation(directory='dataset', new_dir='new_dataset', label_annotation=
         for file in files:
             match AnnotationLabel(label_annotation):
                 case AnnotationLabel.DEFAULT:
-                    relative_path = os.path.join(dir, f'{str(file).zfill(4)}.txt')
+                    relative_path = os.path.join(dir, f'{str(file).zfill(4)}')
                 case AnnotationLabel.NEWDIR:
                     shutil.copy(os.path.join(dir, file), os.path.join(new_dir, f'{star}_{file}'))
-                    relative_path = os.path.join(new_dir, f'{file}')
+                    relative_path = os.path.join(new_dir, f'{star}_{file}')
                 case AnnotationLabel.RAND:
                     path_to_file = f'{str(random.randrange(10000)).zfill(4)}.txt'
                     while os.path.isfile(os.path.join(new_dir, path_to_file)):  # replace number, if file exists
@@ -57,7 +57,7 @@ def get_annotation(directory='dataset', new_dir='new_dataset', label_annotation=
             yield [absolute_path, relative_path, star]
     
 
-def write_csv(path_to_csv='reviews.csv', label_of_annotation=0, new_dir='new_dataset',
+def write_csv(path_to_csv='review.csv', label_of_annotation=0, new_dir='new_dataset',
               old_dir='dataset') -> str:
     """
     write list of elements to a csv file.
