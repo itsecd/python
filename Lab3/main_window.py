@@ -21,7 +21,7 @@ class MainWindow(QtWidgets.QMainWindow):
         # Create widgets
         self.create_annotation_button = QtWidgets.QPushButton("Создать аннотацию")
         self.copy_dataset_button = QtWidgets.QPushButton("Скопировать датасет")
-        self.random_copy_dataset_button = QtWidgets.QPushButton("Скопировать датасет в случайном порядке")
+        self.random_copy_dataset_button = QtWidgets.QPushButton("Скопировать датасет рандомно")
         self.show_tiger_button = QtWidgets.QPushButton("Показать следующего тигра")
         self.show_leopard_button = QtWidgets.QPushButton("Показать следующего тигра")
         self.exit_button = QtWidgets.QPushButton("Выйти из программы")
@@ -29,11 +29,13 @@ class MainWindow(QtWidgets.QMainWindow):
         # Connect buttons to functions
         self.create_annotation_button.clicked.connect(self.create_annotation)
         self.copy_dataset_button.clicked.connect(self.copy_dataset)
+        self.random_copy_dataset_button.clicked.connect(self.random_copy_dataset)
 
         # Layout setup
         layout = QtWidgets.QVBoxLayout()
         layout.addWidget(self.create_annotation_button)
         layout.addWidget(self.copy_dataset_button)
+        layout.addWidget(self.random_copy_dataset_button)
 
         widget = QtWidgets.QWidget()
         widget.setLayout(layout)
@@ -69,6 +71,23 @@ class MainWindow(QtWidgets.QMainWindow):
             if ok and new_copy_name:
                 try:
                     copy_dataset(main_folder, new_copy_name, CopyType.NUMBERED)
+                    QtWidgets.QMessageBox.information(
+                        self, 'Success', 'Dataset copied successfully!')
+                except Exception as ex:
+                    logging.error(f"Failed to copy dataset: {ex}")
+                    QtWidgets.QMessageBox.critical(
+                        self, 'Error', f'Failed to copy dataset: {ex}')
+    def random_copy_dataset(self):
+        main_folder = QtWidgets.QFileDialog.getExistingDirectory(
+            self, 'Выберите папку для копирования датасета:')
+
+        if main_folder:
+            new_copy_name, ok = QtWidgets.QInputDialog.getText(
+                self, 'Введите имя для новой рандом-копии датасета:', 'Новая копия')
+
+            if ok and new_copy_name:
+                try:
+                    copy_dataset(main_folder, new_copy_name, CopyType.RANDOM)
                     QtWidgets.QMessageBox.information(
                         self, 'Success', 'Dataset copied successfully!')
                 except Exception as ex:
