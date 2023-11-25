@@ -42,6 +42,7 @@ class MainWindow(QtWidgets.QMainWindow):
             self.random_copy_dataset)
         self.show_tiger_button.clicked.connect(self.show_tiger)
         self.show_leopard_button.clicked.connect(self.show_leopard)
+        self.exit_button.clicked.connect(self.close)
 
         # Layout setup
         layout = QtWidgets.QVBoxLayout()
@@ -50,6 +51,7 @@ class MainWindow(QtWidgets.QMainWindow):
         layout.addWidget(self.random_copy_dataset_button)
         layout.addWidget(self.show_tiger_button)
         layout.addWidget(self.show_leopard_button)
+        layout.addWidget(self.exit_button)
 
         widget = QtWidgets.QWidget()
         widget.setLayout(layout)
