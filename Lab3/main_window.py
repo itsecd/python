@@ -21,7 +21,7 @@ class MainWindow(QMainWindow):
     def __init__(self)-> None:
         super(MainWindow, self).__init__()
 
-        self.setGeometry(100, 100, 700, 700)
+        self.setGeometry(100, 100, 700, 600)
         self.setMaximumSize(1000, 700)
 
         main_widget = QWidget()
@@ -173,6 +173,7 @@ class MainWindow(QMainWindow):
             logging.error(f"Can not create copy or annotation: {exc.message}\n{exc.args}\n")             
 
     def csv_path(self):
+        """This function opens csv file to read review in window application"""
         try:
             path = QFileDialog.getOpenFileName(self, "Выберите файл для итерации:", "", "CSV File(*.csv)")[0]
             if path == "":
