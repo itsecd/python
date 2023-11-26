@@ -1,10 +1,11 @@
 import sys
-import os
-from PyQt6.QtWidgets import QApplication, QWidget, QVBoxLayout, QLabel, QPushButton, QFileDialog, QMessageBox
-from PyQt6.QtGui import QPixmap
-sys.path.insert(0, "Lab2")
-from create_annotation import get_absolute_paths, get_relative_paths, write_annotation_to_csv
+from PyQt6.QtWidgets import QApplication, QWidget, QVBoxLayout, QHBoxLayout, QLabel, QPushButton, QFileDialog, QMessageBox, QAction
+from PyQt6.QtGui import QIcon, QPixmap
+from PyQt6.QtCore import Qt, QCoreApplication, QEvent
 from iter import DirectoryIterator
+from create_annotation import get_absolute_paths, get_relative_paths, write_annotation_to_csv
+
+
 
 
 class Window(QWidget):
@@ -107,7 +108,8 @@ class Window(QWidget):
 
     def createActions(self) -> None:
         self.exitAction = QAction(QIcon('img/exit.png'), '&Exit')
-        self.exitAction.triggered.connect(qApp.quit)
+        self.exitAction.triggered.connect(QCoreApplication.instance().quit)
+
 
         self.changeAction = QAction(QIcon('img/change.png'), '&Change dataset')
         self.changeAction.triggered.connect(self.changeDataset)
