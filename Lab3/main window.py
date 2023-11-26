@@ -68,6 +68,11 @@ class MainWindow(QtWidgets.QMainWindow):
     def get_dataset_path(self):
         folder_path = QtWidgets.QFileDialog.getExistingDirectory(self, 'Select Folder')
         self.folder_path_label.setText(f"Dataset Folder: {folder_path}")
+
+        self.dataset_path = folder_path
+        self.cat_iterator = DirectoryIterator('cat', folder_path)
+        self.dog_iterator = DirectoryIterator('dog', folder_path)
+
         return folder_path
 
     def create_annotation_file(self):
@@ -137,16 +142,23 @@ class MainWindow(QtWidgets.QMainWindow):
                     self, "Error", f"No more instances of {class_name}.")
 
     def show_next_cat(self):
-        if self.dataset_path and self.cat_iterator:
-            next_path = next(self.cat_iterator)
+        if self.cat_iterator:
+            next_path = next(self.cat_iterator, None)
             if next_path:
-                self.show_image(next_path)
+                self.display_image(next_path)
+            else:
+                QtWidgets.QMessageBox.warning(
+                    self, "Error", "No more instances of cat.")
 
     def show_next_dog(self):
-        if self.dataset_path and self.dog_iterator:
-            next_path = next(self.dog_iterator)
+        if self.dog_iterator:
+            next_path = next(self.dog_iterator, None)
             if next_path:
-                self.show_image(next_path)
+                self.display_image(next_path)
+            else:
+                QtWidgets.QMessageBox.warning(
+                    self, "Error", "No more instances of dog.")
+
 
     def display_image(self, image_path: str) -> None:
         pixmap = QtGui.QPixmap(image_path)
