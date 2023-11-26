@@ -1,65 +1,54 @@
 import os
 import shutil
 import logging
-import csv
-from typing import List
-from util import write_annotation_to_csv
+from create_annotation import get_absolute_paths
+from create_annotation import get_relative_paths
+from create_annotation import write_annotation_to_csv
 
 
-logging.basicConfig(filename='annotation2.log', level=logging.INFO)
-
-
-def get_paths(src_path: str, dest_path: str, name: str) -> List[str]:
+def replace_images(class_name: str, 
+                   dataset_path: str) -> None:
     """
-    This function returns a list of absolute paths for all images
-    of the specific name of the animal passed to the function,
-    after moving the images to another directory.
+    This function changes the names of images by combining the image number and class in the format class_number.jpg ,
+    transfers the images to the dataset directory and deletes the folder where the class images were stored
     """
-    absolute_path = os.path.abspath(os.path.join(dest_path, name))
-    image_paths = [os.path.join(absolute_path, img) for img in os.listdir(absolute_path)]
+    try:
+        abs_dataset_path = os.path.abspath(dataset_path)
+        class_path = os.path.join(abs_dataset_path, class_name)
+        image_names = os.listdir(class_path)
+        image_full_paths = [os.path.join(class_path, name) for name in image_names]
+        new_names = [f'{class_name}_{name}' for name in image_names]
+        new_full_paths = [os.path.join(abs_dataset_path, new_name) for new_name in new_names]
 
-    return image_paths
+        for old_path, new_path in zip(image_full_paths, new_full_paths):
+            os.replace(old_path, new_path)
 
+        if os.path.isdir(class_path):
+            shutil.rmtree(class_path)
 
-def rename_and_move_images(src_path: str, dest_path: str, name: str) -> None:
-    """
-    This function changes the names of images by combining the image number and class
-    in the format class_number.jpg,
-    transfers the images to the destination directory, and deletes the folder
-    where the class images were stored.
-    """
-    src_class_path = os.path.join(src_path, name)
-    dest_class_path = os.path.join(dest_path, name)
-
-    if os.path.isdir(dest_class_path):
-        shutil.rmtree(dest_class_path)
-
-    shutil.copytree(src_class_path, dest_class_path)
-
-    image_names = os.listdir(dest_class_path)
-    new_img_relative_paths = [f'{name}_{img}' for img in image_names]
-
-    for old_name, new_name in zip(image_names, new_img_relative_paths):
-        os.rename(os.path.join(dest_class_path, old_name), os.path.join(dest_class_path, new_name))
-
-    if os.path.isdir(src_class_path):
-        shutil.rmtree(src_class_path)
+    except Exception as e:
+        logging.error(f"Failed to write: {e}")
 
 
 if __name__ == "__main__":
-    src_dataset_path = 'dataset'
-    dest_dataset_path = 'dataset2'
+    class1 = 'cat'
+    class2 = 'dog'
+    old_path="dataset"
+    dataset_path = 'dataset1'
 
-    cat, dog = 'cat', 'dog'
+    if os.path.isdir(dataset_path):
+        shutil.rmtree(dataset_path)
 
-    rename_and_move_images(src_dataset_path, dest_dataset_path, cat)
-    rename_and_move_images(src_dataset_path, dest_dataset_path, dog)
+    old = os.path.relpath(old_path)
+    new = os.path.relpath(dataset_path)
+    shutil.copytree(old, new)
 
-    cat_paths = get_paths(src_dataset_path, dest_dataset_path, cat)
-    dog_paths = get_paths(src_dataset_path, dest_dataset_path, dog)
+    replace_images(class1, dataset_path)
+    replace_images(class2, dataset_path)
 
-    with open('annotation2.csv', 'w', newline='') as csv_file:
-        writer = csv.writer(csv_file, delimiter=',', lineterminator='\r')
-
-        write_annotation_to_csv(writer, cat_paths, cat_paths, cat)
-        write_annotation_to_csv(writer, dog_paths, dog_paths, dog)
+    cat_absolute_paths = get_absolute_paths(class1, old_path)
+    cat_relative_paths = get_relative_paths(class1, dataset_path)
+    dog_absolute_paths = get_absolute_paths(class2, old_path)
+    dog_relative_paths = get_relative_paths(class2, dataset_path)
+    write_annotation_to_csv('annotation1.csv', cat_absolute_paths, cat_relative_paths, class1)
+    write_annotation_to_csv('annotation1.csv', dog_absolute_paths, dog_relative_paths, class2)

@@ -3,57 +3,64 @@ import shutil
 import csv
 import random
 import logging
-from util import write_annotation_to_csv
+from create_annotation import get_absolute_paths
+from create_annotation import get_relative_paths
+from create_annotation import write_annotation_to_csv
 
 
 logging.basicConfig(filename='annotation3.log', level=logging.INFO)
 
 
-def generate_random_numbers(num_items: int) -> list[int]:
+def process_images(class_name: str, source_path: str, dest_path: str) -> None:
     """
-    Generate a list of unique random numbers in the range [0, 10000].
+    This function renames images by combining the image number, class name, and random number
+    in the format class_name_number.jpg, transfers the images to the destination directory,
+    and deletes the folder where the class images were stored.
     """
-    return random.sample(range(0, 10001), num_items)
+    try:
+        abs_source_path = os.path.abspath(source_path)
+        class_path = os.path.join(abs_source_path, class_name)
+        image_names = os.listdir(class_path)
+        image_full_paths = [os.path.join(class_path, name) for name in image_names]
 
+        random_numbers = random.sample(range(0, 10001), len(image_names))
+        new_names = [f'{class_name}_{random_number}.jpg' for random_number in random_numbers]
+        new_full_paths = [os.path.join(dest_path, name) for name in new_names]
 
-def process_images(src_path: str, dest_path: str) -> tuple[list[str], list[str]]:
-    """
-    Process images by copying, renaming, and returning absolute and relative paths.
-    """
-    if os.path.isdir(dest_path):
-        shutil.rmtree(dest_path)
+        for old_path, new_path in zip(image_full_paths, new_full_paths):
+            os.replace(old_path, new_path)
 
-    old_path = os.path.relpath(src_path)
-    new_path = os.path.relpath(dest_path)
-    shutil.copytree(old_path, new_path)
+        if os.path.isdir(class_path):
+            shutil.rmtree(class_path)
 
-    old_names = os.listdir(new_path)
-    old_relative_paths = [os.path.join(new_path, name) for name in old_names]
-
-    random_numbers = generate_random_numbers(len(old_names))
-    new_names = [f'{number}.jpg' for number in random_numbers]
-
-    for old_name, new_name in zip(old_relative_paths, new_names):
-        os.replace(old_name, new_name)
-
-    new_absolute_paths = [os.path.join(os.path.abspath(dest_path), name) for name in new_names]
-
-    return new_absolute_paths, new_names
+    except Exception as e:
+        logging.error(f"Failed to write: {e}")
 
 
 if __name__ == "__main__":
-    dataset_dir = 'dataset3'
-    new_absolute_paths, new_names = process_images('dataset2', dataset_dir)
 
-    annotation_data = []
-    for absolute_path, relative_path, old_relative_path in zip(
-        new_absolute_paths, new_names, [os.path.join(dataset_dir, name) for name in new_names]
-    ):
-        if 'cat' in old_relative_path:
-            name = 'cat'
-        else:
-            name = 'dog'
-        annotation_data.append([absolute_path, relative_path, name])
-        logging.info(f"Added entry for {name}: {absolute_path}")
+    class1 = 'cat'
+    class2 = 'dog'
 
-    write_annotation_to_csv('annotation3.csv', annotation_data)
+    if os.path.isdir('dataset1'):
+        shutil.rmtree('dataset1')
+
+    old_path = os.path.relpath('dataset')
+    new_path = os.path.relpath('dataset1')
+
+    shutil.copytree(old_path, new_path)
+
+    process_images(class1, new_path, new_path)
+    process_images(class2, new_path, new_path)
+
+    if os.path.isdir('dataset2'):
+        shutil.rmtree('dataset2')
+
+    dataset_path = 'dataset'
+    cat_absolute_paths = get_absolute_paths(class1, dataset_path)
+    cat_relative_paths = get_relative_paths(class1, dataset_path)
+    dog_absolute_paths = get_absolute_paths(class2, dataset_path)
+    dog_relative_paths = get_relative_paths(class2, dataset_path)
+
+    write_annotation_to_csv('annotation2.csv', cat_absolute_paths, cat_relative_paths, class1)
+    write_annotation_to_csv('annotation2.csv', dog_absolute_paths, dog_relative_paths, class2)
