@@ -13,7 +13,18 @@ from iterator import DirectoryIterator
 
 
 class MainWindow(QtWidgets.QMainWindow):
+    """
+    Main window class for the Dataset Annotation App.
+
+    Attributes:
+    - dataset_path: The path to the dataset folder.
+    - cat_iterator: Iterator for the 'cat' class in the dataset.
+    - dog_iterator: Iterator for the 'dog' class in the dataset.
+    """
     def __init__(self):
+        """
+        Initialize the main window and set up the user interface.
+        """
         super().__init__()
 
         self.setWindowTitle("Dataset Annotation App")
@@ -66,6 +77,12 @@ class MainWindow(QtWidgets.QMainWindow):
         self.dog_iterator = None
 
     def get_dataset_path(self):
+        """
+        Open a dialog to select the dataset folder and set the dataset_path attribute.
+
+        Returns:
+        - str: The selected dataset folder path.
+        """
         folder_path = QtWidgets.QFileDialog.getExistingDirectory(self, 'Select Folder')
         self.folder_path_label.setText(f"Dataset Folder: {folder_path}")
 
@@ -76,6 +93,15 @@ class MainWindow(QtWidgets.QMainWindow):
         return folder_path
 
     def create_annotation_file(self):
+        """
+        Create an annotation file for the dataset.
+
+        This method prompts the user to select a folder, and then creates an annotation
+        file by collecting absolute and relative paths for 'cat' and 'dog' classes.
+
+        Returns:
+        - None
+        """
         folder_path = self.get_dataset_path()
         annotation_file_path, _ = QtWidgets.QFileDialog.getSaveFileName(
             self, 'Save Annotation File', '', 'CSV Files (*.csv)')
@@ -92,6 +118,15 @@ class MainWindow(QtWidgets.QMainWindow):
                 annotation_file_path, dog_absolute_paths, dog_relative_paths, 'dog')
 
     def create_dataset(self):
+        """
+        Create a new dataset by replacing images in the original dataset.
+
+        This method prompts the user to select a destination folder and then replaces
+        images for 'cat' and 'dog' classes in the original dataset.
+
+        Returns:
+        - None
+        """
         folder_path = self.get_dataset_path()
         new_dataset_path = QtWidgets.QFileDialog.getExistingDirectory(
             self, 'Select Destination Folder')
@@ -104,6 +139,15 @@ class MainWindow(QtWidgets.QMainWindow):
             process_images('dog', folder_path, new_dataset_path)
 
     def copy_dataset(self):
+        """
+        Copy the entire dataset to a new location.
+
+        This method prompts the user to select a destination folder and copies the entire
+        dataset to that location.
+
+        Returns:
+        - None
+        """
         source_folder = self.get_dataset_path()
         destination_folder = QtWidgets.QFileDialog.getExistingDirectory(
             self, 'Select Destination Folder for Copy')
@@ -115,6 +159,15 @@ class MainWindow(QtWidgets.QMainWindow):
                 self, "Copy Dataset", "Dataset copied successfully.")
 
     def copy_random_dataset(self):
+        """
+        Copy the dataset to a new location with a random suffix.
+
+        This method prompts the user to select a destination folder and copies the dataset
+        to that location with a random suffix added to the folder name.
+
+        Returns:
+        - None
+        """
         source_folder = self.get_dataset_path()
         destination_folder = QtWidgets.QFileDialog.getExistingDirectory(
             self, 'Select Destination Folder for Random Copy')
@@ -127,6 +180,18 @@ class MainWindow(QtWidgets.QMainWindow):
                 self, "Copy Random Dataset", "Random dataset copy created successfully.")
 
     def get_next_instance(self, class_name):
+        """
+        Get the next instance of the specified class from an annotation file.
+
+        This method prompts the user to select an annotation file and displays the path
+        of the next instance of the specified class using the DirectoryIterator.
+
+        Parameters:
+        - class_name (str): The class name ('cat' or 'dog').
+
+        Returns:
+        - None
+        """
         csv_path, _ = QtWidgets.QFileDialog.getOpenFileName(
             self, 'Select Annotation File', '', 'CSV Files (*.csv)')
 
@@ -142,6 +207,15 @@ class MainWindow(QtWidgets.QMainWindow):
                     self, "Error", f"No more instances of {class_name}.")
 
     def show_next_cat(self):
+        """
+        Show the next instance of the 'cat' class from an annotation file.
+
+        This method prompts the user to select an annotation file and displays the
+        next instance of the 'cat' class using the cat_iterator.
+
+        Returns:
+        - None
+        """
         csv_path, _ = QtWidgets.QFileDialog.getOpenFileName(
             self, 'Select Annotation File', '', 'CSV Files (*.csv)')
 
@@ -155,6 +229,15 @@ class MainWindow(QtWidgets.QMainWindow):
                     self, "Error", "No more instances of cat.")
 
     def show_next_dog(self):
+        """
+        Show the next instance of the 'dog' class from an annotation file.
+
+        This method prompts the user to select an annotation file and displays the
+        next instance of the 'dog' class using the dog_iterator.
+
+        Returns:
+        - None
+        """
         csv_path, _ = QtWidgets.QFileDialog.getOpenFileName(
             self, 'Select Annotation File', '', 'CSV Files (*.csv)')
 
@@ -170,6 +253,18 @@ class MainWindow(QtWidgets.QMainWindow):
 
 
     def display_image(self, image_path: str) -> None:
+        """
+        Display the image at the specified path in the scroll area.
+
+        This method loads the image, scales it to fit the width of the scroll area,
+        and displays it using a QLabel.
+
+        Parameters:
+        - image_path (str): The path of the image to be displayed.
+
+        Returns:
+        - None
+        """
         pixmap = QtGui.QPixmap(image_path)
         if pixmap.isNull():
             print("Не удалось загрузить изображение:", image_path)
