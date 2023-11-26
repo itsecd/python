@@ -22,6 +22,5 @@ if __name__ == '__main__':
     parser.add_argument("-o", "--old", help="Input path to old dir", type=str)
     args = parser.parse_args()
     #-c review.csv -l 1 -i 3 -a 2 -n new_dataset -o dataset
-    write_csv(args.csv,args.annotation,args.new,args.old)
-    #print(get_path_of_next(args.label,args.index,(write_csv(args.csv,args.annotation,args.new,args.old))))
+    print(get_path_of_next(args.label,args.index,(write_csv(args.csv,args.annotation,args.new,args.old))))
     
