@@ -142,7 +142,11 @@ class MainWindow(QtWidgets.QMainWindow):
                     self, "Error", f"No more instances of {class_name}.")
 
     def show_next_cat(self):
-        if self.cat_iterator:
+        csv_path, _ = QtWidgets.QFileDialog.getOpenFileName(
+            self, 'Select Annotation File', '', 'CSV Files (*.csv)')
+
+        if csv_path:
+            self.cat_iterator = DirectoryIterator('cat', csv_path)
             next_path = next(self.cat_iterator, None)
             if next_path:
                 self.display_image(next_path)
@@ -151,13 +155,18 @@ class MainWindow(QtWidgets.QMainWindow):
                     self, "Error", "No more instances of cat.")
 
     def show_next_dog(self):
-        if self.dog_iterator:
+        csv_path, _ = QtWidgets.QFileDialog.getOpenFileName(
+            self, 'Select Annotation File', '', 'CSV Files (*.csv)')
+
+        if csv_path:
+            self.dog_iterator = DirectoryIterator('dog', csv_path)
             next_path = next(self.dog_iterator, None)
             if next_path:
                 self.display_image(next_path)
             else:
                 QtWidgets.QMessageBox.warning(
                     self, "Error", "No more instances of dog.")
+
 
 
     def display_image(self, image_path: str) -> None:
