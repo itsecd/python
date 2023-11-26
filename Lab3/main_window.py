@@ -22,7 +22,8 @@ class MainWindow(QMainWindow):
     def __init__(self)-> None:
         super(MainWindow, self).__init__()
 
-        self.setGeometry(100, 100, 800, 800)
+        self.setGeometry(100, 100, 700, 700)
+        self.setMaximumSize(1000, 700)
 
         main_widget = QWidget()
         box_layout = QVBoxLayout()
@@ -183,6 +184,8 @@ class MainWindow(QMainWindow):
             logging.error(f"Incorrect path: {exc.message}\n{exc.args}\n")
     
     def next_first(self):
+        """Function returns the path to the next element of the first class
+        and opens text review in the widget"""
         if self.classes_iterator == None:
             QMessageBox(None, "Не выбран файл", "Не выбран файл для итерации")
             return
@@ -195,6 +198,8 @@ class MainWindow(QMainWindow):
         
 
     def next_second(self):
+        """Function returns the path to the next element of the second class
+        and opens text review in the widget"""
         if self.classes_iterator == None:
             QMessageBox(None, "Не выбран файл", "Не выбран файл для итерации")
             return
@@ -206,6 +211,8 @@ class MainWindow(QMainWindow):
         self.text_label.setText(file.read())
 
     def next_third(self):
+        """Function returns the path to the next element of the third class
+        and opens text review in the widget"""
         if self.classes_iterator == None:
             QMessageBox(None, "Не выбран файл", "Не выбран файл для итерации")
             return
@@ -217,6 +224,8 @@ class MainWindow(QMainWindow):
         self.text_label.setText(file.read())
 
     def next_fourth(self):
+        """Function returns the path to the next element of the fourth class
+        and opens text review in the widget"""
         if self.classes_iterator == None:
             QMessageBox(None, "Не выбран файл", "Не выбран файл для итерации")
             return
@@ -228,6 +237,8 @@ class MainWindow(QMainWindow):
         self.text_label.setText(file.read())
 
     def next_fifth(self):
+        """Function returns the path to the next element of the fifth class
+        and opens text review in the widget"""
         if self.classes_iterator == None:
             QMessageBox(None, "Не выбран файл", "Не выбран файл для итерации")
             return
