@@ -142,6 +142,7 @@ class MainWindow(QMainWindow):
             QMessageBox.information(None, "Успешно", "Датасет скопирован")
         except Exception as exc:
                     logging.error(f"Can not create copy or annotation: {exc.message}\n{exc.args}\n")
+                    
 
     def csv_path(self):
         try:
