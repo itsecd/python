@@ -16,7 +16,6 @@ def get_random_list(end_el: int) -> list:
         end_el(int): last element of the rand_list
 
     Returns: 
-
         list: list of the random int numbers"""
     rand_list = [i for i in range(0, end_el)]
     random.shuffle(rand_list)
