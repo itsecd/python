@@ -1,7 +1,7 @@
 import pandas as pd
 import cv2
 import os
-from PIL import Image
+from PIL import Image, UnidentifiedImageError
 import numpy as np
 import random
 import matplotlib.pyplot as plt
@@ -66,8 +66,13 @@ def get_image_dimensions(image_path):
     Returns:
     - tuple: Кортеж с высотой, шириной и глубиной изображения.
     """
-    with Image.open(image_path) as img:
-        return img.height, img.width, len(img.getbands())
+    try:
+        with Image.open(image_path) as img:
+            return img.height, img.width, len(img.getbands())
+    except (IOError, OSError, UnidentifiedImageError):
+        # Обработка ошибок, возникающих при чтении изображения
+        print(f"Error reading image: {image_path}")
+        return None, None, None
 
 def calculate_statistics(df):
     """
@@ -194,7 +199,7 @@ def plot_histogram(histogram_data):
 
 if __name__ == "__main__":
     # Пример использования функций
-    data_folder = "путь_к_вашим_данным"
+    data_folder = r"C:\Users\Prodigy-\Desktop\123\dataset"
     df = create_dataframe(data_folder)
     df = add_numeric_label_column(df)
     df = add_image_dimensions_columns(df)
