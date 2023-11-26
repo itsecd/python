@@ -1,11 +1,12 @@
 import sys
 import os
 import logging
-import typing
-from PyQt6 import QtCore
 from PyQt6.QtCore import QSize
-from PyQt6.QtWidgets import (QApplication, QToolBar, QMainWindow,QPushButton,QMessageBox,QLabel,QFileDialog,QVBoxLayout,QWidget,QGridLayout)
-from PyQt6.QtGui import QPixmap
+from PyQt6.QtWidgets import (QApplication, QMainWindow, 
+                             QPushButton, QMessageBox,QLabel, 
+                             QFileDialog, QVBoxLayout, 
+                             QWidget, QGridLayout)
+
 
 sys.path.insert(1, "D:/AppProgPython/appprog/Lab2")
 from iterator import ClassIterator
@@ -33,9 +34,9 @@ class MainWindow(QMainWindow):
         src.setFixedSize(QSize(250,40))
         box_layout.addWidget(src)
 
-        self.btn_create = self.add_button("Создать аннотацию", 250, 40)
-        self.btn_copy = self.add_button("Копирование папки датасета", 250, 40)
-        self.btn_rand = self.add_button("Создать датасет со случ. числами", 250, 40)
+        self.btn_create = self.add_button("Создать аннотацию", 300, 40)
+        self.btn_copy = self.add_button("Создать копию датасета и его аннотацию", 300, 40)
+        self.btn_rand = self.add_button("Создать датасет со случ. числами и его аннотацию", 300, 40)
 
         self.btn_iterator = self.add_button("Начать итерацию", 200, 40)
         self.btn_next_first = self.add_disabled_button("Следующий отзыв с рейтингом 1", 200, 30)
@@ -47,6 +48,7 @@ class MainWindow(QMainWindow):
         self.btn_close = self.add_button("Закрыть программу", 200, 30)
 
         self.text_label = QLabel(self)
+        self.text_label.setText("Здесь будет отзыв")
         self.text_label.setWordWrap(True)
         self.text_label.setFixedSize(600, 400)
 
@@ -62,6 +64,8 @@ class MainWindow(QMainWindow):
         box_layout.addWidget(self.btn_next_third)
         box_layout.addWidget(self.btn_next_fourth)
         box_layout.addWidget(self.btn_next_fifth)
+        self.path_label=QLabel("Здесь будет обозачен путь активного файла")
+        box_layout.addWidget(self.path_label)
 
         box_layout.addStretch()
 
@@ -95,20 +99,39 @@ class MainWindow(QMainWindow):
 
         self.show()
 
-    def add_button(self, name:str, size_x: int, size_y: int):
+    def add_button(self, name:str, size_w: int, size_h: int):
+        """This function creates active button with specified name and sizes
+        Parametres:
+        
+            name(str): name of the button
+
+            size_w: width of the button
+
+            size_h: height of the button
+            """
         button = QPushButton(name, self)
         button.resize(button.sizeHint())
-        button.setFixedSize(QSize(size_x, size_y))
+        button.setFixedSize(QSize(size_w, size_h))
         return button
 
-    def add_disabled_button(self, name:str, size_x: int, size_y: int):
+    def add_disabled_button(self, name:str, size_w: int, size_h: int):
+        """This function creates inactive button with specified name and sizes
+        Parametres:
+        
+            name(str): name of the button
+
+            size_w: width of the button
+
+            size_h: height of the button
+            """
         button = QPushButton(name, self)
         button.setEnabled(False)
         button.resize(button.sizeHint())
-        button.setFixedSize(QSize(size_x, size_y))
+        button.setFixedSize(QSize(size_w, size_h))
         return button
 
     def create_annotation(self):
+        """This function creates annotation for default dataset"""
         try:
             directory = QFileDialog.getSaveFileName(self, "Выберите папку для создания файла аннотации:", "", "CSV File(*.csv)")[0]
             if directory == "":
@@ -120,6 +143,7 @@ class MainWindow(QMainWindow):
             logging.error(f"Can not create annotation: {exc.message}\n{exc.args}\n")
 
     def copy(self):
+        """This function creates copy of default dataset and his annotation"""
         try:
             file = QFileDialog.getSaveFileName(self, "Выберите файл для создания аннотации:", "", "CSV File(*.csv)")[0]
             directory = QFileDialog.getExistingDirectory(self, "Выберите папку для копирования датасета")
@@ -132,6 +156,7 @@ class MainWindow(QMainWindow):
             logging.error(f"Can not create copy or annotation: {exc.message}\n{exc.args}\n")
 
     def rand(self):
+        """This function creates copy of default dataset with renamed files to random numbers and creates annotation"""
         try:
             file = QFileDialog.getSaveFileName(self, "Выберите файл для создания аннотации:", "", "CSV File(*.csv)")[0]
             directory = QFileDialog.getExistingDirectory(self, "Выберите папку для копирования датасета")
@@ -141,8 +166,7 @@ class MainWindow(QMainWindow):
             copy_random(self.data_path, directory, self.classes, file, 5000)
             QMessageBox.information(None, "Успешно", "Датасет скопирован")
         except Exception as exc:
-                    logging.error(f"Can not create copy or annotation: {exc.message}\n{exc.args}\n")
-                    
+            logging.error(f"Can not create copy or annotation: {exc.message}\n{exc.args}\n")             
 
     def csv_path(self):
         try:
@@ -165,9 +189,10 @@ class MainWindow(QMainWindow):
         element = self.classes_iterator.next_first()
         self.review_path = element
         self.text_label.update()
-        print(self.review_path)
-        file = open(self.review_path, "r")
+        file = open(file=self.review_path, mode="r", encoding="utf-8")
+        self.path_label.setText(self.review_path)
         self.text_label.setText(file.read())
+        
 
     def next_second(self):
         if self.classes_iterator == None:
@@ -176,8 +201,8 @@ class MainWindow(QMainWindow):
         element = self.classes_iterator.next_second()
         self.review_path = element
         self.text_label.update()
-        print(self.review_path)
-        file = open(self.review_path, "r")
+        file = open(file=self.review_path, mode="r", encoding="utf-8")
+        self.path_label.setText(self.review_path)
         self.text_label.setText(file.read())
 
     def next_third(self):
@@ -187,8 +212,8 @@ class MainWindow(QMainWindow):
         element = self.classes_iterator.next_third()
         self.review_path = element
         self.text_label.update()
-        print(self.review_path)
-        file = open(self.review_path, "r")
+        file = open(file=self.review_path, mode="r", encoding="utf-8")
+        self.path_label.setText(self.review_path)
         self.text_label.setText(file.read())
 
     def next_fourth(self):
@@ -198,8 +223,8 @@ class MainWindow(QMainWindow):
         element = self.classes_iterator.next_fourth()
         self.review_path = element
         self.text_label.update()
-        print(self.review_path)
-        file = open(self.review_path, "r")
+        file = open(file=self.review_path, mode="r", encoding="utf-8")
+        self.path_label.setText(self.review_path)
         self.text_label.setText(file.read())
 
     def next_fifth(self):
@@ -209,8 +234,8 @@ class MainWindow(QMainWindow):
         element = self.classes_iterator.next_fifth()
         self.review_path = element
         self.text_label.update()
-        print(self.review_path)
-        file = open(self.review_path, "r")
+        file = open(file=self.review_path, mode="r", encoding="utf-8")
+        self.path_label.setText(self.review_path)
         self.text_label.setText(file.read())
 
 
@@ -223,3 +248,4 @@ if __name__ == "__main__":
 
 
 #Thanks habr.com that you are exist
+#And thanks stackoverflow
