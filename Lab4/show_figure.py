@@ -1,6 +1,7 @@
 import logging
 import matplotlib.pyplot as plt
 import pandas as pd
+from form_and_filter import group_by_month
 
 
 logging.basicConfig(level=logging.INFO)
@@ -27,13 +28,17 @@ def show_figure_month(df: pd.DataFrame,
     try:
         df['Дата'] = pd.to_datetime(df['Дата'])
         df['Месяц'] = df['Дата'].dt.to_period('M')
+    except Exception as ex:
+        logging.error(f"Can't convert date to datetime: {ex}\n{ex.args}\n")
+    try:
+        grouped_df, monthly_avg_df = group_by_month(df)
+        monthly_data = grouped_df[grouped_df['Месяц'] == target_month]
 
-        monthly_data = df[df['Месяц'] == target_month]
+        if monthly_data.empty:
+            logging.warning(f"No data available for the month: {target_month}")
+
         median_value = monthly_data['Курс'].median()
         mean_value = monthly_data['Курс'].mean()
-    except Exception as ex:
-        logging.error(f"can't get monthly data: {ex}\n{ex.args}\n")
-    try:
         plt.figure(figsize=(10, 6))
         plt.plot(monthly_data['Дата'], monthly_data['Курс'], label='Курс')
         plt.axhline(median_value, color='red', linestyle='--', label='Медиана')
@@ -45,4 +50,4 @@ def show_figure_month(df: pd.DataFrame,
         plt.legend()
         plt.show()
     except Exception as ex:
-        logging.error(f"can't show figure: {ex}\n{ex.args}\n")
+        logging.error(f"Can't show figure for the month: {ex}\n{ex.args}\n")
