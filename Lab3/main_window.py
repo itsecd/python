@@ -134,7 +134,8 @@ class MainWindow(QMainWindow):
     def create_annotation(self):
         """This function creates annotation for default dataset"""
         try:
-            directory = QFileDialog.getSaveFileName(self, "Выберите папку для создания файла аннотации:", "", "CSV File(*.csv)")[0]
+            directory = QFileDialog.getSaveFileName(self, "Выберите папку для создания файла аннотации:",\
+                                                     "", "CSV File(*.csv)")[0]
             if directory == "":
                 return
             temp = create_csv_list(self.data_path, self.classes)
@@ -146,7 +147,8 @@ class MainWindow(QMainWindow):
     def copy(self):
         """This function creates copy of default dataset and his annotation"""
         try:
-            file = QFileDialog.getSaveFileName(self, "Выберите файл для создания аннотации:", "", "CSV File(*.csv)")[0]
+            file = QFileDialog.getSaveFileName(self, "Выберите файл для создания аннотации:", "",\
+                                                "CSV File(*.csv)")[0]
             directory = QFileDialog.getExistingDirectory(self, "Выберите папку для копирования датасета")
             if (file == "") or (directory == ""):
                 QMessageBox.information(None, "Не указан путь", "Не был выбран файл или папка")
@@ -157,9 +159,11 @@ class MainWindow(QMainWindow):
             logging.error(f"Can not create copy or annotation: {exc.message}\n{exc.args}\n")
 
     def rand(self):
-        """This function creates copy of default dataset with renamed files to random numbers and creates annotation"""
+        """This function creates copy of default dataset with renamed files to random numbers\
+            and creates annotation"""
         try:
-            file = QFileDialog.getSaveFileName(self, "Выберите файл для создания аннотации:", "", "CSV File(*.csv)")[0]
+            file = QFileDialog.getSaveFileName(self, "Выберите файл для создания аннотации:", "",\
+                                                "CSV File(*.csv)")[0]
             directory = QFileDialog.getExistingDirectory(self, "Выберите папку для копирования датасета")
             if (file == "") or (directory == ""):
                 QMessageBox.information(None, "Не указан путь", "Не был выбран файл или папка")
@@ -174,7 +178,8 @@ class MainWindow(QMainWindow):
             path = QFileDialog.getOpenFileName(self, "Выберите файл для итерации:", "", "CSV File(*.csv)")[0]
             if path == "":
                 return
-            self.classes_iterator = ClassIterator(path, self.classes[0], self.classes[1], self.classes[2], self.classes[3], self.classes[4])
+            self.classes_iterator = ClassIterator(path, self.classes[0], self.classes[1],\
+                                                   self.classes[2], self.classes[3], self.classes[4])
             self.btn_next_first.setEnabled(True)
             self.btn_next_second.setEnabled(True)
             self.btn_next_third.setEnabled(True)
