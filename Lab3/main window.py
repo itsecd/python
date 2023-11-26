@@ -1,180 +1,111 @@
+import os
 import sys
-from PyQt6.QtWidgets import QApplication, QMainWindow, QWidget, QVBoxLayout, QHBoxLayout, QLabel, QPushButton, QFileDialog, QMessageBox
-from PyQt6.QtGui import QIcon, QPixmap, QAction
-from PyQt6.QtCore import Qt, QCoreApplication, QEvent
-from PyQt6.QtWidgets import QDesktopWidget
-sys.path.insert(1, "Lab2")
-from iterator import DirectoryIterator
+from PyQt5 import QtWidgets, QtGui, QtCore
+sys.path.insert(0,"Lab2")
 from create_annotation import get_absolute_paths, get_relative_paths, write_annotation_to_csv
+from copy_dataset_in_new_folder import replace_images
+from copy_dataset_random_names import process_images
+from path_of_next import get_next
+from iterator import DirectoryIterator
 
-class Window(QMainWindow):
-    def __init__(self) -> None:
+class MainWindow(QtWidgets.QMainWindow):
+    def __init__(self):
         super().__init__()
 
-        self.initUI()
-        self.initIterators()
-        self.createActions()
-        self.createMenuBar()
-        self.createToolBar()
+        self.setWindowTitle("Dataset Annotation App")
+        self.setGeometry(100, 100, 800, 600)
 
-    def initUI(self) -> None:
-        self.center()
-        self.setWindowTitle('Cats & Dogs')
-        self.setWindowIcon(QIcon('img/main_icon.png'))
-        self.centralWidget = QWidget()
-        self.setCentralWidget(self.centralWidget)
+        self.central_widget = QtWidgets.QWidget()
+        self.setCentralWidget(self.central_widget)
 
-        cat_btn = QPushButton('Next Cat', self)
-        dog_btn = QPushButton('Next Dog', self)
+        self.layout = QtWidgets.QVBoxLayout()
 
-        pixmap = QPixmap('img/both.jpg')
-        self.lbl = QLabel(self)
-        self.lbl.setPixmap(pixmap)
-        self.lbl.setAlignment(Qt.AlignmentFlag.AlignCenter)
+        self.folder_path_label = QtWidgets.QLabel("Dataset Folder:")
+        self.layout.addWidget(self.folder_path_label)
 
-        hbox = QHBoxLayout()
-        hbox.addSpacing(1)
-        hbox.addWidget(cat_btn)
-        hbox.addWidget(dog_btn)
+        self.create_annotation_button = QtWidgets.QPushButton("Create Annotation File")
+        self.create_annotation_button.clicked.connect(self.create_annotation_file)
+        self.layout.addWidget(self.create_annotation_button)
 
-        vbox = QVBoxLayout()
-        vbox.addSpacing(1)
-        vbox.addWidget(self.lbl)
-        vbox.addLayout(hbox)
+        self.create_dataset_button = QtWidgets.QPushButton("Create Dataset")
+        self.create_dataset_button.clicked.connect(self.create_dataset)
+        self.layout.addWidget(self.create_dataset_button)
 
-        self.centralWidget.setLayout(vbox)
+        self.next_cat_button = QtWidgets.QPushButton("Next Cat")
+        self.next_cat_button.clicked.connect(lambda: self.get_next_instance('cat'))
+        self.layout.addWidget(self.next_cat_button)
 
-        cat_btn.clicked.connect(self.nextCat)
-        dog_btn.clicked.connect(self.nextDog)
+        self.next_dog_button = QtWidgets.QPushButton("Next Dog")
+        self.next_dog_button.clicked.connect(lambda: self.get_next_instance('dog'))
+        self.layout.addWidget(self.next_dog_button)
 
-        self.folderpath = ' '
+        self.exit_button = QtWidgets.QPushButton("EXIT", self)
+        self.exit_button.clicked.connect(self.close)
+        self.layout.addWidget(self.exit_button)
 
-        self.showMaximized()
+        self.scroll_area = QtWidgets.QScrollArea()
+        self.scroll_area.setWidgetResizable(True)
+        self.central_layout = QtWidgets.QVBoxLayout(self.central_widget)
+        self.central_layout.addLayout(self.layout)
+        self.central_layout.addWidget(self.scroll_area)
 
-    def initIterators(self) -> None:
-        self.cats = DirectoryIterator('cat', 'dataset')
-        self.dogs = DirectoryIterator('dog', 'dataset')
+    def get_dataset_path(self):
+        folder_path = QtWidgets.QFileDialog.getExistingDirectory(self, 'Select Folder')
+        self.folder_path_label.setText(f"Dataset Folder: {folder_path}")
+        return folder_path
 
-    def nextCat(self) -> None:
-        lbl_size = self.lbl.size()
-        next_image = next(self.cats)
-        if next_image is not None:
-            img = QPixmap(next_image).scaled(
-                lbl_size, aspectRatioMode=Qt.AspectRatioMode.KeepAspectRatio)
-            self.lbl.setPixmap(img)
-            self.lbl.setAlignment(Qt.AlignmentFlag.AlignCenter)
+    def create_annotation_file(self):
+        folder_path = self.get_dataset_path()
+        annotation_file_path, _ = QtWidgets.QFileDialog.getSaveFileName(self, 'Save Annotation File', '', 'CSV Files (*.csv)')
+
+        if annotation_file_path:
+            cat_absolute_paths = get_absolute_paths('cat', folder_path)
+            cat_relative_paths = get_relative_paths('cat', folder_path)
+            dog_absolute_paths = get_absolute_paths('dog', folder_path)
+            dog_relative_paths = get_relative_paths('dog', folder_path)
+
+            write_annotation_to_csv(annotation_file_path, cat_absolute_paths, cat_relative_paths, 'cat')
+            write_annotation_to_csv(annotation_file_path, dog_absolute_paths, dog_relative_paths, 'dog')
+
+    def create_dataset(self):
+        folder_path = self.get_dataset_path()
+        new_dataset_path = QtWidgets.QFileDialog.getExistingDirectory(self, 'Select Destination Folder')
+
+        if new_dataset_path:
+            replace_images('cat', folder_path)
+            replace_images('dog', folder_path)
+
+            process_images('cat', folder_path, new_dataset_path)
+            process_images('dog', folder_path, new_dataset_path)
+
+    def get_next_instance(self, class_name):
+        csv_path, _ = QtWidgets.QFileDialog.getOpenFileName(self, 'Select Annotation File', '', 'CSV Files (*.csv)')
+
+        if csv_path:
+            iterator = DirectoryIterator(class_name, csv_path)
+            next_path = next(iterator, None)
+
+            if next_path:
+                QtWidgets.QMessageBox.information(self, "Next Instance", f"Next {class_name}: {next_path}")
+            else:
+                QtWidgets.QMessageBox.warning(self, "Error", f"No more instances of {class_name}.")
+
+    def display_image(self, image_path: str) -> None:
+        pixmap = QtGui.QPixmap(image_path)
+
+        if pixmap.isNull():
+            print("Не удалось загрузить изображение:", image_path)
         else:
-            self.initIterators()
-            self.nextCat()
+            print("Изображение успешно загружено.")
+            pixmap = pixmap.scaledToWidth(self.scroll_area.width())
+            label = QtWidgets.QLabel()
+            label.setAlignment(QtCore.Qt.AlignmentFlag.AlignCenter)
+            label.setPixmap(pixmap)
 
-    def nextDog(self) -> None:
-        lbl_size = self.lbl.size()
-        next_image = next(self.dogs)
-        if next_image is not None:
-            img = QPixmap(next_image).scaled(
-                lbl_size, aspectRatioMode=Qt.AspectRatioMode.KeepAspectRatio)
-            self.lbl.setPixmap(img)
-            self.lbl.setAlignment(Qt.AlignmentFlag.AlignCenter)
-        else:
-            self.initIterators()
-            self.nextDog()
+            self.scroll_area.setWidget(label)
 
-    def center(self) -> None:
-        widget_rect = self.frameGeometry()
-        pc_rect = QDesktopWidget().availableGeometry().center()
-        widget_rect.moveCenter(pc_rect)
-        self.move(widget_rect.center())
-
-    def createMenuBar(self) -> None:
-        menuBar = self.menuBar()
-
-        self.fileMenu = menuBar.addMenu('&File')
-        self.fileMenu.addAction(self.exitAction)
-        self.fileMenu.addAction(self.changeAction)
-
-        self.annotMenu = menuBar.addMenu('&Annotation')
-        self.annotMenu.addAction(self.createAnnotAction)
-
-        self.dataMenu = menuBar.addMenu('&Dataset')
-        self.dataMenu.addAction(self.createData2Action)
-
-    def createToolBar(self) -> None:
-        fileToolBar = self.addToolBar('File')
-        fileToolBar.addAction(self.exitAction)
-
-        annotToolBar = self.addToolBar('Annotation')
-        annotToolBar.addAction(self.createAnnotAction)
-
-    def createActions(self) -> None:
-        self.exitAction = QAction(QIcon('img/exit.png'), '&Exit')
-        self.exitAction.triggered.connect(QCoreApplication.instance().quit)
-
-        self.changeAction = QAction(QIcon('img/change.png'), '&Change dataset')
-        self.changeAction.triggered.connect(self.changeDataset)
-
-        self.createAnnotAction = QAction(
-            QIcon('img/csv.png'), '&Create annotation for current dataset')
-        self.createAnnotAction.triggered.connect(self.createAnnotation)
-
-        self.createData2Action = QAction(
-            QIcon('img/new_dataset.png'), '&Create dataset2')
-        self.createData2Action.triggered.connect(self.createDataset2)
-
-        self.createData3Action = QAction(
-            QIcon('img/new_dataset.png'), '&Create dataset3')
-        self.createData3Action.triggered.connect(self.createDataset3)
-
-    def createAnnotation(self) -> None:
-        if 'dataset2' in str(self.folderpath):
-            write_annotation_to_csv('dataset2/data.csv', get_absolute_paths('cat', 'dataset2'),
-                                    get_relative_paths('cat', 'dataset2'), 'cat')
-            write_annotation_to_csv('dataset2/data.csv', get_absolute_paths('dog', 'dataset2'),
-                                    get_relative_paths('dog', 'dataset2'), 'dog')
-        elif 'dataset3' in str(self.folderpath):
-            write_annotation_to_csv('dataset3/data.csv', get_absolute_paths('cat', 'dataset3'),
-                                    get_relative_paths('cat', 'dataset3'), 'cat')
-            write_annotation_to_csv('dataset3/data.csv', get_absolute_paths('dog', 'dataset3'),
-                                    get_relative_paths('dog', 'dataset3'), 'dog')
-        elif 'dataset' in str(self.folderpath):
-            write_annotation_to_csv('dataset/data.csv', get_absolute_paths('cat', 'dataset'),
-                                    get_relative_paths('cat', 'dataset'), 'cat')
-            write_annotation_to_csv('dataset/data.csv', get_absolute_paths('dog', 'dataset'),
-                                    get_relative_paths('dog', 'dataset'), 'dog')
-
-    def createDataset2(self) -> None:
-        write_annotation_to_csv('dataset2/data.csv', get_absolute_paths('cat', 'dataset2'),
-                                get_relative_paths('cat', 'dataset2'), 'cat')
-        write_annotation_to_csv('dataset2/data.csv', get_absolute_paths('dog', 'dataset2'),
-                                get_relative_paths('dog', 'dataset2'), 'dog')
-
-        self.dataMenu.addAction(self.createData3Action)
-
-    def createDataset3(self) -> None:
-        write_annotation_to_csv('dataset3/data.csv', get_absolute_paths('cat', 'dataset3'),
-                                get_relative_paths('cat', 'dataset3'), 'cat')
-        write_annotation_to_csv('dataset3/data.csv', get_absolute_paths('dog', 'dataset3'),
-                                get_relative_paths('dog', 'dataset3'), 'dog')
-
-    def changeDataset(self) -> None:
-        reply = QMessageBox.question(self, 'Warning', f'Are you sure you want to change current dataset?\nCurrent dataset: {str(self.folderpath)}',
-                                     QMessageBox.StandardButton.Yes | QMessageBox.StandardButton.No)
-
-        if reply == QMessageBox.StandardButton.Yes:
-            self.folderpath = QFileDialog.getExistingDirectory(
-                self, 'Select Folder')
-        else:
-            pass
-
-    def closeEvent(self, event: QEvent) -> None:
-        reply = QMessageBox.question(self, 'Warning', 'Are you sure to quit?',
-                                     QMessageBox.StandardButton.Yes | QMessageBox.StandardButton.No)
-        if reply == QMessageBox.StandardButton.Yes:
-            event.accept()
-        else:
-            event.ignore()
-
-
-if __name__ == '__main__':
-    app = QApplication(sys.argv)
-    window = Window()
-    sys.exit(app.exec())
+if __name__ == "__main__":
+    app = QtWidgets.QApplication([])
+    main_window = MainWindow()
+    main_window.show()
+    app.exec_()
