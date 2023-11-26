@@ -1,28 +1,34 @@
 import argparse
+import logging
 import pandas as pd
 from datetime import datetime, date
 import matplotlib.pyplot as plt
 
 
+logging.basicConfig(level=logging.INFO)
+
+
 def form_dataframe(file_path: str) -> pd.DataFrame:
     """the function takes a file_path to the data file and return dataframe with 2 new cols"""
-    df = pd.read_csv(file_path,delimiter=",")
-    df.columns = ['Дата', 'Курс']
-    df['Курс'] = pd.to_numeric(df['Курс'], errors="coerce")
-    
-    invalid_values = df[df['Курс'].isnull()]
-    if not invalid_values.empty:
-        df = df.dropna(subset=['Курс'])
+    try:
+        df = pd.read_csv(file_path,delimiter=",")
+        df.columns = ['Дата', 'Курс']
+        df['Курс'] = pd.to_numeric(df['Курс'], errors="coerce")
         
-    median_value = df['Курс'].median()
-    mean_value = df['Курс'].mean()
-    df['Отклонение от медианы'] = df['Курс'] - median_value
-    df['Отклонение от среднего'] = df['Курс'] - mean_value
-    
-    statistics = df[['Курс', 'Отклонение от медианы', 'Отклонение от среднего']].describe()
-    print(statistics)
-    
-    return df
+        invalid_values = df[df['Курс'].isnull()]
+        if not invalid_values.empty:
+            df = df.dropna(subset=['Курс'])
+            
+        median_value = df['Курс'].median()
+        mean_value = df['Курс'].mean()
+        df['Отклонение от медианы'] = df['Курс'] - median_value
+        df['Отклонение от среднего'] = df['Курс'] - mean_value
+        
+        statistics = df[['Курс', 'Отклонение от медианы', 'Отклонение от среднего']].describe()
+        print(statistics)
+        return df
+    except Exception as ex:
+        logging.error(f"Can't form dataframe: {ex}\n{ex.args}\n")    
 
 
 def filter_by_deviation(df: pd.DataFrame,
@@ -32,7 +38,7 @@ def filter_by_deviation(df: pd.DataFrame,
     mean_value = df['Курс'].mean()
     df['Отклонение от среднего'] = df['Курс'] - mean_value
 
-    filtered_df = df[df['Отклонение от среднего'] >= deviation_value]
+    filtered_df = df[df['Отклонение от среднего'] >= deviation_value].copy()
 
     filtered_df.drop(columns=['Отклонение от среднего'], inplace=True)
 
@@ -51,44 +57,57 @@ def filter_by_date(df: pd.DataFrame,
 
 def group_by_month(df: pd.DataFrame) -> (pd.DataFrame,pd.DataFrame):
     """the function takes dataframe and return df grouped by month and monthly average value"""
-    df['Дата'] = pd.to_datetime(df['Дата'])
-    df['Месяц'] = df['Дата'].dt.to_period('M')
+    try:
+        df['Дата'] = pd.to_datetime(df['Дата'])
+        df['Месяц'] = df['Дата'].dt.to_period('M')
+        
+        monthly_avg_df = df.groupby('Месяц')['Курс'].mean().reset_index()
+        return (df, monthly_avg_df)
+    except Exception as ex:
+        logging.error(f"can't group by month: {ex}\n{ex.args}\n")
     
-    monthly_avg_df = df.groupby('Месяц')['Курс'].mean().reset_index()
-    return (df, monthly_avg_df)
 
 
 def show_figure(df: pd.DataFrame) -> None:
     """the function takes dataframe and show it's graph"""
-    plt.figure(figsize=(10, 6))
-    plt.plot(df['Дата'], df['Курс'])
-    plt.title('График изменения курса за весь период')
-    plt.xlabel('Дата')
-    plt.ylabel('Курс')
-    plt.show()
+    try:
+        df.loc[:, 'Дата'] = pd.to_datetime(df['Дата'])
+        plt.figure(figsize=(10, 6))
+        plt.plot(df['Дата'], df['Курс'])
+        plt.title('График изменения курса за весь период')
+        plt.xlabel('Дата')
+        plt.ylabel('Курс')
+        plt.show()
+    except Exception as ex:
+        logging.error(f"can't show figure: {ex}\n{ex.args}\n")
 
 
 def show_figure_month(df: pd.DataFrame,
                       target_month: str
                       ) -> None:
     """the function takes dataframe and show it's graph by month"""
-    df['Дата'] = pd.to_datetime(df['Дата'])
-    df['Месяц'] = df['Дата'].dt.to_period('M')
+    try:
+        df['Дата'] = pd.to_datetime(df['Дата'])
+        df['Месяц'] = df['Дата'].dt.to_period('M')
 
-    monthly_data = df[df['Месяц'] == target_month]
-    median_value = monthly_data['Курс'].median()
-    mean_value = monthly_data['Курс'].mean()
+        monthly_data = df[df['Месяц'] == target_month]
+        median_value = monthly_data['Курс'].median()
+        mean_value = monthly_data['Курс'].mean()
+    except Exception as ex:
+        logging.error(f"can't get monthly data: {ex}\n{ex.args}\n")
+    try:
+        plt.figure(figsize=(10, 6))
+        plt.plot(monthly_data['Дата'], monthly_data['Курс'], label='Курс')
+        plt.axhline(median_value, color='red', linestyle='--', label='Медиана')
+        plt.axhline(mean_value, color='green', linestyle='--', label='Среднее значение')
 
-    plt.figure(figsize=(10, 6))
-    plt.plot(monthly_data['Дата'], monthly_data['Курс'], label='Курс')
-    plt.axhline(median_value, color='red', linestyle='--', label='Медиана')
-    plt.axhline(mean_value, color='green', linestyle='--', label='Среднее значение')
-
-    plt.title(f'График изменения курса за {target_month}')
-    plt.xlabel('Дата')
-    plt.ylabel('Курс')
-    plt.legend()
-    plt.show()
+        plt.title(f'График изменения курса за {target_month}')
+        plt.xlabel('Дата')
+        plt.ylabel('Курс')
+        plt.legend()
+        plt.show()
+    except Exception as ex:
+        logging.error(f"can't show figure: {ex}\n{ex.args}\n")
 
 
 if __name__ == "__main__":
@@ -99,7 +118,7 @@ if __name__ == "__main__":
                         help='the path to the csv file with the data'
                         )
     parser.add_argument('--new_path',
-                        type=str, default="stat.csv",
+                        type=str, default="dataset/stat.csv",
                         help='new path of modified csv'
                         )
     parser.add_argument('--deviation_value',
