@@ -7,7 +7,6 @@ from PyQt6.QtWidgets import (QApplication, QMainWindow,
                              QFileDialog, QVBoxLayout, 
                              QWidget, QGridLayout)
 
-
 sys.path.insert(1, "D:/AppProgPython/appprog/Lab2")
 from iterator import ClassIterator
 from create_annotation import create_csv_list, write_into_csv
@@ -39,12 +38,12 @@ class MainWindow(QMainWindow):
         self.btn_copy = self.add_button("Создать копию датасета и его аннотацию", 300, 40)
         self.btn_rand = self.add_button("Создать датасет со случ. числами и его аннотацию", 300, 40)
 
-        self.btn_iterator = self.add_button("Начать итерацию", 200, 40)
-        self.btn_next_first = self.add_disabled_button("Следующий отзыв с рейтингом 1", 200, 30)
-        self.btn_next_second = self.add_disabled_button("Следующий отзыв с рейтингом 2", 200, 30)
-        self.btn_next_third = self.add_disabled_button("Следующий отзыв с рейтингом 3", 200, 30)
-        self.btn_next_fourth = self.add_disabled_button("Следующий отзыв с рейтингом 4", 200, 30)
-        self.btn_next_fifth = self.add_disabled_button("Следующий отзыв с рейтингом 5", 200, 30)
+        self.btn_iterator = self.add_button("Начать итерацию", 250, 40)
+        self.btn_next_first = self.add_disabled_button("Следующий отзыв с рейтингом 1 ==>", 250, 30)
+        self.btn_next_second = self.add_disabled_button("Следующий отзыв с рейтингом 2 ==>", 250, 30)
+        self.btn_next_third = self.add_disabled_button("Следующий отзыв с рейтингом 3 ==>", 250, 30)
+        self.btn_next_fourth = self.add_disabled_button("Следующий отзыв с рейтингом 4 ==>", 250, 30)
+        self.btn_next_fifth = self.add_disabled_button("Следующий отзыв с рейтингом 5 ==>", 250, 30)
 
         self.btn_close = self.add_button("Закрыть программу", 200, 30)
 
@@ -259,9 +258,3 @@ if __name__ == "__main__":
     app = QApplication(sys.argv)
     window = MainWindow()
     app.exec()
-
-
-
-
-#Thanks habr.com that you are exist
-#And thanks stackoverflow
