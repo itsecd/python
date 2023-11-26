@@ -192,10 +192,14 @@ class MainWindow(QMainWindow):
         """Function returns the path to the next element of the first class
         and opens text review in the widget"""
         if self.classes_iterator == None:
-            QMessageBox(None, "Не выбран файл", "Не выбран файл для итерации")
+            QMessageBox.information(None, "Не выбран файл", "Не выбран файл для итерации")
             return
         element = self.classes_iterator.next_first()
         self.review_path = element
+        if self.review_path == None:
+            QMessageBox.information(None, "Конец класса", "Файлы для класса кончились")
+            self.btn_next_first.setEnabled(False)
+            return
         self.text_label.update()
         file = open(file=self.review_path, mode="r", encoding="utf-8")
         self.path_label.setText(self.review_path)
@@ -206,10 +210,14 @@ class MainWindow(QMainWindow):
         """Function returns the path to the next element of the second class
         and opens text review in the widget"""
         if self.classes_iterator == None:
-            QMessageBox(None, "Не выбран файл", "Не выбран файл для итерации")
+            QMessageBox.information(None, "Не выбран файл", "Не выбран файл для итерации")
             return
         element = self.classes_iterator.next_second()
         self.review_path = element
+        if self.review_path == None:
+            QMessageBox.information(None, "Конец класса", "Файлы для класса кончились")
+            self.btn_next_second.setEnabled(False)
+            return
         self.text_label.update()
         file = open(file=self.review_path, mode="r", encoding="utf-8")
         self.path_label.setText(self.review_path)
@@ -219,10 +227,14 @@ class MainWindow(QMainWindow):
         """Function returns the path to the next element of the third class
         and opens text review in the widget"""
         if self.classes_iterator == None:
-            QMessageBox(None, "Не выбран файл", "Не выбран файл для итерации")
+            QMessageBox.information(None, "Не выбран файл", "Не выбран файл для итерации")
             return
         element = self.classes_iterator.next_third()
         self.review_path = element
+        if self.review_path == None:
+            QMessageBox.information(None, "Конец класса", "Файлы для класса кончились")
+            self.btn_next_third.setEnabled(False)
+            return
         self.text_label.update()
         file = open(file=self.review_path, mode="r", encoding="utf-8")
         self.path_label.setText(self.review_path)
@@ -232,10 +244,14 @@ class MainWindow(QMainWindow):
         """Function returns the path to the next element of the fourth class
         and opens text review in the widget"""
         if self.classes_iterator == None:
-            QMessageBox(None, "Не выбран файл", "Не выбран файл для итерации")
+            QMessageBox.information(None, "Не выбран файл", "Не выбран файл для итерации")
             return
         element = self.classes_iterator.next_fourth()
         self.review_path = element
+        if self.review_path == None:
+            QMessageBox.information(None, "Конец класса", "Файлы для класса кончились")
+            self.btn_next_fourth.setEnabled(False)
+            return
         self.text_label.update()
         file = open(file=self.review_path, mode="r", encoding="utf-8")
         self.path_label.setText(self.review_path)
@@ -245,10 +261,14 @@ class MainWindow(QMainWindow):
         """Function returns the path to the next element of the fifth class
         and opens text review in the widget"""
         if self.classes_iterator == None:
-            QMessageBox(None, "Не выбран файл", "Не выбран файл для итерации")
+            QMessageBox.information(None, "Не выбран файл", "Не выбран файл для итерации")
             return
         element = self.classes_iterator.next_fifth()
         self.review_path = element
+        if self.review_path == None:
+            QMessageBox.information(None, "Конец класса", "Файлы для класса кончились")
+            self.btn_next_fifth.setEnabled(False)
+            return
         self.text_label.update()
         file = open(file=self.review_path, mode="r", encoding="utf-8")
         self.path_label.setText(self.review_path)

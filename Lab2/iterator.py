@@ -23,7 +23,7 @@ class PathIterator:
             self.count += 1
             return self.data[self.count-1]
         else:
-            raise StopIteration
+            return None
 
 class ClassIterator:
     def __init__(self, path, first_class, second_class, third_class, fourth_class, fifth_class):
