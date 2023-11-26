@@ -45,7 +45,7 @@ def create_txt(count:int, dataset_name: str, rating: int, review: str) -> None:
     create_folder(rate_folder)
     review_filename = f"{count:04}.txt"
     review_path = os.path.join(rate_folder, review_filename)
-    with open(review_path, mode="w", encoding="utf-8") as review_file:
+    with open(review_path, mode="w", encoding="ansi") as review_file:
         review_file.write(review)
 
 
