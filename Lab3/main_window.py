@@ -2,7 +2,7 @@ import sys
 import os
 from PyQt6.QtWidgets import QApplication, QWidget, QVBoxLayout, QLabel, QPushButton, QFileDialog, QComboBox, QMessageBox, QDialog, QDialogButtonBox, QVBoxLayout
 from PyQt6.QtGui import QPixmap
-from PyQt6.QtCore import Qt
+
 sys.path.insert(0,"Lab2")
 from make_rel_abs_path import get_full_paths, get_rel_paths, write_to_csv
 from copy_dataset_no_random import replace_images as replace_images_no_random
@@ -10,7 +10,7 @@ from copy_dataset_random import replace_images_and_randomize
 from iterator import ElementIterator
 
 class CreateDatasetDialog(QDialog):
-    def __init__(self):
+    def __init__(self)-> None:
         super().__init__()
         self.setWindowTitle('Выберите тип датасета')
         self.layout = QVBoxLayout()
@@ -28,7 +28,7 @@ class CreateDatasetDialog(QDialog):
         self.setLayout(self.layout)
 
 class App(QWidget):
-    def __init__(self):
+    def __init__(self)-> None:
         super().__init__()
         self.setWindowTitle('Dataset Manager')
         self.layout = QVBoxLayout()
@@ -66,7 +66,8 @@ class App(QWidget):
         self.setFixedSize(320, 400)    
 
 
-    def select_dataset_folder(self):
+    def select_dataset_folder(self)-> None:
+        """function for selecting a directory"""
         self.dataset_path = QFileDialog.getExistingDirectory(self, 'Выберите папку с датасетом')
         if self.dataset_path:
             QMessageBox.about(self, "Выбрана директория", f"Выбрана директория: {self.dataset_path}")
@@ -76,7 +77,8 @@ class App(QWidget):
         else:
             QMessageBox.about(self, "Ошибка", "Пожалуйста, выберите директорию")
 
-    def create_csv(self, dataset_path):
+    def create_csv(self, dataset_path:str)-> None:
+        """function for creating an annotation for an iterator"""
         brown_full_paths = get_full_paths('brown bear', dataset_path)
         brown_rel_paths = get_rel_paths('brown bear', dataset_path)
         polar_full_paths = get_full_paths('polar bear', dataset_path)
@@ -89,7 +91,9 @@ class App(QWidget):
         write_to_csv(csv_file, brown_full_paths, brown_rel_paths, 'brown bear')
         write_to_csv(csv_file, polar_full_paths, polar_rel_paths, 'polar bear')
 
-    def create_annotation(self):
+
+    def create_annotation(self)-> None:
+        """function for manual annotation creation"""
         if self.dataset_path:
             self.annotation_path, _ = QFileDialog.getSaveFileName(self, 'Укажите файл аннотации', '', 'CSV Files (*.csv)')
 
@@ -101,10 +105,13 @@ class App(QWidget):
 
                 write_to_csv(self.annotation_path, brown_full_paths, brown_rel_paths, 'brown bear')
                 write_to_csv(self.annotation_path, polar_full_paths, polar_rel_paths, 'polar bear')
+
+                QMessageBox.about(self, "Успех", "Файл аннотации успешно создан.")
         else:
             QMessageBox.about(self, "Ошибка", "Пожалуйста, выберите директорию")
 
-    def show_create_dataset_dialog(self):
+    def show_create_dataset_dialog(self)-> None:
+        """function for creating a selection how to create a dataset"""
         if self.dataset_path:
             dialog = CreateDatasetDialog()
             result = dialog.exec()
@@ -118,29 +125,36 @@ class App(QWidget):
                     else:
                         replace_images_no_random('brown bear', self.dataset_path)
                         replace_images_no_random('polar bear', self.dataset_path)
-            else:
-                QMessageBox.about(self, "Ошибка", "Пожалуйста, выберите директорию")
+                QMessageBox.about(self, "Успех", "Датасет успешно создан.")
+        else:
+            QMessageBox.about(self, "Ошибка", "Пожалуйста, выберите директорию")
     
 
-    def show_image(self, image_path):
+    def show_image(self, image_path: str) -> None:
+        """function for displaying an image"""
         pixmap = QPixmap(image_path)
         if not pixmap.isNull():
             self.image_label.setPixmap(pixmap.scaled(300, 300))
         else:
             self.image_label.setText('Изображение не найдено')
 
-    def show_next_brown_bear(self):
+    def show_next_brown_bear(self)-> None:
+        """function to switch the brown bear"""
         if self.dataset_path and self.brown_iterator:
             next_path = next(self.brown_iterator)
             if next_path:
                 self.show_image(next_path)
+        else:
+            QMessageBox.about(self, "Ошибка", "Пожалуйста, выберите директорию")
 
-    def show_next_polar_bear(self):
+    def show_next_polar_bear(self)-> None:
+        """function to switch the polar bear"""
         if self.dataset_path and self.polar_iterator:
             next_path = next(self.polar_iterator)
             if next_path:
                 self.show_image(next_path)
-    
+        else:
+            QMessageBox.about(self, "Ошибка", "Пожалуйста, выберите директорию")
 
 if __name__ == '__main__':
     app = QApplication(sys.argv)
