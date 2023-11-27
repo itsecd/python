@@ -5,7 +5,8 @@ from PyQt6.QtCore import QSize
 from PyQt6.QtWidgets import (QApplication, QMainWindow, 
                              QPushButton, QMessageBox,QLabel, 
                              QFileDialog, QVBoxLayout, 
-                             QWidget, QGridLayout)
+                             QWidget, QGridLayout,
+                             QComboBox)
 
 sys.path.insert(1, "D:/AppProgPython/appprog/Lab2")
 from iterator import ClassIterator
@@ -34,16 +35,18 @@ class MainWindow(QMainWindow):
         src.setFixedSize(QSize(250,40))
         box_layout.addWidget(src)
 
+        self.combo = QComboBox(self)
+        self.combo.addItems(["Рейтинг 1", "Рейтинг 2", "Рейтинг 3", "Рейтинг 4", "Рейтинг 5"])
+        self.combo.setFixedSize(QSize(250, 20))
+
         self.btn_create = self.add_button("Создать аннотацию", 300, 40)
         self.btn_copy = self.add_button("Создать копию датасета и его аннотацию", 300, 40)
         self.btn_rand = self.add_button("Создать датасет со случ. числами и его аннотацию", 300, 40)
 
         self.btn_iterator = self.add_button("Начать итерацию", 250, 40)
-        self.btn_next_first = self.add_disabled_button("Следующий отзыв с рейтингом 1 ==>", 250, 30)
-        self.btn_next_second = self.add_disabled_button("Следующий отзыв с рейтингом 2 ==>", 250, 30)
-        self.btn_next_third = self.add_disabled_button("Следующий отзыв с рейтингом 3 ==>", 250, 30)
-        self.btn_next_fourth = self.add_disabled_button("Следующий отзыв с рейтингом 4 ==>", 250, 30)
-        self.btn_next_fifth = self.add_disabled_button("Следующий отзыв с рейтингом 5 ==>", 250, 30)
+        self.btn_next = self.add_disabled_button("Следующий отзыв", 250, 30)
+        self.mode_map = {'Рейтинг 1': "1", 'Рейтинг 2': "2", 'Рейтинг 3': "3", 'Рейтинг 4': "4", 'Рейтинг 5': "5"}
+
 
         self.btn_close = self.add_button("Закрыть программу", 200, 30)
 
@@ -59,11 +62,8 @@ class MainWindow(QMainWindow):
         box_layout.addStretch()
 
         box_layout.addWidget(self.btn_iterator)
-        box_layout.addWidget(self.btn_next_first)
-        box_layout.addWidget(self.btn_next_second)
-        box_layout.addWidget(self.btn_next_third)
-        box_layout.addWidget(self.btn_next_fourth)
-        box_layout.addWidget(self.btn_next_fifth)
+        box_layout.addWidget(self.btn_next)
+        box_layout.addWidget(self.combo)
         self.path_label=QLabel("Здесь будет обозачен путь активного файла")
         box_layout.addWidget(self.path_label)
 
@@ -89,11 +89,7 @@ class MainWindow(QMainWindow):
         self.btn_rand.clicked.connect(self.rand)
 
         self.btn_iterator.clicked.connect(self.csv_path)
-        self.btn_next_first.clicked.connect(self.next_first)
-        self.btn_next_second.clicked.connect(self.next_second)
-        self.btn_next_third.clicked.connect(self.next_third)
-        self.btn_next_fourth.clicked.connect(self.next_fourth)
-        self.btn_next_fifth.clicked.connect(self.next_fifth)
+        self.btn_next.clicked.connect(self.next)
 
         self.btn_close.clicked.connect(self.close)
 
@@ -180,94 +176,34 @@ class MainWindow(QMainWindow):
                 return
             self.classes_iterator = ClassIterator(path, self.classes[0], self.classes[1],\
                                                    self.classes[2], self.classes[3], self.classes[4])
-            self.btn_next_first.setEnabled(True)
-            self.btn_next_second.setEnabled(True)
-            self.btn_next_third.setEnabled(True)
-            self.btn_next_fourth.setEnabled(True)
-            self.btn_next_fifth.setEnabled(True)
+            
+            self.btn_next.setEnabled(True)
         except Exception as exc:
             logging.error(f"Incorrect path: {exc.message}\n{exc.args}\n")
     
-    def next_first(self):
-        """Function returns the path to the next element of the first class
+    def next(self):
+        """Function returns the path to the next element of the class
         and opens text review in the widget"""
         if self.classes_iterator == None:
             QMessageBox.information(None, "Не выбран файл", "Не выбран файл для итерации")
             return
-        element = self.classes_iterator.next_first()
-        self.review_path = element
+        if self.combo.currentText() == "Рейтинг 1":
+            element = self.classes_iterator.next_first()
+            self.review_path = element
+        if self.combo.currentText() == "Рейтинг 2":
+            element = self.classes_iterator.next_second()
+            self.review_path = element
+        if self.combo.currentText() == "Рейтинг 3":
+            element = self.classes_iterator.next_third()
+            self.review_path = element
+        if self.combo.currentText() == "Рейтинг 4":
+            element = self.classes_iterator.next_fourth()
+            self.review_path = element
+        if self.combo.currentText() == "Рейтинг 5":
+            element = self.classes_iterator.next_fifth()
+            self.review_path = element
         if self.review_path == None:
             QMessageBox.information(None, "Конец класса", "Файлы для класса кончились")
-            self.btn_next_first.setEnabled(False)
-            return
-        self.text_label.update()
-        file = open(file=self.review_path, mode="r", encoding="utf-8")
-        self.path_label.setText(self.review_path)
-        self.text_label.setText(file.read())
-        
-
-    def next_second(self):
-        """Function returns the path to the next element of the second class
-        and opens text review in the widget"""
-        if self.classes_iterator == None:
-            QMessageBox.information(None, "Не выбран файл", "Не выбран файл для итерации")
-            return
-        element = self.classes_iterator.next_second()
-        self.review_path = element
-        if self.review_path == None:
-            QMessageBox.information(None, "Конец класса", "Файлы для класса кончились")
-            self.btn_next_second.setEnabled(False)
-            return
-        self.text_label.update()
-        file = open(file=self.review_path, mode="r", encoding="utf-8")
-        self.path_label.setText(self.review_path)
-        self.text_label.setText(file.read())
-
-    def next_third(self):
-        """Function returns the path to the next element of the third class
-        and opens text review in the widget"""
-        if self.classes_iterator == None:
-            QMessageBox.information(None, "Не выбран файл", "Не выбран файл для итерации")
-            return
-        element = self.classes_iterator.next_third()
-        self.review_path = element
-        if self.review_path == None:
-            QMessageBox.information(None, "Конец класса", "Файлы для класса кончились")
-            self.btn_next_third.setEnabled(False)
-            return
-        self.text_label.update()
-        file = open(file=self.review_path, mode="r", encoding="utf-8")
-        self.path_label.setText(self.review_path)
-        self.text_label.setText(file.read())
-
-    def next_fourth(self):
-        """Function returns the path to the next element of the fourth class
-        and opens text review in the widget"""
-        if self.classes_iterator == None:
-            QMessageBox.information(None, "Не выбран файл", "Не выбран файл для итерации")
-            return
-        element = self.classes_iterator.next_fourth()
-        self.review_path = element
-        if self.review_path == None:
-            QMessageBox.information(None, "Конец класса", "Файлы для класса кончились")
-            self.btn_next_fourth.setEnabled(False)
-            return
-        self.text_label.update()
-        file = open(file=self.review_path, mode="r", encoding="utf-8")
-        self.path_label.setText(self.review_path)
-        self.text_label.setText(file.read())
-
-    def next_fifth(self):
-        """Function returns the path to the next element of the fifth class
-        and opens text review in the widget"""
-        if self.classes_iterator == None:
-            QMessageBox.information(None, "Не выбран файл", "Не выбран файл для итерации")
-            return
-        element = self.classes_iterator.next_fifth()
-        self.review_path = element
-        if self.review_path == None:
-            QMessageBox.information(None, "Конец класса", "Файлы для класса кончились")
-            self.btn_next_fifth.setEnabled(False)
             return
         self.text_label.update()
         file = open(file=self.review_path, mode="r", encoding="utf-8")
