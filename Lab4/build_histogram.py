@@ -13,20 +13,15 @@ def build_histogram(df: pd.DataFrame, label: int) -> list:
     img = cv2.imread(img_path)
     channels = cv2.split(img)
 
-    hist_blue = np.zeros((256,))
-    hist_green = np.zeros((256,))
-    hist_red = np.zeros((256,))
+    width = df.iloc[random_img_idx]["width"]
+    height = df.iloc[random_img_idx]["height"]
+    depth = df.iloc[random_img_idx]["depth"]
+    answer = []
+    for i in range(depth):
+        hist = cv2.calcHist([channels[i]], [0], None, [256], [0, 256]).flatten() / (width * height)
+        answer.append(hist)
 
-    for channel in channels:
-        hist = cv2.calcHist([channel], [0], None, [256], [0, 256]).flatten()
-        if channel is channels[0]:
-            hist_blue = hist
-        elif channel is channels[1]:
-            hist_green = hist
-        else:
-            hist_red = hist
-
-    return hist_blue, hist_green, hist_red
+    return answer
 
 
 def show_histogram(hists: list) -> None:

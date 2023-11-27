@@ -55,20 +55,23 @@ def main_func(path_annotation:str,
     df.columns = ['absolute_path', 'class']
     df['label'] = df['class'].map({'tiger': 0, 'leopard': 1})
     set_width_height_depth(df)
-    if selector == 0:
-        make_describe_df(df)
-    elif selector == 1:
-        print(filter_df_by_label(df, label))
-    elif selector ==2:
-        print(filter_df_by_width_height_label(df, label, max_width, max_height))
-    elif selector == 3:
-        grouping(df)
-        max_pixel_count, min_pixel_count, mean_pixel_count = max_min_average(df)
-        logging.info(max_pixel_count, "\n", min_pixel_count, "\n", mean_pixel_count, "\n")
-    elif selector == 4:
-        show_histogram(build_histogram(df, label))
-    elif selector == 5:
-        print("balanced: ", is_balanced(df))
+    match selector:
+        case 0:
+            make_describe_df(df)
+        case 1:
+            print(filter_df_by_label(df, label))
+        case 2:
+            print(filter_df_by_width_height_label(df, label, max_width, max_height))
+        case 3:
+            grouping(df)
+            max_pixel_count, min_pixel_count, mean_pixel_count = max_min_average(df)
+            logging.info(max_pixel_count, "\n", min_pixel_count, "\n", mean_pixel_count, "\n")
+        case 4:
+            show_histogram(build_histogram(df, label))
+        case 5:
+            print("balanced: ", is_balanced(df))
+        case _:
+            logging.info("You didn't choose anything!")
     print(df)
 
 
@@ -80,11 +83,12 @@ if __name__ == "__main__":
                         description='Downloads yandex images'
                         )
     parser.add_argument('-s', '--selector',
-                        type = int, default = 0,
+                        type = int, default = 4,
                         help = '0-describe \n 1-filter DF by label\n'
                         '2-filter_df_by_width_height_label\n'
                         '3-grouping and calculation of maximum, minimum, average\n'
-                        '4-build and show histogram')
+                        '4-build and show histogram\n'
+                        'another - no choice message')
     args = parser.parse_args()
     main_func(settings['path_annotation'],
               settings['max_width'],
