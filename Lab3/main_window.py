@@ -1,5 +1,4 @@
 import sys
-import os
 import logging
 from PyQt6 import QtWidgets, QtGui, QtCore
 from PyQt6.QtWidgets import QFileDialog
@@ -55,11 +54,14 @@ class MainWindow(QtWidgets.QMainWindow):
         self.scroll_area.setFixedHeight(524)
 
         self.create_annotation_button.clicked.connect(self.create_annotation)
-        self.copy_dataset_button.clicked.connect(self.copy_dataset)
+        self.copy_dataset_button.clicked.connect(
+            lambda: self.copy_dataset(CopyType.NUMBERED))
         self.random_copy_dataset_button.clicked.connect(
-            self.random_copy_dataset)
-        self.show_tiger_button.clicked.connect(self.show_tiger)
-        self.show_leopard_button.clicked.connect(self.show_leopard)
+            lambda: self.copy_dataset(CopyType.RANDOM))
+        self.show_tiger_button.clicked.connect(
+            lambda: self.show_next_image("tiger"))
+        self.show_leopard_button.clicked.connect(
+            lambda: self.show_next_image("leopard"))
         self.exit_button.clicked.connect(self.close)
 
         left_layout = QtWidgets.QVBoxLayout(self)
@@ -100,7 +102,7 @@ class MainWindow(QtWidgets.QMainWindow):
                     QtWidgets.QMessageBox.critical(
                         self, 'Error', f'Не удалось создать аннотацию.: {ex}')
 
-    def copy_dataset(self) -> None:
+    def copy_dataset(self, copy_type: CopyType) -> None:
         main_folder = QtWidgets.QFileDialog.getExistingDirectory(
             self, 'Выберите папку для копирования:')
 
@@ -110,7 +112,7 @@ class MainWindow(QtWidgets.QMainWindow):
 
             if ok and new_copy_name:
                 try:
-                    copy_dataset(main_folder, new_copy_name, CopyType.NUMBERED)
+                    copy_dataset(main_folder, new_copy_name, copy_type)
                     QtWidgets.QMessageBox.information(
                         self, 'Success', 'Набор данных успешно скопирован!')
                 except Exception as ex:
@@ -118,26 +120,10 @@ class MainWindow(QtWidgets.QMainWindow):
                     QtWidgets.QMessageBox.critical(
                         self, 'Error', f'Не удалось скопировать набор данных: {ex}')
 
-    def random_copy_dataset(self) -> None:
-        main_folder = QtWidgets.QFileDialog.getExistingDirectory(
-            self, 'Выберите папку для копирования:')
+    def show_next_image(self, class_label: str) -> None:
+        iterator = getattr(self, f'{class_label}_iterator', None)
 
-        if main_folder:
-            new_copy_name, ok = QtWidgets.QInputDialog.getText(
-                self, 'Введите имя для новой рандом-копии:', 'Новая копия')
-
-            if ok and new_copy_name:
-                try:
-                    copy_dataset(main_folder, new_copy_name, CopyType.RANDOM)
-                    QtWidgets.QMessageBox.information(
-                        self, 'Success', 'Набор данных успешно скопирован!')
-                except Exception as ex:
-                    logging.error(f"Failed to copy dataset: {ex}")
-                    QtWidgets.QMessageBox.critical(
-                        self, 'Error', f'Не удалось скопировать набор данных: {ex}')
-
-    def show_tiger(self) -> None:
-        if not hasattr(self, 'tiger_iterator') or not self.tiger_iterator:
+        if iterator is None:
             csv_file, _ = QFileDialog.getOpenFileName(
                 self, 'Выберите CSV-файл', '', 'CSV Files (*.csv);;All Files (*)')
 
@@ -146,61 +132,32 @@ class MainWindow(QtWidgets.QMainWindow):
                     self, 'Error', 'Выбран неверный файл. Пожалуйста, выберите файл CSV.')
                 return
 
-            class_label = ["tiger"]
+            class_labels = [class_label]
 
-            self.tiger_iterator = ClassIterator(csv_file, class_label)
-
-            if not self.tiger_iterator:
+            setattr(self, f'{class_label}_iterator',
+                    ClassIterator(csv_file, class_labels))
+            if not getattr(self, f'{class_label}_iterator', None):
                 QtWidgets.QMessageBox.critical(
                     self, 'Error', 'Не удалось инициализировать итератор.')
                 return
 
-        tiger_image_path = self.tiger_iterator.next_image()
+        image_path = getattr(self, f'{class_label}_iterator').next_image()
 
-        if tiger_image_path:
-            print("Showing tiger image:", tiger_image_path)
-            self.display_image(tiger_image_path)
-        else:
-            QtWidgets.QMessageBox.information(
-                self, 'Information', 'В наборе данных больше нет изображений.')
-
-    def show_leopard(self) -> None:
-        if not hasattr(self, 'leopard_iterator') or not self.leopard_iterator:
-
-            csv_file, _ = QFileDialog.getOpenFileName(
-                self, 'Выберите CSV-файл', '', 'CSV Files (*.csv);;All Files (*)')
-
-            if not csv_file.lower().endswith('.csv'):
-                QtWidgets.QMessageBox.critical(
-                    self, 'Error', 'Выбран неверный файл. Пожалуйста, выберите файл CSV.')
-                return
-
-            class_label = ["leopard"]
-
-            self.leopard_iterator = ClassIterator(csv_file, class_label)
-
-            if not self.leopard_iterator:
-                QtWidgets.QMessageBox.critical(
-                    self, 'Error', 'В наборе данных больше нет изображений.')
-                return
-
-        leopard_image_path = self.leopard_iterator.next_image()
-
-        if leopard_image_path:
-            print("Showing leopard image:", leopard_image_path)
-            self.display_image(leopard_image_path)
+        if image_path:
+            logging.info(f"Showing {class_label} image: {image_path}")
+            self.display_image(image_path)
         else:
             QtWidgets.QMessageBox.information(
                 self, 'Information', 'В наборе данных больше нет изображений.')
 
     def display_image(self, image_path: str) -> None:
-        print("Displaying image:", image_path)
+        logging.debug(f"Displaying image: {image_path}")
         pixmap = QtGui.QPixmap(image_path)
 
         if pixmap.isNull():
-            print("Не удалось загрузить изображение:", image_path)
+            logging.error(f"Failed to load image: {image_path}")
         else:
-            print("Изображение успешно загружено.")
+            logging.info("Image successfully loaded.")
             pixmap = pixmap.scaledToWidth(self.scroll_area.width())
             self.image_label.setAlignment(
                 QtCore.Qt.AlignmentFlag.AlignCenter | QtCore.Qt.AlignmentFlag.AlignHCenter)
