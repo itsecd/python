@@ -1,8 +1,7 @@
 import pandas as pd
 import logging
 import cv2
-from open_save_part import open_new_csv, save_csv
-from graphic_part import draw_histogram
+
 
 logging.basicConfig(level=logging.INFO)
 
@@ -102,14 +101,12 @@ def histogram_build(dframe: pd.DataFrame, label: int) -> list:
         fitrted_df = filter_by_label(dframe, label)
         image = fitrted_df["Absolute path"].sample().values[0]
         image_bgr = cv2.imread(image)
+        height, width, channel=image_bgr.shape
         b, g, r = cv2.split(image_bgr)
-        hist_b = cv2.calcHist([b], [0], None, [256], [0, 256])
-        hist_g = cv2.calcHist([g], [0], None, [256], [0, 256])
-        hist_r = cv2.calcHist([r], [0], None, [256], [0, 256])
-        normal_b = cv2.normalize(hist_b, hist_b)
-        normal_g = cv2.normalize(hist_g, hist_g)
-        normal_r = cv2.normalize(hist_r, hist_r)
-        hists = [normal_b, normal_g, normal_r]
+        hist_b = cv2.calcHist([b], [0], None, [256], [0, 256])/(height*width)
+        hist_g = cv2.calcHist([g], [0], None, [256], [0, 256])/(height*width)
+        hist_r = cv2.calcHist([r], [0], None, [256], [0, 256])/(height*width)
+        hists = [hist_b, hist_g, hist_r]
         return hists
     except:
         logging.error(f"File for histogram was not found: {ex.message}\n{ex.args}\n")
