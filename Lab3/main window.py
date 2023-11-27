@@ -158,7 +158,6 @@ def copy_dataset(self, random_suffix=None):
         else:
             destination_folder = os.path.join(destination_folder, f"{os.path.basename(source_folder)}_copy")
 
-        # Замена изображений и сохранение с новыми именами
         replace_images('cat', source_folder)
         replace_images('dog', source_folder)
         process_images('cat', source_folder, destination_folder)
