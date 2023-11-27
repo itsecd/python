@@ -1,133 +1,46 @@
-import pandas as pd
-import logging
-import cv2
-import matplotlib.pyplot as plt
-
-logging.basicConfig(level=logging.INFO)
+import argparse
+import tasks_part
+from graphic_part import draw_histogram
+from open_save_part import open_new_csv, save_csv, open_csv
 
 
-def image_forms(csv_path: str, new_csv_filename: str, class_one) -> None:
-    """Function reads the csv-file as a dateframe and adds new columns to it:
-    image parameters (height, width and channels) and also set a unique class label
-    1-4 points of lab. work"""
-    try:
-        height_image = []
-        width_image = []
-        channels_image = []
-        numerical = []
-        counter = 0
-        dframe = pd.read_csv(
-            csv_path, delimiter=",", names=["Absolute path", "Relative path", "Class"]
-        )
-        abs_path = dframe["Absolute path"]
-        for path_of_image in abs_path:
-            img = cv2.imread(path_of_image)
-            cv_tuple = img.shape
-            height_image.append(cv_tuple[0])
-            width_image.append(cv_tuple[1])
-            channels_image.append(cv_tuple[2])
-            if dframe.loc[counter, "Class"] == class_one:
-                label = 0
-            else:
-                label = 1
-            numerical.append(label)
-            counter += 1
-        dframe = dframe.drop("Relative path", axis=1)
-        dframe["Height"] = height_image
-        dframe["Width"] = width_image
-        dframe["Channels"] = channels_image
-        dframe["Label"] = numerical
-        dframe.to_csv(new_csv_filename, index=False)
-    except:
-        logging.error(f"Recording error: {ex.message}\n{ex.args}\n")
+def main():
+    parser = argparse.ArgumentParser()
 
+    group = parser.add_mutually_exclusive_group()
+    group.add_argument("--option1", action="store_true", help="Проверка датасета на сбалансированность")
+    group.add_argument("--option2", action="store_true", help="Фильтрация датафрейма")
+    group.add_argument("--option3", action="store_true", help="Фильтрация датафрейма по макс. ширине, высоте и метке")
+    group.add_argument("--option4", action="store_true", help="Группировка датафрейма")
+    group.add_argument("--option5", action="store_true", help="Создание гистограммы по рандомному изображению")
 
-def checking_balance(dataframe_file: str, statistic_file: str) -> None:
-    """The function accepts a csv file, calculates statistics
-    and also checks the dataset for balance
-    5 point of lab. work"""
-    try:
-        dframe = pd.read_csv(dataframe_file)
-        images_info = dframe[["Height", "Width", "Channels"]].describe()
-        label_stats = dframe["Label"]
-        label_info = label_stats.value_counts()
-        df = pd.DataFrame()
-        num_images_per_label = label_info.values
-        is_balanced = num_images_per_label[0] / num_images_per_label[1]
-        df["Quantity"] = num_images_per_label
-        df["Balance"] = f"{is_balanced:.1f}"
-        pd.concat([images_info, df], axis=1).to_csv(statistic_file)
-        if is_balanced >= 0.95 and is_balanced <= 1.05:
-            logging.info(f"Выборка сбалансированна")
-        else:
-            logging.info(
-                "Выборка несбалансирована, погрешность:",
-                f"{abs(is_balanced*100-100):.1f}%",
-            )
-    except:
-        logging.error(f"Balance check error")
+    parser.add_argument("--csv_path", help="base csv-file")
+    parser.add_argument("--label", type=int, help="label of image (0 or 1)")
+    parser.add_argument("--width", type=int, help="width of image")
+    parser.add_argument("--height", type=int, help="height of image")
+    parser.add_argument("--class", help="class of image (rose or tulip)")
+    parser.add_argument("--new_file_path", help="new_file_path")
 
+    args = parser.parse_args()
 
-def filter_by_label(dframe, label) -> pd.DataFrame:
-    """The function returns a dataframe filtered by the class label
-    6 point of lab. work"""
-    filtered_df = dframe[dframe["Label"] == label]
-    return filtered_df
-
-
-def min_max_filter(dframe, width_max: int, height_max: int, label: str) -> pd.DataFrame:
-    """The function returns a dataframe filtered
-    by the class label and set min-max values
-    7 point of lab. work"""
-    filtered_df = dframe[
-        (dframe["Label"] == label)
-        & (dframe["Width"] <= width_max)
-        & (dframe["Height"] <= height_max)
-    ]
-    return filtered_df
-
-
-def grouping(dframe) -> pd.DataFrame:
-    """Function groups the DataFrame by the class label
-    with the calculation of the max, min and mean values by the number of pixels
-    8 point of lab. work"""
-    dframe["Pixels"] = dframe["Height"] * dframe["Width"]
-    grouped = dframe.groupby("Label").agg({"Pixels": ["max", "min", "mean"]})
-    return grouped
-
-
-def histogram_build(dframe, label) -> list:
-    """Function builds a histogram for a random image,
-    returns a list of arrays for each channel
-    9 point of lab. work"""
-    try:
-        fitrted_df = filter_by_label(dframe, label)
-        image = fitrted_df["Absolute path"].sample().values[0]
-        image_bgr = cv2.imread(image)
-        b, g, r = cv2.split(image_bgr)
-        hist_b = cv2.calcHist([b], [0], None, [256], [0, 256])
-        hist_g = cv2.calcHist([g], [0], None, [256], [0, 256])
-        hist_r = cv2.calcHist([r], [0], None, [256], [0, 256])
-        hists = [hist_b, hist_g, hist_r]
-        return hists
-    except:
-        logging.error(f"File for histogram was not found: {ex.message}\n{ex.args}\n")
-
-
-def draw_histogram(hists):
-    """The function builds a histogram based on the specified values
-    10 point of lab. work"""
-    colors = ["blue", "green", "red"]
-    for i in range(len(hists)):
-        plt.plot(hists[i], color=colors[i], label=f"Histogram {i}")
-        plt.xlim([0, 256])
-    plt.ylabel("density")
-    plt.title("Image Histograms")
-    plt.xlabel("intensity")
-    plt.legend()
-    plt.show()
+    if args.option1:
+        dfame = tasks_part.image_forms(open_new_csv(args.csv_path), "rose")
+        save_csv(tasks_part.checking_balance(dfame), args.new_file_path)
+    elif args.option2:
+        dframe = open_csv(args.csv_path)
+        print(tasks_part.filter_by_label(dframe, args.label))
+    elif args.option3:
+        dframe = open_csv(args.csv_path)
+        print(tasks_part.min_max_filter(dframe, args.width, args.height, args.label))
+    elif args.option4:
+        dframe = open_csv(args.csv_path)
+        print(tasks_part.grouping(dframe))
+    elif args.option5:
+        dframe = open_csv(args.csv_path)
+        draw_histogram(tasks_part.histogram_build(dframe, args.label))
+    else:
+        print("Ни одна опция не выбрана")
 
 
 if __name__ == "__main__":
-    dframe = pd.read_csv("Lab4\csv_files\data.csv")
-    draw_histogram(histogram_build(dframe, 0))
+    main()
