@@ -69,34 +69,20 @@ class MainWindow(QtWidgets.QMainWindow):
         return dest_folder
 
 
-    def create_dataset_xy(self) -> None:
-        """Create dataset 1 by splitting data."""
+    def create_dataset(self, dataset_type: str) -> None:
+        """Create datasets based on the dataset type."""
         dest_folder = self.get_destination_folder()
         if dest_folder:
-            split_into_two(dest_folder)
+            if dataset_type == "X and Y":
+                split_into_two(dest_folder)
+            elif dataset_type == "Years":
+                sort_by_year(dest_folder)
+            elif dataset_type == "Weeks":
+                sort_by_week(dest_folder)
+            
             QtWidgets.QMessageBox.information(self, "Success", "Dataset created successfully.")
         else:
-            QtWidgets.QMessageBox.information(self, "Error", "You dont choose folder")
-
-
-    def create_dataset_years(self) -> None:
-        """Create dataset 2 by sorting data by years."""
-        dest_folder = self.get_destination_folder()
-        if dest_folder:
-            sort_by_year(dest_folder)
-            QtWidgets.QMessageBox.information(self, "Success", "Dataset created successfully.")
-        else:
-            QtWidgets.QMessageBox.information(self, "Error", "You dont choose folder")
-
-
-    def create_dataset_weeks(self) -> None:
-        """Create dataset 3 by sorting data by weeks."""
-        dest_folder = self.get_destination_folder()
-        if dest_folder:
-            sort_by_week(dest_folder)
-            QtWidgets.QMessageBox.information(self, "Success", "Dataset created successfully.")
-        else:
-            QtWidgets.QMessageBox.information(self, "Error", "You dont choose folder")
+            QtWidgets.QMessageBox.information(self, "Error", "You didn't choose a folder")
     
 
     def get_data(self) -> None:
@@ -110,12 +96,7 @@ class MainWindow(QtWidgets.QMainWindow):
     def on_combo_box_activated(self) -> None:
         """Handle the activation of the combo box"""
         selected_text = self.combo_box.currentText()
-        if selected_text == "X and Y":
-            self.create_dataset_xy()
-        elif selected_text == "Years":
-            self.create_dataset_years()
-        elif selected_text == "Weeks":
-            self.create_dataset_weeks()
+        self.create_dataset(selected_text)
 
         
 if __name__ == "__main__":
