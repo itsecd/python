@@ -69,8 +69,8 @@ class App(QWidget):
         self.select_dataset_button.clicked.connect(self.select_dataset_folder)
         self.create_annotation_button.clicked.connect(self.create_annotation)
         self.create_new_dataset_button.clicked.connect(self.show_create_dataset_dialog)
-        self.next_brown_bear_button.clicked.connect(self.show_next_brown_bear)
-        self.next_polar_bear_button.clicked.connect(self.show_next_polar_bear)
+        self.next_brown_bear_button.clicked.connect(lambda: self.show_next_bear('brown bear'))
+        self.next_polar_bear_button.clicked.connect(lambda: self.show_next_bear('polar bear'))
 
         self.brown_iterator = None
         self.polar_iterator = None
@@ -165,20 +165,17 @@ class App(QWidget):
             self.image_label.setText('Изображение не найдено')
 
 
-    def show_next_brown_bear(self)-> None:
-        """function to switch the brown bear"""
-        if self.dataset_path and self.brown_iterator:
-            next_path = next(self.brown_iterator)
-            if next_path:
-                self.show_image(next_path)
-        else:
-            QMessageBox.about(self, "Ошибка", "Пожалуйста, выберите директорию")
+    def show_next_bear(self, bear_class: str) -> None:
+        """Function to switch between bear classes"""
+        iterator = None
 
+        if bear_class == 'brown bear':
+            iterator = self.brown_iterator
+        elif bear_class == 'polar bear':
+            iterator = self.polar_iterator
 
-    def show_next_polar_bear(self)-> None:
-        """function to switch the polar bear"""
-        if self.dataset_path and self.polar_iterator:
-            next_path = next(self.polar_iterator)
+        if self.dataset_path and iterator:
+            next_path = next(iterator)
             if next_path:
                 self.show_image(next_path)
         else:
