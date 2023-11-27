@@ -1473,7 +1473,6 @@ Lab2/Weeks/20230918_20230924.csv
 Lab2/Weeks/20230925_20231001.csv
 Lab2/Weeks/20231002_20231008.csv
 Lab2/Weeks/20231009_20231014.csv
-Lab2/dataset/data.csv
 Lab2/XY/X.csv
 Lab2/XY/Y.csv
 Lab2/Years/19980102_19981231.csv
@@ -1502,12 +1501,6 @@ Lab2/Years/20200101_20201231.csv
 Lab2/Years/20210101_20211231.csv
 Lab2/Years/20220101_20221231.csv
 Lab2/Years/20230101_20231014.csv
-Lab2/division_by_week.py
-Lab2/division_by_year.py
-Lab2/file_manipulation.py
-Lab2/get_value_from_date.py
-Lab2/iterator.py
-Lab2/splitting_into_two_files.py
 Lab3/Weeks/19980102_19980104.csv
 Lab3/Weeks/19980105_19980111.csv
 Lab3/Weeks/19980112_19980118.csv

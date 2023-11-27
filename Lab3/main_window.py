@@ -30,7 +30,7 @@ class MainWindow(QtWidgets.QMainWindow):
         self.combo_box.addItem("Years")
         self.combo_box.addItem("Weeks")
 
-        self.sort_type = QtWidgets.QLabel("Select sortin type and then folder:")
+        self.sort_type = QtWidgets.QLabel("Select sorting type and then folder:")
         self.combo_box.activated.connect(self.on_combo_box_activated)
 
         self.label = QtWidgets.QLabel('Input date (YYYY/MM/DD):')
@@ -107,7 +107,8 @@ class MainWindow(QtWidgets.QMainWindow):
         self.data_display.setText(f"Данные для даты {date} = {value}")
 
     
-    def on_combo_box_activated(self):
+    def on_combo_box_activated(self) -> None:
+        """Handle the activation of the combo box"""
         selected_text = self.combo_box.currentText()
         if selected_text == "X and Y":
             self.create_dataset_xy()
