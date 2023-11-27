@@ -12,6 +12,10 @@ from typing import List
 
 
 def parse_arguments():
+    """
+            Получаем ссылку путь директории и количество страниц
+
+    """
     parser = argparse.ArgumentParser(description="Скрипт для парсинга рецензий с сайта и сортировка их на хорошии и плохие")
     parser.add_argument("--out_dir", type=str, default="dataset", help="Путь к директории для сохранения датасета")
     parser.add_argument("--urls", type=str, default="https://irecommend.ru/content/internet-magazin-ozon-kazan-0?page=", help="Базовый URL для сбора данных")
