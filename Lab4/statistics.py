@@ -21,3 +21,9 @@ def make_describe_df(df: pd.DataFrame,
     except Exception as e:
          logging.exception(e)
     return stats
+
+def max_min_average(df: pd.DataFrame,
+                column: str = "pixels"
+                )->list:
+    """Funk find min msx average"""
+    return df['pixels'].max(), df['pixels'].min(), df['pixels'].mean()

@@ -4,7 +4,7 @@ import pandas as pd
 import numpy as np
 import matplotlib.pyplot as plt
 
-def build_histogram(df: pd.DataFrame, label: int):
+def build_histogram(df: pd.DataFrame, label: int) -> list:
     """build_histogram of random image in DataFrame"""
     filtered_df = df[df['label'] == label]
     random_img_idx = np.random.randint(0, len(filtered_df))
@@ -29,21 +29,18 @@ def build_histogram(df: pd.DataFrame, label: int):
     return hist_blue, hist_green, hist_red
 
 
-def show_histogram(df: pd.DataFrame, label: int) -> None:
+def show_histogram(hists: list) -> None:
     """
     draw histograms that are returned from the function of paragraph 9.
     Graphs and axes must have appropriate signatures.
     """
-    blue, green, red = build_histogram(df, label)
+    blue, green, red = hists
+    plt.hist(blue, alpha=0.5,  color='blue', label='blue')
+    plt.hist(green, alpha=0.5, color='green', label='green')
+    plt.hist(red, alpha=0.5, color='red', label='red')
 
-    plt.hist(blue, bins=10, alpha=0.5, color='blue', label='blue')
-
-    plt.hist(green, bins=10, alpha=0.5, color='green', label='green')
-
-    plt.hist(red, bins=10, alpha=0.5, color='red', label='red')
-
-    plt.xlabel('Value')
-    plt.ylabel('Frequency')
+    plt.xlabel('Saturation')
+    plt.ylabel('Density')
     plt.title('Histogram of picture')
 
     plt.legend()

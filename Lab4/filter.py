@@ -16,7 +16,9 @@ def filter_df_by_width_height_label(df: pd.DataFrame,
                               max_height: int,
                               max_width:int
                               ) -> pd.DataFrame:
-    
-    filtered_df = df[df['label'] == class_num][df['width'] <= max_width]
+    """"Func filters DataFrame by class, """
+    filtered_df = df[df['label'] == class_num]
     filtered_df = filtered_df[filtered_df['height'] <= max_height]
+    filtered_df = filtered_df[filtered_df['width'] <= max_width]
     return filtered_df
+

@@ -46,13 +46,13 @@ def yandex_images_parser(text: str,
                          time_sleep: int,
                          extention: str,
                          base_folder: str = "dataset",
-                         url: str = "https://www.yandex.ru/images/search?text=") -> []:
+                         url: str = "https://yandex.ru/images/search?from=tabbar&text=") -> []:
     """parser 'Yandex.Images'"""
     create_folders(text)
     iterator = len(os.listdir(os.path.join(base_folder, text)))
     for page in range(iterator // 30, max_count // 30 + 1):
         headers = Headers(
-            browser = "Chrome",
+            browser = "Firefox",
             os = "win",
             headers = True
             ).generate()
@@ -91,7 +91,7 @@ if __name__ == "__main__":
                         description='Downloads yandex images'
                         )
     parser.add_argument('-m', '--max_count',
-                        type = int, default = 1000,
+                        type = int, default = 1100,
                         help = 'The largest number of images'
                         )
     parser.add_argument('-s', '--time_sleep',
