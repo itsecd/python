@@ -20,6 +20,10 @@ def parse_arguments():
 
 
 def get_html_code(page: int , url: str) -> BeautifulSoup:
+    """
+               Получаем html код страницы
+
+    """
 
     try:
         tmp_url = url+str(page)
@@ -38,6 +42,10 @@ def get_html_code(page: int , url: str) -> BeautifulSoup:
 
 
 def get_reviews(soup: BeautifulSoup) -> List[BeautifulSoup]:
+    """
+            Создаем лист из рецензий на одной страници
+
+    """
     try:
             reviews = soup.find('ul', class_="list-comments").find_all('li')
             return reviews
@@ -46,6 +54,10 @@ def get_reviews(soup: BeautifulSoup) -> List[BeautifulSoup]:
 
 
 def review_text(review: BeautifulSoup) -> str:
+    """
+            Получасем текс рецензий
+
+    """
     try:
         review_txt = review.find('div', class_="reviewTextSnippet")
         if review_txt is not None:
@@ -57,6 +69,10 @@ def review_text(review: BeautifulSoup) -> str:
 
 
 def get_name(soup:BeautifulSoup) -> str:
+    """
+            Получасем название обьекта на которые парсим рецензии
+
+    """
     try:
         name_txt = soup.find('h1',class_="largeHeader")
         if name_txt is not None:
@@ -68,6 +84,10 @@ def get_name(soup:BeautifulSoup) -> str:
 
 
 def status_review(review: BeautifulSoup) -> bool:
+    """
+        Получаем статус рецензии
+
+    """
     try:
         stars = review.find_all(class_='on')
         if len(stars) > 3:
@@ -84,6 +104,10 @@ def random_user_agent() -> str:
 
 
 def create_directories():
+    """
+        Создаем директорию для сохранения рецензий если он еще не создана
+
+    """
     try:
         for folder_name in ["good", "bad"]:
             folder_path = os.path.join("dataset", folder_name)
@@ -114,16 +138,12 @@ def save_review_to_file(review_text: str, status_review: bool, review_n_g: int, 
         logging.exception(f"Ошибка при сохранении рецензии : {e}")
 
 
-def parsing_review():
+def parsing_review(out_dir: str, urls: str, pages: int):
     """
     итоговая функция которая используя все пердидущие функции  полностью выполняет задачу
 
     """
     try:
-        args = parse_arguments()
-        out_dir = args.out_dir
-        urls = args.urls
-        pages = args.pages
         number = 0
         review_n_b = 1
         review_n_g = 1
@@ -144,5 +164,9 @@ def parsing_review():
 
 
 if __name__ == "__main__":
-    parsing_review()
+    args = parse_arguments()
+    out_dir = args.out_dir
+    urls = args.urls
+    pages = args.pages
+    parsing_review(out_dir,urls,pages)
 
