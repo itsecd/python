@@ -3,7 +3,7 @@ import os
 import logging
 from PyQt6.QtCore import QSize
 from PyQt6.QtWidgets import (QApplication, QMainWindow, QPushButton,
-                             QMessageBox, QLabel, QFileDialog, QVBoxLayout, QWidget, QGridLayout,)
+                            QMessageBox, QLabel, QFileDialog, QVBoxLayout, QWidget, QGridLayout,)
 from PyQt6.QtGui import QPixmap
 
 from iterator import ChoiceIterator
@@ -24,7 +24,8 @@ class Window(QMainWindow):
         layout = QGridLayout()  # Упорядочивает в виде сетки из строк и столбцов
 
         self.dataset_path = os.path.abspath("dataset")
-        src = QLabel(f"Путь к папке исходного датасета:\n{self.dataset_path}", self)
+        src = QLabel(
+            f"Путь к папке исходного датасета:\n{self.dataset_path}", self)
         src.setFixedSize(QSize(230, 40))
         box_layout.addWidget(src)
         src.setStyleSheet('color:blue')
@@ -34,8 +35,8 @@ class Window(QMainWindow):
         self.bata_copy = self.add_button("Копирование датасета", 230, 30)
         self.bata_random = self.add_button("Датасет из радомных чисел", 230, 30)
         self.bata_iterator = self.add_button("Получение следующего экземпляра", 230, 30)
-        self.next_cats = self.add_button("Следующая кошка", 230, 30)
-        self.next_dogs = self.add_button("Следующая собака", 230, 30)
+        self.next_cats = self.add_button("Следующий котик", 230, 30)
+        self.next_dogs = self.add_button("Следующая собачка", 230, 30)
         self.exit = self.add_button("Выйти из программы", 230, 30)
 
         # установим изображение
@@ -52,7 +53,7 @@ class Window(QMainWindow):
         box_layout.addWidget(self.next_cats)
         box_layout.addWidget(self.next_dogs)
         box_layout.addWidget(self.exit)
-        box_layout.addStretch() # кнопки вплотную
+        box_layout.addStretch()  # кнопки вплотную
         layout.addLayout(box_layout, 0, 0)
         layout.addWidget(self.image_label, 0, 1)
 
@@ -67,6 +68,11 @@ class Window(QMainWindow):
         self.bata_copy.clicked.connect(self.copy)
         self.bata_random.clicked.connect(self.random)
 
+        # то, что будет на экране при нажатии кнопки итератора
+        self.bata_iterator.clicked.connect(self.csv_path)
+        self.next_cats.clicked.connect(self.cat)
+        self.next_dogs.clicked.connect(self.dog)
+
         # то, что будет на экране при нажатии кнопки выход из программы
         self.exit.clicked.connect(self.close)
 
@@ -74,7 +80,8 @@ class Window(QMainWindow):
 
     def add_button(self, name: str, size_x: int, size_y: int) -> QPushButton:
         '''принимает название поля кнопки и ее размеры'''
-        button = QPushButton(name, self)  # Виджет кнопок, на который пользователь может нажать
+        button = QPushButton(
+            name, self)  # Виджет кнопок, на который пользователь может нажать
         # Возвращает измененную копию этого изображения (возвращает объект QSize)
         button.resize(button.sizeHint())
         button.setStyleSheet('color:blue')
@@ -84,21 +91,23 @@ class Window(QMainWindow):
     def create_copy_random(self, number: int) -> None:
         '''создаем csv-файл по указанному пути; копируем данные с новым именем'''
         try:
-            directory = QFileDialog.getSaveFileName(
+            folder = QFileDialog.getSaveFileName(
                 self,
                 "Введите название папки для создания csv-файла:",
             )[0]
-            if directory == "":
-                QMessageBox.information(None, "Ошибка работы программы!", "Не правильно выбрана папка")
+            if folder == "":
+                QMessageBox.information(
+                    None, "Ошибка работы программы!", "Не правильно выбрана папка")
                 return
             if number == 0 or number == 1:
-                write_in_new(self.dataset_path, self.classes, directory, number)
+                write_in_new(self.dataset_path, self.classes, folder, number)
             else:
                 a = make_list(self.dataset_path, self.classes)
-                write_in_file(a, directory)
-            QMessageBox.information(None, "Результат нажатия книпки", "Датасет успешно скопирован!")
-        except Exception as ex:
-            logging.error(f"Couldn't create copy: {ex.message}\n{ex.args}\n")
+                write_in_file(a, folder)
+            QMessageBox.information(
+                None, "Результат нажатия книпки", "Датасет успешно скопирован!")
+        except:
+            logging.error(f"Error in cteate_copy_random\n")
 
     def create_annotation(self) -> None:
         self.create_copy_random(7)
@@ -108,6 +117,38 @@ class Window(QMainWindow):
 
     def random(self) -> None:
         self.create_copy_random(1)
+
+    def csv_path(self) -> None:
+        '''запрашиваем путь к файлу для итерации и куда итеруем'''
+        try:
+            path_1 = QFileDialog.getOpenFileName(
+                self, "Выберите файл для итерации:")[0]
+            path = QFileDialog.getSaveFileName(
+                self, "Выберите файл куда итеруем:")[0]
+            if path == "":
+                return
+            self.choice_iterator = ChoiceIterator(os.path.relpath(path_1.rpartition('.')[0]),
+                                                os.path.relpath(path), self.classes[0], self.classes[1])
+        except:
+            logging.error(f"Error in csv_path\n")
+
+    def next(self, number: int) -> None:
+        '''возвращаем путь следующего элемента'''
+        if self.choice_iterator == None:
+            QMessageBox.information(
+                None, "Ошибка работы программы!", "Не выбран файл для итерации")
+            return
+        if number == 0:
+            a = self.choice_iterator.next_cat()
+        else:
+            a = self.choice_iterator.next_dog()
+        self.image_label.setPixmap(QPixmap(a))
+
+    def cat(self) -> None:
+        self.next(0)
+
+    def dog(self) -> None:
+        self.next(1)
 
 
 if __name__ == "__main__":
