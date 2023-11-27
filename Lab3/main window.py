@@ -138,29 +138,34 @@ class MainWindow(QtWidgets.QMainWindow):
             process_images('cat', folder_path, new_dataset_path)
             process_images('dog', folder_path, new_dataset_path)
 
-    def copy_dataset(self, random_suffix=None):
-        """
-        Copy the dataset to a new location.
-        
-        This method prompts the user to select a destination folder and copies the dataset
-        to that location. If a random_suffix is provided, it will be added to the folder name.
+def copy_dataset(self, random_suffix=None):
+    """
+    Copy the dataset to a new location.
 
-        Parameters:
-        - random_suffix (str or None): Random suffix to be added to the folder name (default is None).
-        """
-        source_folder = self.get_dataset_path()
-        destination_folder = QtWidgets.QFileDialog.getExistingDirectory(
-            self, 'Select Destination Folder for Copy')
+    This method prompts the user to select a destination folder and copies the dataset
+    to that location. If a random_suffix is provided, it will be added to the folder name.
 
-        if destination_folder:
-            if random_suffix is not None:
-                destination_folder = os.path.join(destination_folder, f"{os.path.basename(source_folder)}_copy_{random_suffix}")
-            else:
-                destination_folder = os.path.join(destination_folder, f"{os.path.basename(source_folder)}_copy")
+    Parameters:
+    - random_suffix (str or None): Random suffix to be added to the folder name (default is None).
+    """
+    source_folder = self.get_dataset_path()
+    destination_folder = QtWidgets.QFileDialog.getExistingDirectory(
+        self, 'Select Destination Folder for Copy')
 
-            shutil.copytree(source_folder, destination_folder)
-            action = "Random Dataset Copy" if random_suffix else "Dataset Copy"
-            QtWidgets.QMessageBox.information(self, action, f"{action} created successfully.")
+    if destination_folder:
+        if random_suffix is not None:
+            destination_folder = os.path.join(destination_folder, f"{os.path.basename(source_folder)}_copy_{random_suffix}")
+        else:
+            destination_folder = os.path.join(destination_folder, f"{os.path.basename(source_folder)}_copy")
+
+        # Замена изображений и сохранение с новыми именами
+        replace_images('cat', source_folder)
+        replace_images('dog', source_folder)
+        process_images('cat', source_folder, destination_folder)
+        process_images('dog', source_folder, destination_folder)
+
+        QtWidgets.QMessageBox.information(self, "Dataset Copy", "Dataset copied successfully.")
+
 
 
     def get_next_instance(self, class_name):
