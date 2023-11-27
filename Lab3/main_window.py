@@ -1,7 +1,6 @@
 import os
 import sys
 import logging
-
 from PyQt6.QtCore import QSize
 from PyQt6.QtWidgets import (
     QApplication,
@@ -76,7 +75,8 @@ class MainWindow(QMainWindow):
 
         #app functions
         self.button_annotation.clicked.connect(self.create_annotation)
-        #self.button_сopy_dataset.connect(self.copy_dataset)
+        self.button_сopy_dataset.clicked.connect(self.copy_dataset)
+        self.button_сopy_random.clicked.connect(self.copy_dataset_random)
         self.button_iterator.clicked.connect(self.path_to_csv)
         self.button_ntiger.clicked.connect(self.next_first_tag)
         self.button_nleopard.clicked.connect(self.next_second_tag)
@@ -103,6 +103,43 @@ class MainWindow(QMainWindow):
             QMessageBox.information(None, "Done", "Annotation created")
         except Exception as e:
             logging.error(f"Annotation not created:{e}")
+
+    def copy_dataset(self):
+        try:
+            directory = QFileDialog.getSaveFileName(self,"Select path - ",
+            "","CSV File(*.csv)",)[0]
+            print(directory)
+            if directory == "":
+                QMessageBox.information(None, "Path error")
+                return
+            folder=QFileDialog.getExistingDirectory(self,"Select folder for copy - ")
+            if (folder == ""):
+                QMessageBox.information(None, "Folder error")
+                return
+            print(folder)
+            copy_dataset(self.dataset,self.tags,folder,directory,False)
+            QMessageBox.information(None, "Done","Dataset copied!")
+        except Exception as e:
+            logging.error(f"Copy dataset error:{e}")
+
+    def copy_dataset_random(self):
+        try:
+            directory = QFileDialog.getSaveFileName(self,"Select path - ",
+            "","CSV File(*.csv)",)[0]
+            print(directory)
+            if directory == "":
+                QMessageBox.information(None, "Path error")
+                return
+            folder=QFileDialog.getExistingDirectory(self,"Select folder for copy - ")
+            if (folder == ""):
+                QMessageBox.information(None, "Folder error")
+                return
+            print(folder)
+            copy_dataset(self.dataset,self.tags,folder,directory,True)
+            QMessageBox.information(None, "Done","Dataset with random numbers copied!")
+        except Exception as e:
+            logging.error(f"Copy dataset error:{e}")
+    
     def path_to_csv(self):
         try:
             path=QFileDialog.getOpenFileName(self,"Select picture - ")[0]
