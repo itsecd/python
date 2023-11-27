@@ -29,11 +29,17 @@ class Iterator:
 
     def __next__(self) -> str:
         if self.count < self.limit:
-            if self.t == self.l[self.count + 1][2]:
-                self.count += 1
+            if self.t == self.l[self.count][2]:
+                if (self.count+1==self.limit):
+                    return None
+                self.count+=1
+            if self.t!=self.l[self.count][2]:
+                while(self.t!=self.l[self.count][2]):
+                    if(self.limit==self.count+1):
+                        return None
+                    self.count+=1
             return self.l[self.count][0]
-        else:
-            return None
+        else: return None
 
 
 class TagIterator:
