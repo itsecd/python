@@ -138,46 +138,30 @@ class MainWindow(QtWidgets.QMainWindow):
             process_images('cat', folder_path, new_dataset_path)
             process_images('dog', folder_path, new_dataset_path)
 
-    def copy_dataset(self):
+    def copy_dataset(self, random_suffix=None):
         """
-        Copy the entire dataset to a new location.
+        Copy the dataset to a new location.
+        
+        This method prompts the user to select a destination folder and copies the dataset
+        to that location. If a random_suffix is provided, it will be added to the folder name.
 
-        This method prompts the user to select a destination folder and copies the entire
-        dataset to that location.
-
-        Returns:
-        - None
+        Parameters:
+        - random_suffix (str or None): Random suffix to be added to the folder name (default is None).
         """
         source_folder = self.get_dataset_path()
         destination_folder = QtWidgets.QFileDialog.getExistingDirectory(
             self, 'Select Destination Folder for Copy')
 
         if destination_folder:
-            shutil.copytree(source_folder, os.path.join(
-                destination_folder, os.path.basename(source_folder) + "_copy"))
-            QtWidgets.QMessageBox.information(
-                self, "Copy Dataset", "Dataset copied successfully.")
+            if random_suffix is not None:
+                destination_folder = os.path.join(destination_folder, f"{os.path.basename(source_folder)}_copy_{random_suffix}")
+            else:
+                destination_folder = os.path.join(destination_folder, f"{os.path.basename(source_folder)}_copy")
 
-    def copy_random_dataset(self):
-        """
-        Copy the dataset to a new location with a random suffix.
+            shutil.copytree(source_folder, destination_folder)
+            action = "Random Dataset Copy" if random_suffix else "Dataset Copy"
+            QtWidgets.QMessageBox.information(self, action, f"{action} created successfully.")
 
-        This method prompts the user to select a destination folder and copies the dataset
-        to that location with a random suffix added to the folder name.
-
-        Returns:
-        - None
-        """
-        source_folder = self.get_dataset_path()
-        destination_folder = QtWidgets.QFileDialog.getExistingDirectory(
-            self, 'Select Destination Folder for Random Copy')
-
-        if destination_folder:
-            random_suffix = str(random.randint(1, 1000))
-            shutil.copytree(source_folder, os.path.join(
-                destination_folder, os.path.basename(source_folder) + f"_copy_{random_suffix}"))
-            QtWidgets.QMessageBox.information(
-                self, "Copy Random Dataset", "Random dataset copy created successfully.")
 
     def get_next_instance(self, class_name):
         """
