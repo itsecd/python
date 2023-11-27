@@ -55,11 +55,11 @@ class MainWindow(QtWidgets.QMainWindow):
         self.layout.addWidget(self.copy_random_dataset_button)
 
         self.next_cat_button = QtWidgets.QPushButton("Next Cat")
-        self.next_cat_button.clicked.connect(lambda: self.get_next_instance('cat'))
+        self.next_cat_button.clicked.connect(lambda: self.show_next_instance('cat'))        
         self.layout.addWidget(self.next_cat_button)
 
         self.next_dog_button = QtWidgets.QPushButton("Next Dog")
-        self.next_dog_button.clicked.connect(lambda: self.get_next_instance('dog'))
+        self.next_dog_button.clicked.connect(lambda: self.show_next_instance('dog'))
         self.layout.addWidget(self.next_dog_button)
 
         self.exit_button = QtWidgets.QPushButton("EXIT", self)
@@ -206,12 +206,15 @@ class MainWindow(QtWidgets.QMainWindow):
                 QtWidgets.QMessageBox.warning(
                     self, "Error", f"No more instances of {class_name}.")
 
-    def show_next_cat(self):
+    def show_next_instance(self, class_name):
         """
-        Show the next instance of the 'cat' class from an annotation file.
+        Show the next instance of the specified class from an annotation file.
 
         This method prompts the user to select an annotation file and displays the
-        next instance of the 'cat' class using the cat_iterator.
+        next instance of the specified class using the corresponding iterator.
+
+        Parameters:
+        - class_name (str): The class name ('cat' or 'dog').
 
         Returns:
         - None
@@ -220,35 +223,16 @@ class MainWindow(QtWidgets.QMainWindow):
             self, 'Select Annotation File', '', 'CSV Files (*.csv)')
 
         if csv_path:
-            self.cat_iterator = DirectoryIterator('cat', csv_path)
-            next_path = next(self.cat_iterator, None)
+            iterator = DirectoryIterator(class_name, csv_path)
+            class_iterator = self.cat_iterator if class_name == 'cat' else self.dog_iterator
+            class_iterator = DirectoryIterator(class_name, csv_path)
+            next_path = next(class_iterator, None)
+
             if next_path:
                 self.display_image(next_path)
             else:
                 QtWidgets.QMessageBox.warning(
-                    self, "Error", "No more instances of cat.")
-
-    def show_next_dog(self):
-        """
-        Show the next instance of the 'dog' class from an annotation file.
-
-        This method prompts the user to select an annotation file and displays the
-        next instance of the 'dog' class using the dog_iterator.
-
-        Returns:
-        - None
-        """
-        csv_path, _ = QtWidgets.QFileDialog.getOpenFileName(
-            self, 'Select Annotation File', '', 'CSV Files (*.csv)')
-
-        if csv_path:
-            self.dog_iterator = DirectoryIterator('dog', csv_path)
-            next_path = next(self.dog_iterator, None)
-            if next_path:
-                self.display_image(next_path)
-            else:
-                QtWidgets.QMessageBox.warning(
-                    self, "Error", "No more instances of dog.")
+                    self, "Error", f"No more instances of {class_name}.")
 
 
 
