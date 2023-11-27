@@ -176,19 +176,15 @@ class MainWindow(QMainWindow):
             return
         if self.combo.currentText() == "Рейтинг 1":
             element = self.classes_iterator.next_first()
-            self.review_path = element
         if self.combo.currentText() == "Рейтинг 2":
             element = self.classes_iterator.next_second()
-            self.review_path = element
         if self.combo.currentText() == "Рейтинг 3":
             element = self.classes_iterator.next_third()
-            self.review_path = element
         if self.combo.currentText() == "Рейтинг 4":
             element = self.classes_iterator.next_fourth()
-            self.review_path = element
         if self.combo.currentText() == "Рейтинг 5":
             element = self.classes_iterator.next_fifth()
-            self.review_path = element
+        self.review_path = element
         if self.review_path == None:
             QMessageBox.information(None, "Конец класса", "Файлы для класса кончились")
             return
