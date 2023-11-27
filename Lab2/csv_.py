@@ -16,7 +16,7 @@ def make_list(directory: str, tags: list) -> list:
         logging.info(f"for {tag}")
         count_files = len(os.listdir(os.path.join(directory, tag)))
         for img in range(count_files):
-            item = [[os.path.abspath(os.path.join(directory, tag, f"Lab2\\{img:04}.jpg")),
+            item = [[os.path.abspath(os.path.join(directory, tag, f"{img:04}.jpg")),
                     os.path.join(directory, tag, f"{img:04}.jpg"),tag,]]
             img_list += item
     return img_list

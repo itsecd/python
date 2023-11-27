@@ -36,7 +36,7 @@ class MainWindow(QMainWindow):
         buttons_layout=QVBoxLayout()
         layout=QGridLayout()
 
-        self.dataset=os.path.abspath("Lab1\dataset")
+        self.dataset=os.path.abspath("Lab2\dataset")
         base=QLabel(f'Basic dataset:{self.dataset}',self)
         base.setFixedSize(QSize(350,50))
         buttons_layout.addWidget(base)
@@ -79,7 +79,7 @@ class MainWindow(QMainWindow):
         #self.button_сopy_dataset.connect(self.copy_dataset)
         self.button_iterator.clicked.connect(self.path_to_csv)
         self.button_ntiger.clicked.connect(self.next_first_tag)
-        self.button_ntiger.clicked.connect(self.next_second_tag)
+        self.button_nleopard.clicked.connect(self.next_second_tag)
         self.button_exit.clicked.connect(self.close)
 
         self.show()
@@ -106,26 +106,28 @@ class MainWindow(QMainWindow):
     def path_to_csv(self):
         try:
             path=QFileDialog.getOpenFileName(self,"Select picture - ")[0]
+            print(path)
             if(path==""):
-                QMessageBox.information(None, "Path error")
+                QMessageBox.information(None, "Error","Path error")
                 return
             self.iterator=TagIterator(path,self.tags[0],self.tags[1])
-            print(path)
         except Exception as e:
             logging.error(f"Error with picture:{e}")
+       
     
     def next_first_tag(self):
         if (self.iterator==None):
-            QMessageBox.information(None, "Error when selecting picture")
+            QMessageBox.information(None, "Error", "Error when selecting picture")
             return
         tag=self.iterator.next_first_tag()
         self.image_path=tag
+        print(self.image_path)
         self.image.update()
         self.image.setPixmap(QPixmap(tag))
 
     def next_second_tag(self):
         if (self.iterator==None):
-            QMessageBox.information(None, "Error when selecting picture")
+            QMessageBox.information(None, "Error", "Error when selecting picture")
             return
         tag=self.iterator.next_second_tag()
         self.image_path=tag
