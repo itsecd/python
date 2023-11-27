@@ -39,14 +39,15 @@ class MainWindow(QMainWindow):
         self.combo.addItems(["Рейтинг 1", "Рейтинг 2", "Рейтинг 3", "Рейтинг 4", "Рейтинг 5"])
         self.combo.setFixedSize(QSize(250, 20))
 
+        self.combo_copy = QComboBox(self)
+        self.combo_copy.addItems(["Стандарт", "Случайные числа"])
+        self.combo_copy.setFixedSize(QSize(300, 30))
+
         self.btn_create = self.add_button("Создать аннотацию", 300, 40)
-        self.btn_copy = self.add_button("Создать копию датасета и его аннотацию", 300, 40)
-        self.btn_rand = self.add_button("Создать датасет со случ. числами и его аннотацию", 300, 40)
+        self.btn_execute = self.add_button("Выполнить создание копии", 300, 40)
 
         self.btn_iterator = self.add_button("Начать итерацию", 250, 40)
         self.btn_next = self.add_disabled_button("Следующий отзыв", 250, 30)
-        self.mode_map = {'Рейтинг 1': "1", 'Рейтинг 2': "2", 'Рейтинг 3': "3", 'Рейтинг 4': "4", 'Рейтинг 5': "5"}
-
 
         self.btn_close = self.add_button("Закрыть программу", 200, 30)
 
@@ -56,8 +57,8 @@ class MainWindow(QMainWindow):
         self.text_label.setFixedSize(600, 400)
 
         box_layout.addWidget(self.btn_create)
-        box_layout.addWidget(self.btn_copy)
-        box_layout.addWidget(self.btn_rand)
+        box_layout.addWidget(self.btn_execute)
+        box_layout.addWidget(self.combo_copy)
     
         box_layout.addStretch()
 
@@ -85,8 +86,7 @@ class MainWindow(QMainWindow):
         self.review_path = None
 
         self.btn_create.clicked.connect(self.create_annotation)
-        self.btn_copy.clicked.connect(self.copy)
-        self.btn_rand.clicked.connect(self.rand)
+        self.btn_execute.clicked.connect(self.copy)
 
         self.btn_iterator.clicked.connect(self.csv_path)
         self.btn_next.clicked.connect(self.next)
@@ -148,25 +148,13 @@ class MainWindow(QMainWindow):
             if (file == "") or (directory == ""):
                 QMessageBox.information(None, "Не указан путь", "Не был выбран файл или папка")
                 return
-            copy_folder(self.data_path, directory, self.classes, file)
+            if self.combo_copy.currentText() == "Стандарт":
+                copy_folder(self.data_path, directory, self.classes, file)
+            if self.combo_copy.currentText() == "Случайные числа":
+                copy_random(self.data_path, directory, self.classes, file, 5000)
             QMessageBox.information(None, "Успешно", "Датасет скопирован")
         except Exception as exc:
-            logging.error(f"Can not create copy or annotation: {exc.message}\n{exc.args}\n")
-
-    def rand(self):
-        """This function creates copy of default dataset with renamed files to random numbers\
-            and creates annotation"""
-        try:
-            file = QFileDialog.getSaveFileName(self, "Выберите файл для создания аннотации:", "",\
-                                                "CSV File(*.csv)")[0]
-            directory = QFileDialog.getExistingDirectory(self, "Выберите папку для копирования датасета")
-            if (file == "") or (directory == ""):
-                QMessageBox.information(None, "Не указан путь", "Не был выбран файл или папка")
-                return
-            copy_random(self.data_path, directory, self.classes, file, 5000)
-            QMessageBox.information(None, "Успешно", "Датасет скопирован")
-        except Exception as exc:
-            logging.error(f"Can not create copy or annotation: {exc.message}\n{exc.args}\n")             
+            logging.error(f"Can not create copy or annotation: {exc.message}\n{exc.args}\n")    
 
     def csv_path(self):
         """This function opens csv file to read review in window application"""
@@ -176,7 +164,6 @@ class MainWindow(QMainWindow):
                 return
             self.classes_iterator = ClassIterator(path, self.classes[0], self.classes[1],\
                                                    self.classes[2], self.classes[3], self.classes[4])
-            
             self.btn_next.setEnabled(True)
         except Exception as exc:
             logging.error(f"Incorrect path: {exc.message}\n{exc.args}\n")
