@@ -47,11 +47,11 @@ class MainWindow(QtWidgets.QMainWindow):
         self.layout.addWidget(self.create_dataset_button)
 
         self.copy_dataset_button = QtWidgets.QPushButton("Copy Dataset")
-        self.copy_dataset_button.clicked.connect(self.copy_dataset)
+        self.copy_dataset_button.clicked.connect(lambda: self.copy_dataset())
         self.layout.addWidget(self.copy_dataset_button)
 
         self.copy_random_dataset_button = QtWidgets.QPushButton("Copy Dataset Randomly")
-        self.copy_random_dataset_button.clicked.connect(self.copy_random_dataset)
+        self.copy_random_dataset_button.clicked.connect(lambda: self.copy_dataset(random_suffix=str(random.randint(1, 1000))))
         self.layout.addWidget(self.copy_random_dataset_button)
 
         self.next_cat_button = QtWidgets.QPushButton("Next Cat")
