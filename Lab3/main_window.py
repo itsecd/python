@@ -7,6 +7,7 @@ from PyQt6.QtWidgets import QWidget, QApplication, QMainWindow, QLabel, QPushBut
 sys.path.insert(1, "C:\\Users\\ksush\\OneDrive\\Рабочий стол\\python-v8\\Lab2")
 from create_annotation import create_annotation_file
 from random_dataset import random_dataset
+from copy_dataset import copy_dataset
 from file_iterator import FileIterator
 
 class MainWindow(QMainWindow):
@@ -32,12 +33,14 @@ class MainWindow(QMainWindow):
         self.browse_dataset_btn = QPushButton('Select Data Folder', self)
         self.create_annotation_btn = QPushButton('Create Annotation', self)
         self.create_random_dataset_btn = QPushButton('Create Random Dataset', self)
+        self.create_copy_dataset_btn = QPushButton('Create Copy Dataset', self)
         self.next_good_review_btn = QPushButton('Next Positive Review', self)
         self.next_bad_review_btn = QPushButton('Next Negative Review', self)
 
         self.browse_dataset_btn.clicked.connect(self.browse_dataset)
         self.create_annotation_btn.clicked.connect(self.create_annotation)
         self.create_random_dataset_btn.clicked.connect(self.create_random_dataset)
+        self.create_copy_dataset_btn.clicked.connect(self.create_copy_dataset)
         self.next_good_review_btn.clicked.connect(lambda: self.next('good'))
         self.next_bad_review_btn.clicked.connect(lambda: self.next('bad'))
 
@@ -50,6 +53,7 @@ class MainWindow(QMainWindow):
         layout.addWidget(self.browse_dataset_btn)
         layout.addWidget(self.create_annotation_btn)
         layout.addWidget(self.create_random_dataset_btn)
+        layout.addWidget(self.create_copy_dataset_btn)
         layout.addWidget(self.next_bad_review_btn)
         layout.addWidget(self.next_good_review_btn)
         layout.addWidget(self.txt_file)
@@ -72,18 +76,46 @@ class MainWindow(QMainWindow):
         except Exception as ex:
             logging.error(f"Failed to create annotation: {ex}\n")
 
-    def create_random_dataset(self):
-        """Create a random dataset."""
+
+    def create_copy_dataset(self):
+        """Create a copy dataset."""
         if self.dataset_path:
-            self.randomized_dataset_path = QFileDialog.getExistingDirectory(
-                self, "Select Folder for Random Dataset"
+            self.copy_dataset_path = QFileDialog.getExistingDirectory(
+                self, "Select Folder for Copy Dataset"
             )
-            if self.randomized_dataset_path:
+            if self.copy_dataset_path:
                 subfolder_name, _ = QInputDialog.getText(
                     self, 'Subfolder Name', 'Enter Subfolder Name:'
                 )
                 if subfolder_name:
-                    subfolder_path = os.path.join(self.randomized_dataset_path, subfolder_name)
+                    subfolder_path = os.path.join(self.copy_dataset_path, subfolder_name)
+                    if not os.path.exists(subfolder_path):
+                        os.makedirs(subfolder_path)
+
+                    self.copy_annotation_file_path, _ = QFileDialog.getSaveFileName(
+                        self, "Save Copy Annotation File", "", "CSV Files (*.csv)"
+                    )
+                    if self.copy_annotation_file_path:
+                        copy_dataset(
+                            self.dataset_path,
+                            subfolder_path,
+                            self.classes,
+                            self.copy_annotation_file_path,
+                        )
+
+
+    def create_random_dataset(self):
+        """Create a random dataset."""
+        if self.dataset_path:
+            self.random_dataset_path = QFileDialog.getExistingDirectory(
+                self, "Select Folder for Random Dataset"
+            )
+            if self.random_dataset_path:
+                subfolder_name, _ = QInputDialog.getText(
+                    self, 'Subfolder Name', 'Enter Subfolder Name:'
+                )
+                if subfolder_name:
+                    subfolder_path = os.path.join(self.random_dataset_path, subfolder_name)
                     if not os.path.exists(subfolder_path):
                         os.makedirs(subfolder_path)
 
@@ -99,6 +131,7 @@ class MainWindow(QMainWindow):
                             self.random_annotation_file_path,
                         )
 
+
     def browse_dataset(self):
         """Open dialog to select the data folder."""
         self.dataset_path = QFileDialog.getExistingDirectory(self, "Select Data Folder")
@@ -107,6 +140,7 @@ class MainWindow(QMainWindow):
             dataset_files = list(dataset_iterator)  
             self.iter = FileIterator(dataset_files)
 
+
     def get_dataset_files(self):
         """Generator to enumerate file paths in the dataset."""
         if self.dataset_path:
@@ -114,11 +148,12 @@ class MainWindow(QMainWindow):
                 for file in files:
                     yield os.path.join(root, file)
 
+
     def next(self, review_type):
         """Function returns the path to the next element of the class
         and opens text review in the widget"""
         if self.iter is None:
-            QMessageBox.information(None, "Не выбран файл", "Не выбран файл для итерации")
+            QMessageBox.information(None, "File not selected", "No file selected for iteration")
             return
 
         if review_type == "good":
@@ -126,13 +161,13 @@ class MainWindow(QMainWindow):
         elif review_type == "bad":
             element = self.iter.next_bad()
         else:
-            QMessageBox.information(None, "Недопустимое значение", "Выбрано недопустимое значение")
+            QMessageBox.information(None, "Invalid value", "An invalid value has been selected")
             return
 
         self.review_path = element
 
         if self.review_path is None:
-            QMessageBox.information(None, "Конец класса", "Файлы для класса закончились")
+            QMessageBox.information(None, "End of class", "No more files for this class")
             return
 
         self.text_label.update()

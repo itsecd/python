@@ -2,17 +2,16 @@ import os
 import logging
 import shutil
 import json
-import create_annotation
+import csv
 
 logging.basicConfig(level=logging.INFO)
 
 
-def copy_dataset(dataset: str, copy_dataset: str, classes: list) -> None:
+def copy_dataset(dataset: str, copy_dataset: str, classes: list, csv_file_name: str) -> None:
     """Копирует файлы из dataset в copy_dataset с переименованием по формату {class}_{number}.txt.."""
     path_list = []
     if not os.path.exists(copy_dataset):
         os.mkdir(copy_dataset)
-        create_annotation.create_annotation_file(settings['main_dataset'], settings['copy_csv'])
     try:
         for cls in classes:
             files_list = os.listdir(os.path.join(dataset, cls))
@@ -28,6 +27,12 @@ def copy_dataset(dataset: str, copy_dataset: str, classes: list) -> None:
                     ]
                     path_list += path_set
 
+                    csv_file_path = os.path.join(os.getcwd(), csv_file_name)
+                    with open(csv_file_path, 'w', newline='') as csv_file:
+                        csv_writer = csv.writer(csv_file)
+                        csv_writer.writerow(['Absolute Path', 'Relative Path', 'Class'])
+                        csv_writer.writerows(path_list)
+
         logging.info(f"Файлы из {dataset} успешно скопированы в {copy_dataset}")
     except Exception as e:
         logging.error(f"Произошла ошибка в copy_dataset: {e}", exc_info=True)
@@ -38,4 +43,4 @@ if __name__ == '__main__':
     with open(os.path.join("Lab2", "settings.json"), "r") as settings_file:
         settings = json.load(settings_file)
 
-    copy_dataset(settings['main_dataset'], settings['dataset_copy'], settings['classes'])
+    copy_dataset(settings['main_dataset'], settings['dataset_copy'], settings['classes'],settings['copy_csv'])
