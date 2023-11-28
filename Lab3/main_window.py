@@ -51,7 +51,7 @@ class DatasetApp(QWidget):
         layout.addWidget(self.image_label)
 
         self.setLayout(layout)
-
+        
     def browse_dataset(self):
         self.dataset_path = QFileDialog.getExistingDirectory(self, "Select Dataset Folder")
         if self.dataset_path:
@@ -71,5 +71,28 @@ class DatasetApp(QWidget):
                 if self.randomized_annotation_file_path:
                     randomize_dataset_with_annotation(self.dataset_path, self.randomized_annotation_file_path,
                                                       self.randomized_dataset_path, self.classes, self.default_size)
+
+    def get_dataset_files(self):
+        if self.dataset_path:
+            for root, dirs, files in os.walk(self.dataset_path):
+                for file in files:
+                    yield os.path.join(root, file)
+
+    def show_next_brown_bear(self):
+        self.show_next_animal('brown_bear')
+
+    def show_next_polar_bear(self):
+        self.show_next_animal('polar_bear')
+
+    def show_next_animal(self, animal_type):
+        if self.dataset_iterator:
+            try:
+                file_path = next(self.dataset_iterator)
+                while animal_type not in file_path.lower():
+                    file_path = next(self.dataset_iterator)
+                pixmap = QPixmap(file_path)
+                self.image_label.setPixmap(pixmap)
+            except StopIteration:
+                print(f"No more {animal_type}s in the dataset.")
 
     
