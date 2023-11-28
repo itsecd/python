@@ -77,22 +77,6 @@ class MainWindow(QtWidgets.QMainWindow):
         self.cat_iterator = None
         self.dog_iterator = None
 
-    def get_dataset_path(self):
-        """
-        Open a dialog to select the dataset folder and set the dataset_path attribute.
-
-        Returns:
-        - str: The selected dataset folder path.
-        """
-        folder_path = QtWidgets.QFileDialog.getExistingDirectory(self, 'Select Folder')
-        self.folder_path_label.setText(f"Dataset Folder: {folder_path}")
-
-        self.dataset_path = folder_path
-        self.cat_iterator = DirectoryIterator('cat', folder_path)
-        self.dog_iterator = DirectoryIterator('dog', folder_path)
-
-        return folder_path
-
     def create_annotation_file(self):
         """
         Create an annotation file for the dataset.
@@ -117,9 +101,23 @@ class MainWindow(QtWidgets.QMainWindow):
                 write_annotation_to_csv(
                     annotation_file_path, cat_absolute_paths, cat_relative_paths, 'cat')
                 write_annotation_to_csv(
-                annotation_file_path, dog_absolute_paths, dog_relative_paths, 'dog')
+                    annotation_file_path, dog_absolute_paths, dog_relative_paths, 'dog')
 
+    def get_dataset_path(self):
+        """
+        Open a dialog to select the dataset folder and set the dataset_path attribute.
 
+        Returns:
+        - str: The selected dataset folder path.
+        """
+        folder_path = QtWidgets.QFileDialog.getExistingDirectory(self, 'Select Folder')
+        self.folder_path_label.setText(f"Dataset Folder: {folder_path}")
+
+        self.dataset_path = folder_path
+        self.cat_iterator = DirectoryIterator('cat', folder_path)
+        self.dog_iterator = DirectoryIterator('dog', folder_path)
+
+        return folder_path
 
     def create_dataset(self):
         """
