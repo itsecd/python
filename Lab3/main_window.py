@@ -1,6 +1,6 @@
+from enum import Enum
 import re
 import sys
-import os
 from PyQt6.QtCore import Qt
 from PyQt6.QtWidgets import (
     QLabel,
@@ -20,6 +20,15 @@ from annotation import write_csv
 from rev_iterator import RevIterator
 
 
+class DirOrFile(Enum):
+    """
+    param for method get_file_or_dir()
+    """
+    NEW_DIR = 0
+    OLD_DIR = 1
+    CSV = 2
+
+
 class MainWindow(QMainWindow):
     def __init__(self):
         super(MainWindow, self).__init__()
@@ -31,17 +40,17 @@ class MainWindow(QMainWindow):
         self.setMaximumSize(900, 800)
 
         self.open_old_dir_btn = QPushButton('Open directory with dataset')
-        self.open_old_dir_btn.clicked.connect(self.get_old_dir)
+        self.open_old_dir_btn.clicked.connect(lambda: self.get_file_or_dir(DirOrFile.OLD_DIR))
         self.chosen_old_dir = QLabel(self)
         self.chosen_old_dir.setFixedHeight(18)
 
         self.open_new_dir_btn = QPushButton('Choose directory for new dataset')
-        self.open_new_dir_btn.clicked.connect(self.get_new_dir)
+        self.open_new_dir_btn.clicked.connect(lambda: self.get_file_or_dir(DirOrFile.NEW_DIR))
         self.chosen_new_dir = QLabel(self)
         self.chosen_new_dir.setFixedHeight(18)
 
         self.path_to_csv = QPushButton('Choose directory for csv')
-        self.path_to_csv.clicked.connect(self.get_csv)
+        self.path_to_csv.clicked.connect(lambda: self.get_file_or_dir(DirOrFile.CSV))
         self.chosen_csv = QLabel(self)
         self.chosen_csv.setFixedHeight(18)
 
@@ -132,29 +141,23 @@ class MainWindow(QMainWindow):
         path = self.iter.__next__()
         self.show_rev(path)
 
-    def get_csv(self) -> None:
+    def get_file_or_dir(self, label_of_file) -> None:
         """
-        get path to csv for annotation
+        path to dataset or file
         """
-        self.csv = QFileDialog.getSaveFileName(
-            self, 'Choose path to csv', '', 'csv-file(*.csv)')[0]
-        self.chosen_csv.setText(f'You chose: {self.csv}')
-
-    def get_old_dir(self) -> None:
-        """
-        path to dataset
-        """
-        self.old_dir = QFileDialog.getExistingDirectory(
-            self, 'Open working directory')
-        self.chosen_old_dir.setText(f'You chose: {self.old_dir}')
-
-    def get_new_dir(self) -> None:
-        """
-        get path to folder with new dataset
-        """
-        self.new_dir = QFileDialog.getExistingDirectory(
-            self, 'Choose directory')
-        self.chosen_new_dir.setText(f'You chose: {self.new_dir}')
+        if label_of_file == DirOrFile.CSV:
+            self.csv = QFileDialog.getSaveFileName(
+                        self, 'Choose path to csv', '', 'csv-file(*.csv)')[0]
+            self.chosen_csv.setText(f'You chose: {self.csv}')
+            return
+        self.dir = QFileDialog.getExistingDirectory(
+            self, 'Open directory')
+        if label_of_file == DirOrFile.OLD_DIR:
+            self.old_dir=self.dir
+            self.chosen_old_dir.setText(f'You chose: {self.dir}')
+        else:
+            self.new_dir = self.dir
+            self.chosen_new_dir.setText(f'You chose: {self.dir}')
 
     def closeEvent(self, event) -> None:
         event.accept()
