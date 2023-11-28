@@ -7,7 +7,6 @@ import logging
 os.chdir("C:\\Users\\Yana\\Documents\\python-v6\\")
 logging.basicConfig(filename="Lab2\\py_log1.log", filemode="a", level=logging.INFO)
 
-
 def make_list(directory: str, tags: list) -> list:
     """Function creates list with
     parametrs for csv file"""
@@ -34,7 +33,6 @@ def write_csv(name_csv: str, img_list: list) -> None:
         logging.info("csv done!")
     except Exception as e:
         logging.error(f"Error in write data:{e}")
-
 
 if __name__ == "__main__":
     load_dotenv()

@@ -3,6 +3,7 @@ import sys
 import logging
 from PyQt6.QtCore import QSize
 from PyQt6.QtWidgets import (
+    QInputDialog,
     QApplication,
     QMainWindow,
     QPushButton,
@@ -35,7 +36,8 @@ class MainWindow(QMainWindow):
         buttons_layout = QVBoxLayout()
         layout = QGridLayout()
 
-        self.dataset = os.path.abspath("Lab2\dataset")
+        self.dataset = os.path.abspath("Lab3\dataset")
+        self.dataset_copy=os.path.abspath("Lab2\dataset")
         base = QLabel(f"Basic dataset:{self.dataset}", self)
         base.setFixedSize(QSize(350, 50))
 
@@ -54,7 +56,6 @@ class MainWindow(QMainWindow):
         # buttons
         self.button_annotation = self.add_button("Create annotation", 300, 50)
         self.button_сopy_dataset = self.add_button("Copy dataset", 300, 50)
-        self.button_сopy_random = self.add_button("Copy dataset with random numbers", 300, 50)
         self.button_ntiger = self.add_button("Next tiger", 300, 50)
         self.button_nleopard = self.add_button("Next leopard", 300, 50)
         self.button_iterator = self.add_button("Iterator", 300, 50)
@@ -64,7 +65,6 @@ class MainWindow(QMainWindow):
         buttons_layout.addWidget(base)
         buttons_layout.addWidget(self.button_annotation)
         buttons_layout.addWidget(self.button_сopy_dataset)
-        buttons_layout.addWidget(self.button_сopy_random)
         buttons_layout.addWidget(self.button_ntiger)
         buttons_layout.addWidget(self.button_nleopard)
         buttons_layout.addWidget(self.button_iterator)
@@ -77,40 +77,38 @@ class MainWindow(QMainWindow):
         # app functions
         self.button_annotation.clicked.connect(self.create_annotation)
         self.button_сopy_dataset.clicked.connect(self.copy_dataset)
-        self.button_сopy_random.clicked.connect(self.copy_dataset_random)
         self.button_iterator.clicked.connect(self.path_to_csv)
-        self.button_ntiger.clicked.connect(self.next_first_tag)
-        self.button_nleopard.clicked.connect(self.next_second_tag)
+        self.button_ntiger.clicked.connect(lambda:self.next_tag('tiger'))
+        self.button_nleopard.clicked.connect(lambda:self.next_tag('leopard'))
         self.button_exit.clicked.connect(self.close)
 
         self.show()
 
-    def add_button(self, name: str, size_x: str, size_y: str):
+    def add_button(self, name: str, size_x: str, size_y: str) -> QPushButton:
         """The function creates a button with its own name and size"""
         button = QPushButton(name, self)
         button.resize(button.sizeHint())
         button.setFixedSize(QSize(size_x, size_y))
         return button
 
-    def create_annotation(self):
+    def create_annotation(self) -> None:
         """The function creates an annotation in csv file format"""
         try:
-            directory = QFileDialog.getSaveFileName(
+            directory, _ = QFileDialog.getSaveFileName(
                 self,
                 "Select filename and folder - ",
                 "",
                 "CSV File(*.csv)",
-            )[0]
+            )
             if directory == "":
                 QMessageBox.information(None, "Path error")
                 return
-            l = make_list(self.dataset, self.tags)
-            write_csv(directory, l)
+            l = make_list(self.dataset, directory)
             QMessageBox.information(None, "Done", "Annotation created")
         except Exception as e:
-            logging.error(f"Annotation not created:{e}")
+            logging.error(f"Annotation not created: {e}")
 
-    def copy_dataset(self):
+    def copy_dataset(self) -> None:
         """The function copies the dataset and creates a csv file based on it"""
         try:
             directory = QFileDialog.getSaveFileName(
@@ -126,36 +124,18 @@ class MainWindow(QMainWindow):
             if folder == "":
                 QMessageBox.information(None, "Folder error")
                 return
-            copy_dataset(self.dataset, self.tags, folder, directory, False)
-            QMessageBox.information(None, "Done", "Dataset copied!")
+            mode,press_button=QInputDialog.getItem(self,'Mode','Select mode: ',['Copy','Copy with random numbers'],0,False)
+            if press_button:
+                if mode=='Copy':
+                    copy_dataset(self.dataset_copy, self.tags, folder, directory, False)
+                elif mode=='Copy with random numbers':
+                    copy_dataset(self.dataset_copy, self.tags, folder, directory, True)
+            QMessageBox.information(None, "Done", f"Dataset copied with mode {mode}!")
             logging.info("copy_dataset works")
         except Exception as e:
             logging.error(f"Copy dataset error:{e}")
 
-    def copy_dataset_random(self):
-        """The function copies the dataset with random numbers
-        and creates a csv file based on it"""
-        try:
-            directory = QFileDialog.getSaveFileName(
-                self,
-                "Select path - ",
-                "",
-                "CSV File(*.csv)",
-            )[0]
-            if directory == "":
-                QMessageBox.information(None, "Path error")
-                return
-            folder = QFileDialog.getExistingDirectory(self, "Select folder for copy -")
-            if folder == "":
-                QMessageBox.information(None, "Folder error")
-                return
-            copy_dataset(self.dataset, self.tags, folder, directory, True)
-            QMessageBox.information(None, "Done", "Dataset with random numbers copied!")
-            logging.info("copy_dataset_random works")
-        except Exception as e:
-            logging.error(f"Copy dataset error:{e}")
-
-    def path_to_csv(self):
+    def path_to_csv(self) -> None:
         """The function requests the path to the 
         csv file and creates an iterator"""
         try:
@@ -168,25 +148,20 @@ class MainWindow(QMainWindow):
         except Exception as e:
             logging.error(f"Error with picture:{e}")
 
-    def next_first_tag(self):
+    def next_tag(self,tag:str) -> None:
         """The function shows the next image for a given tag"""
         if self.iterator == None:
             QMessageBox.information(None, "Error", "Error when selecting picture")
             return
-        tag = self.iterator.next_first_tag()
-        self.image_path = tag
+        next_image=None
+        if tag == 'tiger':
+            next_image=self.iterator.next_first_tag()
+        if tag == 'leopard':
+            next_image=self.iterator.next_second_tag()
+        print(next_image)
+        self.image_path = next_image
         self.image.update()
-        self.image.setPixmap(QPixmap(tag))
-
-    def next_second_tag(self):
-        """The function shows the next image for a given tag"""
-        if self.iterator == None:
-            QMessageBox.information(None, "Error", "Error when selecting picture")
-            return
-        tag = self.iterator.next_second_tag()
-        self.image_path = tag
-        self.image.update()
-        self.image.setPixmap(QPixmap(tag))
+        self.image.setPixmap(QPixmap(next_image))
 
 
 if __name__ == "__main__":
