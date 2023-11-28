@@ -1,17 +1,18 @@
 import sys
 from PyQt5 import QtWidgets, QtGui, QtCore
-import shutil
 import os
 import random
-
+import logging
 sys.path.insert(0, "Lab2")
 from create_annotation import get_absolute_paths, get_relative_paths, write_annotation_to_csv
 from copy_dataset_in_new_folder import replace_images
 from copy_dataset_random_names import process_images
-from path_of_next import get_next
 from iterator import DirectoryIterator
 
 
+logging.basicConfig(level=logging.INFO)
+  
+  
 class MainWindow(QtWidgets.QMainWindow):
     """
     Main window class for the Dataset Annotation App.
@@ -102,20 +103,23 @@ class MainWindow(QtWidgets.QMainWindow):
         Returns:
         - None
         """
-        folder_path = self.get_dataset_path()
         annotation_file_path, _ = QtWidgets.QFileDialog.getSaveFileName(
             self, 'Save Annotation File', '', 'CSV Files (*.csv)')
 
         if annotation_file_path:
-            cat_absolute_paths = get_absolute_paths('cat', folder_path)
-            cat_relative_paths = get_relative_paths('cat', folder_path)
-            dog_absolute_paths = get_absolute_paths('dog', folder_path)
-            dog_relative_paths = get_relative_paths('dog', folder_path)
+            folder_path = self.get_dataset_path()
+            if folder_path:
+                cat_absolute_paths = get_absolute_paths('cat', folder_path)
+                cat_relative_paths = get_relative_paths('cat', folder_path)
+                dog_absolute_paths = get_absolute_paths('dog', folder_path)
+                dog_relative_paths = get_relative_paths('dog', folder_path)
 
-            write_annotation_to_csv(
-                annotation_file_path, cat_absolute_paths, cat_relative_paths, 'cat')
-            write_annotation_to_csv(
+                write_annotation_to_csv(
+                    annotation_file_path, cat_absolute_paths, cat_relative_paths, 'cat')
+                write_annotation_to_csv(
                 annotation_file_path, dog_absolute_paths, dog_relative_paths, 'dog')
+
+
 
     def create_dataset(self):
         """
@@ -138,34 +142,35 @@ class MainWindow(QtWidgets.QMainWindow):
             process_images('cat', folder_path, new_dataset_path)
             process_images('dog', folder_path, new_dataset_path)
 
-def copy_dataset(self, random_suffix=None):
-    """
-    Copy the dataset to a new location.
+    def copy_dataset(self, random_suffix=None):
+        """
+        Copy the dataset to a new location.
 
-    This method prompts the user to select a destination folder and copies the dataset
-    to that location. If a random_suffix is provided, it will be added to the folder name.
+        This method prompts the user to select a destination folder and copies the dataset
+        to that location. If a random_suffix is provided, it will be added to the folder name.
 
-    Parameters:
-    - random_suffix (str or None): Random suffix to be added to the folder name (default is None).
-    """
-    source_folder = self.get_dataset_path()
-    destination_folder = QtWidgets.QFileDialog.getExistingDirectory(
-        self, 'Select Destination Folder for Copy')
+        Parameters:
+        - random_suffix (str or None): Random suffix to be added to the folder name (default is None).
+        """
+        source_folder = self.get_dataset_path()
+        destination_folder = QtWidgets.QFileDialog.getExistingDirectory(
+            self, 'Select Destination Folder for Copy')
 
-    if destination_folder:
-        if random_suffix is not None:
-            destination_folder = os.path.join(destination_folder, f"{os.path.basename(source_folder)}_copy_{random_suffix}")
-        else:
-            destination_folder = os.path.join(destination_folder, f"{os.path.basename(source_folder)}_copy")
+        if destination_folder:
+            if random_suffix is not None:
+                destination_folder = os.path.join(destination_folder, f"{os.path.basename(source_folder)}_copy_{random_suffix}")
+            else:
+                destination_folder = os.path.join(destination_folder, f"{os.path.basename(source_folder)}_copy")
 
-        replace_images('cat', source_folder)
-        replace_images('dog', source_folder)
-        process_images('cat', source_folder, destination_folder)
-        process_images('dog', source_folder, destination_folder)
+            try:
+                replace_images('cat', source_folder)
+                replace_images('dog', source_folder)
+                process_images('cat', source_folder, destination_folder)
+                process_images('dog', source_folder, destination_folder)
 
-        QtWidgets.QMessageBox.information(self, "Dataset Copy", "Dataset copied successfully.")
-
-
+                QtWidgets.QMessageBox.information(self, "Dataset Copy", "Dataset copied successfully.")
+            except Exception as e:
+                QtWidgets.QMessageBox.critical(self, "Error", f"An error occurred: {str(e)}")
 
     def get_next_instance(self, class_name):
         """
@@ -222,8 +227,6 @@ def copy_dataset(self, random_suffix=None):
                 QtWidgets.QMessageBox.warning(
                     self, "Error", f"No more instances of {class_name}.")
 
-
-
     def display_image(self, image_path: str) -> None:
         """
         Display the image at the specified path in the scroll area.
@@ -239,9 +242,9 @@ def copy_dataset(self, random_suffix=None):
         """
         pixmap = QtGui.QPixmap(image_path)
         if pixmap.isNull():
-            print("Не удалось загрузить изображение:", image_path)
+            logging.error(f"Failed to load image: {image_path}")
         else:
-            print("Изображение успешно загружено.")
+            logging.info("Image loaded successfully.")
             pixmap = pixmap.scaledToWidth(self.scroll_area.width())
 
             label = QtWidgets.QLabel()
