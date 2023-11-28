@@ -5,42 +5,44 @@ from file_manipulation import read_csv
 
 
 class DateIterator:
-    __data_dict = None
-    __index = None
-    __dates = None
-
     def __init__(self, file_path: str):
         header, data = read_csv(file_path)
-        self.set_data_dict(data)
-        self.set_dates(self.get_data_dict())
-        self.set_index(0)
-
-    def set_data_dict(self, data):
-        self.__data_dict = {datetime.strptime(row[0], '%Y-%m-%d'): [t for t in row] for row in data}
-
-    def get_data_dict(self):
+        self.__data_dict = {datetime.strptime(row[0], '%Y-%m-%d'): [t for t in row[1:]] for row in data}
+        self.__dates = sorted(self.__data_dict.keys())
+        self.__index = 0
+    
+    @property
+    def data_dict(self):
         return self.__data_dict
 
-    def set_dates(self, data_dict):
-        self.__dates = sorted(data_dict.keys())
-
-    def get_dates(self):
+    @data_dict.setter
+    def data_dict(self, x):
+        self.__data_dict = x
+    
+    @property
+    def dates(self):
         return self.__dates
 
-    def set_index(self, index):
-        self.__index = index
+    @dates.setter
+    def dates(self, x):
+        self.__dates = x
 
-    def get_index(self):
+    @property
+    def index(self):
         return self.__index
+
+    @index.setter
+    def index(self, index):
+        self.__index = index
 
     def __iter__(self):
         return self
 
     def __next__(self) -> tuple:
-        if self.get_index() < len(self.get_dates()):
-            date = self.get_dates()[self.get_index()]
-            data = self.get_data_dict()[date]
-            self.set_index(self.get_index()+1)
+        if self.__index < len(self.__dates):
+            date = self.__dates[self.__index]
+            data = self.__data_dict[date]
+            self.__index += 1
             return date, data
         else:
             raise StopIteration

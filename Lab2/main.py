@@ -19,7 +19,7 @@ if __name__ == '__main__':
         '--mode',
         type=str,
         default='X_Y',
-        help='provide a string (mode: "X_Y" or "years" or "weeks" or "find" default: X_Y)'
+        help='provide a string (mode: "X_Y" or "years" or "weeks" or "find" or DateIterator default: X_Y)'
     )
     parser.add_argument(
         '--path',
@@ -63,6 +63,6 @@ if __name__ == '__main__':
             logging.info(f"Empty date {e}/{e.args}")
 
     if namespace.mode == 'DateIterator':
-        iterator = DateIterator('test.csv')
+        iterator = DateIterator(namespace.path)
         for date, data in iterator:
             print(date, *data)
