@@ -10,8 +10,7 @@ from PyQt6.QtWidgets import (QApplication,
                              QComboBox, 
                              QMessageBox, 
                              QDialog, 
-                             QDialogButtonBox, 
-                             QVBoxLayout)
+                             QDialogButtonBox)
 from PyQt6.QtGui import QPixmap
 
 sys.path.insert(0,"Lab2")
@@ -21,6 +20,7 @@ from copy_dataset_random import replace_images_and_randomize
 from iterator import ElementIterator
 
 logging.basicConfig(level=logging.INFO)
+
 
 class CreateDatasetDialog(QDialog):
     def __init__(self)-> None:
@@ -76,7 +76,7 @@ class App(QWidget):
         self.polar_iterator = None
 
         self.setLayout(self.layout)
-        self.setFixedSize(320, 400)    
+        self.setMinimumSize(320, 400)    
 
 
     def select_dataset_folder(self)-> None:
@@ -155,12 +155,22 @@ class App(QWidget):
             logging.error(f"Couldn't create dataset: {ex.message}\n{ex.args}\n")
             
 
-    def show_image(self, 
-                   image_path: str) -> None:
+    def show_image(self, image_path: str) -> None:
         """function for displaying an image"""
         pixmap = QPixmap(image_path)
         if not pixmap.isNull():
-            self.image_label.setPixmap(pixmap.scaled(300, 300))
+            window_width = self.size().width()
+            window_height = self.size().height()
+
+            width_factor = window_width / pixmap.width()
+            height_factor = window_height / pixmap.height()
+            scale_factor = min(width_factor, height_factor)
+
+            scaled_width = int(pixmap.width() * scale_factor)
+            scaled_height = int(pixmap.height() * scale_factor)
+
+            scaled_pixmap = pixmap.scaled(scaled_width, scaled_height)
+            self.image_label.setPixmap(scaled_pixmap)
         else:
             self.image_label.setText('Изображение не найдено')
 
