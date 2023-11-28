@@ -7,17 +7,16 @@ import logging
 os.chdir("C:\\Users\\Yana\\Documents\\python-v6\\")
 logging.basicConfig(filename="Lab2\\py_log1.log", filemode="a", level=logging.INFO)
 
-def make_list(directory: str, tags: list) -> list:
+
+def make_list(directory: str) -> list:
     """Function creates list with
     parametrs for csv file"""
     img_list = []
-    for tag in tags:
-        logging.info(f"for {tag}")
-        count_files = len(os.listdir(os.path.join(directory, tag)))
-        for img in range(count_files):
-            item = [[os.path.abspath(os.path.join(directory, tag, f"{img:04}.jpg")),
-                    os.path.join(directory, tag, f"{img:04}.jpg"),tag,]]
-            img_list += item
+    count_files = len(os.listdir(os.path.join(directory)))
+    for img in range(count_files):
+        item = [[os.path.abspath(os.path.join(directory,f"{img:04}.jpg")),
+                os.path.relpath(os.path.join(directory,f"{img:04}.jpg")),]]
+        img_list += item
     return img_list
 
 
@@ -28,11 +27,12 @@ def write_csv(name_csv: str, img_list: list) -> None:
         logging.info("in function make_csv")
         logging.info("make_csv")
         for img in img_list:
-            with open(f"{name_csv}.csv", "a") as f:
+            with open(f"Lab3\{name_csv}", "a") as f:
                 csv.writer(f, lineterminator="\n").writerow(img)
         logging.info("csv done!")
     except Exception as e:
         logging.error(f"Error in write data:{e}")
+
 
 if __name__ == "__main__":
     load_dotenv()

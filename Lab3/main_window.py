@@ -94,16 +94,17 @@ class MainWindow(QMainWindow):
     def create_annotation(self) -> None:
         """The function creates an annotation in csv file format"""
         try:
-            directory, _ = QFileDialog.getSaveFileName(
+            directory= QFileDialog.getSaveFileName(
                 self,
                 "Select filename and folder - ",
                 "",
                 "CSV File(*.csv)",
-            )
+            )[0]
             if directory == "":
                 QMessageBox.information(None, "Path error")
                 return
-            l = make_list(self.dataset, directory)
+            l = make_list(self.dataset)
+            write_csv(os.path.basename(directory),l)
             QMessageBox.information(None, "Done", "Annotation created")
         except Exception as e:
             logging.error(f"Annotation not created: {e}")
