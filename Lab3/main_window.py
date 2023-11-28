@@ -144,7 +144,7 @@ class MainWindow(QMainWindow):
             if path == "":
                 QMessageBox.information(None, "Error", "Path error")
                 return
-            self.iterator = TagIterator(path, self.tags[0], self.tags[1])
+            self.iterator=TagIterator(path, self.tags[0], self.tags[1])
             logging.info("path_to_csv works")
         except Exception as e:
             logging.error(f"Error with picture:{e}")
@@ -159,7 +159,6 @@ class MainWindow(QMainWindow):
             next_image=self.iterator.next_first_tag()
         if tag == 'leopard':
             next_image=self.iterator.next_second_tag()
-        print(next_image)
         self.image_path = next_image
         self.image.update()
         self.image.setPixmap(QPixmap(next_image))

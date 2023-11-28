@@ -13,10 +13,11 @@ def make_list(directory: str) -> list:
     parametrs for csv file"""
     img_list = []
     count_files = len(os.listdir(os.path.join(directory)))
-    for img in range(count_files):
-        item = [[os.path.abspath(os.path.join(directory,f"{img:04}.jpg")),
-                os.path.relpath(os.path.join(directory,f"{img:04}.jpg")),]]
-        img_list += item
+    logging.info(os.listdir(os.path.join(directory)))
+    for item in os.listdir(os.path.join(directory)):
+            str = [[os.path.abspath(os.path.join(directory,f"{item}")),
+                    os.path.relpath(os.path.join(directory,f"{item}")),]]
+            img_list += str
     return img_list
 
 
