@@ -1,7 +1,6 @@
 import sys
 import os
 import logging
-from PyQt6.QtCore import QSize
 from PyQt6.QtWidgets import (QApplication, QMainWindow, QPushButton,
                             QMessageBox, QLabel, QFileDialog, QVBoxLayout, QWidget, QGridLayout,)
 from PyQt6.QtGui import QPixmap
@@ -17,33 +16,37 @@ class Window(QMainWindow):
     def __init__(self) -> None:
         super().__init__()
 
-        self.setGeometry(700, 200, 600, 350)
+        self.setGeometry(500, 200, 800, 450)
         self.setWindowTitle("Lab3-var3 main window")
+        self.setStyleSheet('background-color: #2cf3e2;')
+
         main_widget = QWidget()
-        box_layout = QVBoxLayout()  # Размещает область в вертикальном столбце
-        layout = QGridLayout()  # Упорядочивает в виде сетки из строк и столбцов
+        box_layout = QVBoxLayout()
+        layout = QGridLayout()
 
         self.dataset_path = os.path.abspath("dataset")
         src = QLabel(
             f"Путь к папке исходного датасета:\n{self.dataset_path}", self)
-        src.setFixedSize(QSize(230, 40))
         box_layout.addWidget(src)
-        src.setStyleSheet('color:blue')
+        main_widget.setStyleSheet("max-width: 900%;"
+                                "margin: 0 20% 0 10%;"
+                                "height: auto;"
+                                "padding: 5% 40% 5% 40%;")
 
         # установим кнопки
-        self.annotation = self.add_button("Создать файл-аннотацию", 230, 30)
-        self.bata_copy = self.add_button("Копирование датасета", 230, 30)
-        self.bata_random = self.add_button("Датасет из радомных чисел", 230, 30)
-        self.bata_iterator = self.add_button("Получение следующего экземпляра", 230, 30)
-        self.next_cats = self.add_button("Следующий котик", 230, 30)
-        self.next_dogs = self.add_button("Следующая собачка", 230, 30)
-        self.exit = self.add_button("Выйти из программы", 230, 30)
+        self.annotation = self.add_button("Создать файл-аннотацию")
+        self.bata_copy = self.add_button("Копирование датасета")
+        self.bata_random = self.add_button("Датасет из радомных чисел")
+        self.bata_iterator = self.add_button("Получение следующего экземпляра")
+        self.next_cats = self.add_button("Следующий котик")
+        self.next_dogs = self.add_button("Следующая собачка")
+        self.exit = self.add_button("Выйти из программы")
 
         # установим изображение
         self.image_label = QLabel(self)
-        self.image_label.setFixedSize(300, 300)
-        # масштабирует пиксельное изображение
+        self.image_label.setFixedSize(400, 400)
         self.image_label.setScaledContents(True)
+        self.image_label.setStyleSheet("margin: 0;" "padding: 0;")
 
         # форматируем виджеты по размеру окна
         box_layout.addWidget(self.annotation)
@@ -78,14 +81,11 @@ class Window(QMainWindow):
 
         self.show()
 
-    def add_button(self, name: str, size_x: int, size_y: int) -> QPushButton:
+    def add_button(self, name: str) -> QPushButton:
         '''принимает название поля кнопки и ее размеры'''
-        button = QPushButton(
-            name, self)  # Виджет кнопок, на который пользователь может нажать
-        # Возвращает измененную копию этого изображения (возвращает объект QSize)
+        button = QPushButton(name, self)
         button.resize(button.sizeHint())
-        button.setStyleSheet('color:blue')
-        button.setFixedSize(QSize(size_x, size_y))
+        button.setStyleSheet('background-color: #ee5300;')
         return button
 
     def create_copy_random(self, number: int) -> None:
