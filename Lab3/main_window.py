@@ -30,8 +30,8 @@ class MainWindow(QMainWindow):
     def __init__(self) -> None:
         super().__init__()
 
-        self.setGeometry(1000, 200, 1000, 1000)
-        self.setMaximumSize(1000, 1000)
+        self.setGeometry(1000, 200, 1000, 500)
+        self.setMaximumSize(2000, 2000)
 
         box_layout = QVBoxLayout()
         grid_layout = QGridLayout()
