@@ -12,6 +12,7 @@ def copy_dataset(dataset: str, copy_dataset: str, classes: list) -> None:
     path_list = []
     if not os.path.exists(copy_dataset):
         os.mkdir(copy_dataset)
+        create_annotation.create_annotation_file(settings['main_dataset'], settings['copy_csv'])
     try:
         for cls in classes:
             files_list = os.listdir(os.path.join(dataset, cls))
@@ -38,4 +39,3 @@ if __name__ == '__main__':
         settings = json.load(settings_file)
 
     copy_dataset(settings['main_dataset'], settings['dataset_copy'], settings['classes'])
-    create_annotation.create_annotation_file(settings['main_dataset'], settings['copy_csv'])
