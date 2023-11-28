@@ -1,5 +1,4 @@
 import csv
-import os
 
 
 class ImageIterator:
@@ -15,11 +14,8 @@ class ImageIterator:
         with open(self.annotation_file, 'r') as csvfile:
             csvreader = csv.reader(csvfile)
             for row in csvreader:
-                if len(row) == 3:
-                    instance_class = os.path.split(
-                        row[1])[-1].split("_")[0].split(".")[0]
-                    if instance_class == self.target_class:
-                        instances.append(row[1])
+                if len(row) == 3 and row[2] == self.target_class:
+                    instances.append(row[0])
         return instances
 
     def __iter__(self):
