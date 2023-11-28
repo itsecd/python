@@ -19,6 +19,11 @@ class Action(Enum):
     RANDOM = 1
 
 
+class Animal(Enum):
+    Cat = 0
+    Dog = 1
+
+
 class Window(QMainWindow):
     def __init__(self) -> None:
         super().__init__()
@@ -79,8 +84,8 @@ class Window(QMainWindow):
 
         # то, что будет на экране при нажатии кнопки итератора
         self.bata_iterator.clicked.connect(self.csv_path)
-        self.next_cats.clicked.connect(self.next_cat)
-        self.next_dogs.clicked.connect(self.next_dog)
+        self.next_cats.clicked.connect(lambda: self.next(Animal.Cat))
+        self.next_dogs.clicked.connect(lambda: self.next(Animal.Dog))
 
         # то, что будет на экране при нажатии кнопки выход из программы
         self.exit.clicked.connect(self.close)
@@ -149,21 +154,17 @@ class Window(QMainWindow):
         except:
             logging.error(f"Error in csv_path\n")
 
-    def next_cat(self) -> None:
+    def next(self, number: int) -> None:
         '''возвращаем путь следующего элемента'''
         if self.choice_iterator == None:
             QMessageBox.information(
                 None, "Ошибка работы программы!", "Не выбран файл для итерации")
             return
-        self.image_label.setPixmap(QPixmap(self.choice_iterator.next_cat()))
-
-    def next_dog(self) -> None:
-        '''возвращаем путь следующего элемента'''
-        if self.choice_iterator == None:
-            QMessageBox.information(
-                None, "Ошибка работы программы!", "Не выбран файл для итерации")
-            return
-        self.image_label.setPixmap(QPixmap(self.choice_iterator.next_dog()))
+        if number == 0:
+            choice = self.choice_iterator.next_cat()
+        else:
+            choice = self.choice_iterator.next_dog()
+        self.image_label.setPixmap(QPixmap(choice))
 
 
 if __name__ == "__main__":
