@@ -65,6 +65,7 @@ class DatasetApp(QWidget):
         self.setLayout(layout)
         
     def browse_dataset(self):
+        """Open a file dialog to select a dataset folder."""
         self.dataset_path = QFileDialog.getExistingDirectory(self, "Select Dataset Folder")
         if self.dataset_path:
             self.dataset_iterator = iter(self.get_dataset_files())
@@ -100,18 +101,22 @@ class DatasetApp(QWidget):
                     copy_dataset_with_annotation(self.dataset_path, self.copied_dataset_path, self.annotation_file_path)
 
     def get_dataset_files(self):
+        """Generator function to yield file paths in the selected dataset folder."""
         if self.dataset_path:
             for root, dirs, files in os.walk(self.dataset_path):
                 for file in files:
                     yield os.path.join(root, file)
 
     def show_next_brown_bear(self):
+        """Display the next image of a brown bear in the dataset."""
         self.show_next_animal('brown_bear')
 
     def show_next_polar_bear(self):
+        """Display the next image of a polar bear in the dataset."""
         self.show_next_animal('polar_bear')
 
     def show_next_animal(self, animal_type):
+        """Display the next image of the specified animal type in the dataset."""
         if self.dataset_iterator:
             try:
                 file_path = next(self.dataset_iterator)
