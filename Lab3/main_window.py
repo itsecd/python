@@ -7,9 +7,9 @@ from PyQt6.QtWidgets import (QApplication, QMainWindow, QPushButton,
 from PyQt6.QtGui import QPixmap
 
 sys.path.append("C:/Users/user/Desktop/Python2/Lab2")
-from new import write_in_new
-from csv_name import make_list, write_in_file
 from iterator import ChoiceIterator
+from csv_name import make_list, write_in_file
+from new import write_in_new
 
 logging.basicConfig(level=logging.INFO)
 
@@ -42,7 +42,8 @@ class Window(QMainWindow):
         self.annotation = self.add_button("Создать файл-аннотацию")
         self.bata_copy = self.add_button("Копирование датасета")
         self.bata_random = self.add_button("Датасет из радомных чисел")
-        self.bata_iterator = self.add_button("Получение следующего экземпляра")
+        self.bata_iterator = self.add_button(
+            "Выбрать аннотацию для просмотра датасета")
         self.next_cats = self.add_button("Следующий котик")
         self.next_dogs = self.add_button("Следующая собачка")
         self.exit = self.add_button("Выйти из программы")
@@ -78,8 +79,8 @@ class Window(QMainWindow):
 
         # то, что будет на экране при нажатии кнопки итератора
         self.bata_iterator.clicked.connect(self.csv_path)
-        self.next_cats.clicked.connect(self.cat)
-        self.next_dogs.clicked.connect(self.dog)
+        self.next_cats.clicked.connect(self.next_cat)
+        self.next_dogs.clicked.connect(self.next_dog)
 
         # то, что будет на экране при нажатии кнопки выход из программы
         self.exit.clicked.connect(self.close)
@@ -148,23 +149,21 @@ class Window(QMainWindow):
         except:
             logging.error(f"Error in csv_path\n")
 
-    def next(self, number: int) -> None:
+    def next_cat(self) -> None:
         '''возвращаем путь следующего элемента'''
         if self.choice_iterator == None:
             QMessageBox.information(
                 None, "Ошибка работы программы!", "Не выбран файл для итерации")
             return
-        if number == 0:
-            a = self.choice_iterator.next_cat()
-        else:
-            a = self.choice_iterator.next_dog()
-        self.image_label.setPixmap(QPixmap(a))
+        self.image_label.setPixmap(QPixmap(self.choice_iterator.next_cat()))
 
-    def cat(self) -> None:
-        self.next(0)
-
-    def dog(self) -> None:
-        self.next(1)
+    def next_dog(self) -> None:
+        '''возвращаем путь следующего элемента'''
+        if self.choice_iterator == None:
+            QMessageBox.information(
+                None, "Ошибка работы программы!", "Не выбран файл для итерации")
+            return
+        self.image_label.setPixmap(QPixmap(self.choice_iterator.next_dog()))
 
 
 if __name__ == "__main__":
