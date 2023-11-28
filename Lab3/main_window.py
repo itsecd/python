@@ -64,7 +64,7 @@ class MainWindow(QMainWindow):
         box_layout.addWidget(self.btn_iterator)
         box_layout.addWidget(self.btn_next)
         box_layout.addWidget(self.combo)
-        self.path_label=QLabel("Здесь будет обозачен путь активного файла")
+        self.path_label=QLabel("Здесь будет обозначен путь активного файла")
         box_layout.addWidget(self.path_label)
 
         box_layout.addStretch()
