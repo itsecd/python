@@ -6,17 +6,14 @@ import json
 import create_annotation
 import csv
 
-def make_random_list(top: int) -> list:
-    """Creates a list filled with random numbers from 0 to {top}"""
-    rand_list = []
-    for i in range(0, top):
-        rand_list.append(i)
-    random.shuffle(rand_list)
-    return rand_list
 
 def random_dataset(dataset: str, random_dataset: str, size: int, classes: list, csv_file_name: str) -> list:
     """Создает папку, где файлы из random_dataset получают случайные имена."""
-    random_idx = make_random_list(size)
+    rand_list = []
+    for i in range(0, size):
+        rand_list.append(i)
+    random.shuffle(rand_list)
+    random_idx = rand_list
 
     path_list = list()
     if not os.path.exists(os.path.join(random_dataset)):

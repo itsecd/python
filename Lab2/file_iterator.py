@@ -2,7 +2,6 @@ import csv
 import os
 import json
 
-
 class FileIterator:
     def __init__(self, csv_path: str, class_name: str):
         self.file_paths = []
@@ -25,6 +24,29 @@ class FileIterator:
         else:
             raise StopIteration
 
+    def next_good(self) -> str:
+        """Возвращает следующий элемент для класса 'good'"""
+        if self.class_name != 'good':
+            return None
+        
+        if self.current_index < len(self.file_paths):
+            current_path = self.file_paths[self.current_index]
+            self.current_index += 1
+            return current_path
+        else:
+            return None
+
+    def next_bad(self) -> str:
+        """Возвращает следующий элемент для класса 'bad'"""
+        if self.class_name != 'bad':
+            return None
+        
+        if self.current_index < len(self.file_paths):
+            current_path = self.file_paths[self.current_index]
+            self.current_index += 1
+            return current_path
+        else:
+            return None
 
 if __name__ == "__main__":
     with open(os.path.join("Lab2", "settings.json"), "r") as settings_file:
@@ -36,4 +58,4 @@ if __name__ == "__main__":
     )
 
     for file_path in file_iterator:
-        print(file_path)
+        print(file_path)  # Ваша логика для обработки каждого файла
