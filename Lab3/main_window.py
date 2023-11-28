@@ -2,6 +2,7 @@ import sys
 import os
 from PyQt5.QtWidgets import QApplication, QWidget, QLabel, QPushButton, QVBoxLayout, QFileDialog
 from PyQt5.QtGui import QPixmap
+sys.path.insert(1, "K:/Pyth/PLab1/Lab2")
 from generate_annotation import generate_annotation_file
 from randomize_dataset import randomize_dataset_with_annotation
 
@@ -50,5 +51,25 @@ class DatasetApp(QWidget):
         layout.addWidget(self.image_label)
 
         self.setLayout(layout)
+
+    def browse_dataset(self):
+        self.dataset_path = QFileDialog.getExistingDirectory(self, "Select Dataset Folder")
+        if self.dataset_path:
+            self.dataset_iterator = iter(self.get_dataset_files())
+
+    def create_annotation(self):
+        if self.dataset_path:
+            self.annotation_file_path, _ = QFileDialog.getSaveFileName(self, "Save Annotation File", "", "CSV Files (*.csv)")
+            if self.annotation_file_path:
+                generate_annotation_file(self.dataset_path, self.annotation_file_path)
+
+    def create_randomized_dataset(self):
+        if self.dataset_path:
+            self.randomized_dataset_path = QFileDialog.getExistingDirectory(self, "Select Randomized Dataset Folder")
+            if self.randomized_dataset_path:
+                self.randomized_annotation_file_path, _ = QFileDialog.getSaveFileName(self, "Save Randomized Annotation File", "", "CSV Files (*.csv)")
+                if self.randomized_annotation_file_path:
+                    randomize_dataset_with_annotation(self.dataset_path, self.randomized_annotation_file_path,
+                                                      self.randomized_dataset_path, self.classes, self.default_size)
 
     
