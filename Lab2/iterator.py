@@ -1,37 +1,21 @@
-import shutil
-import os
-import csv
-import json
+from return_files import get_paths
 
 
 class DatasetIterator:
-    """Returns a path to a file belonging of the class"""
-    def __init__(self, dataset_path: str, class_name: str):
-        self.data = list()
-        self.count = 0
-        self.mark = class_name
-        with open(dataset_path, 'r') as file:
-            reader = csv.reader(file)
-            for row in reader:
-                if self.mark == row[2]:
-                    self.data.append(row[0])
+    def __init__(self, class_name: str, 
+                 csv_path: str) -> None:
+        self.counter = 0
+        self.class_name = class_name
+        self.paths = get_paths(class_name, csv_path)
+        self.limit = len(self.paths) if self.paths else 0
 
     def __iter__(self):
         return self
-
-    def __next__(self) -> str:
-        def __next__(self) -> str:
-            if self.count < len(self.data):
-                self.count += 1
-                return self.data[self.count-1]
-            else:
-                raise StopIteration
-
-
-if __name__ == "__main__":
-    with open(os.path.join("Lab2", "settings.json"), "r") as settings:
-        settings = json.load(settings)
-    iterator = DatasetIterator(settings["randomized_csv"], settings["classes"][0])
-    for i in iter:
-        print(i)
-       
+    
+    def __next__(self):
+        if self.counter < self.limit:
+            next_path = self.paths[self.counter]
+            self.counter += 1
+            return next_path
+        else:
+            return None

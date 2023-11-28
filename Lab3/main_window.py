@@ -7,7 +7,7 @@ sys.path.insert(1, "K:/Pyth/PLab1/Lab2")
 from generate_annotation import generate_annotation_file
 from randomize_dataset import randomize_dataset_with_annotation
 from copy_dataset import copy_dataset_with_annotation
-
+from iterator import DatasetIterator
 
 
 class DatasetApp(QWidget):
@@ -46,6 +46,9 @@ class DatasetApp(QWidget):
         self.next_polar_bear_btn = QPushButton('Next polar bear', self)
         self.next_polar_bear_btn.clicked.connect(self.show_next_polar_bear)
 
+        self.brown_iterator = None
+        self.polar_iterator = None
+
         # Image display
         self.image_label = QLabel(self)
 
@@ -65,8 +68,10 @@ class DatasetApp(QWidget):
         self.dataset_path = QFileDialog.getExistingDirectory(self, "Select Dataset Folder")
         if self.dataset_path:
             self.dataset_iterator = iter(self.get_dataset_files())
+            
 
     def create_annotation(self):
+        """This function create a csv annotation."""
         try:
             if self.dataset_path:
                 self.annotation_file_path, _ = QFileDialog.getSaveFileName(self, "Save Annotation File", "", "CSV Files (*.csv)")
@@ -76,6 +81,7 @@ class DatasetApp(QWidget):
             logging.error(f"Couldn't create annotation: {ex.message}\n{ex.args}\n")            
 
     def create_randomized_dataset(self):
+        """This function create a randomized dataset and csv file using the selected dataset folder."""
         if self.dataset_path:
             self.randomized_dataset_path = QFileDialog.getExistingDirectory(self, "Select Randomized Dataset Folder")
             if self.randomized_dataset_path:
@@ -85,6 +91,7 @@ class DatasetApp(QWidget):
                                                       self.randomized_dataset_path, self.classes, self.default_size)
                     
     def create_copied_dataset(self):
+        """This function create a copied dataset and csv file using the selected dataset folder."""
         if self.dataset_path:
             self.copied_dataset_path = QFileDialog.getExistingDirectory(self, "Select Copied Dataset Folder")
             if self.copied_dataset_path:
