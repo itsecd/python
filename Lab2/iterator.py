@@ -31,6 +31,7 @@ class ElementIterator:
                     if self.ch[self.count + 1][2] == self.__search:
                         spamwriter.writerow({self.ch[self.count + 1][1]})
                     self.count += 1
+                    return self.ch[self.count][1]
         else:
             return None
 

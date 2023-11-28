@@ -13,10 +13,12 @@ def make_list(
     '''принимает название папки и метки класса (cat, dog)'''
     list = []
     for s in search:
-        for photo in range(main["max_file"]):
+        count = len(os.listdir(os.path.join(folder, s)))
+        for photo in range(count):
             string = [[
                 os.path.abspath(os.path.join(folder, s, f"{photo:04}.jpg")),
-                os.path.join(folder, s, f"{photo:04}.jpg"),
+                os.path.relpath(os.path.abspath(
+                    os.path.join(folder, s, f"{photo:04}.jpg"))),
                 s, ]
             ]
             list += string

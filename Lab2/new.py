@@ -1,6 +1,7 @@
 import os
 import json
 import logging
+import shutil
 import random
 import csv_name
 
@@ -17,15 +18,20 @@ def write_in_new(
     try:
         string = []
         for s in search:
-            for photo in range(main["max_file"]):
+            count = len(os.listdir(os.path.join(folder, s)))
+            for photo in range(count):
+                der = os.path.abspath(os.path.join(
+                    folder, s, f"{photo:04}.jpg"))
                 if choice == 0:
                     new = os.path.abspath(os.path.join(
                         folder, f"{s}_{photo:04}.jpg"))
+                    shutil.copy(der, new)
                     a = [[new, os.path.relpath(new), s]]
                     string += a
                 else:
                     b = random.randint(0, 10000)
                     new = os.path.abspath(os.path.join(folder, f"{b:04}.jpg"))
+                    shutil.copy(der, new)
                     a = [[new, os.path.relpath(new), s]]
                     string += a
         csv_name.write_in_file(string, name_csv)

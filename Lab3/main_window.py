@@ -1,22 +1,29 @@
 import sys
 import os
 import logging
+from enum import Enum
 from PyQt6.QtWidgets import (QApplication, QMainWindow, QPushButton,
                             QMessageBox, QLabel, QFileDialog, QVBoxLayout, QWidget, QGridLayout,)
 from PyQt6.QtGui import QPixmap
 
-from iterator import ChoiceIterator
-from csv_name import make_list, write_in_file
+sys.path.append("C:/Users/user/Desktop/Python2/Lab2")
 from new import write_in_new
+from csv_name import make_list, write_in_file
+from iterator import ChoiceIterator
 
 logging.basicConfig(level=logging.INFO)
+
+
+class Action(Enum):
+    COPY = 0
+    RANDOM = 1
 
 
 class Window(QMainWindow):
     def __init__(self) -> None:
         super().__init__()
 
-        self.setGeometry(500, 200, 800, 450)
+        self.setGeometry(500, 200, 700, 400)
         self.setWindowTitle("Lab3-var3 main window")
         self.setStyleSheet('background-color: #2cf3e2;')
 
@@ -28,10 +35,8 @@ class Window(QMainWindow):
         src = QLabel(
             f"Путь к папке исходного датасета:\n{self.dataset_path}", self)
         box_layout.addWidget(src)
-        main_widget.setStyleSheet("max-width: 900%;"
-                                "margin: 0 20% 0 10%;"
-                                "height: auto;"
-                                "padding: 5% 40% 5% 40%;")
+        main_widget.setStyleSheet(
+            "max-width: 1400%;" "margin: 0 0 0 10%;" "height: auto;" "padding: 5% 40% 5% 40%;")
 
         # установим кнопки
         self.annotation = self.add_button("Создать файл-аннотацию")
@@ -44,9 +49,9 @@ class Window(QMainWindow):
 
         # установим изображение
         self.image_label = QLabel(self)
-        self.image_label.setFixedSize(400, 400)
         self.image_label.setScaledContents(True)
-        self.image_label.setStyleSheet("margin: 0;" "padding: 0;")
+        self.image_label.setStyleSheet(
+            "margin: 80% 0 170% 30%;" "max-width: 1600%;" "height: auto;" "padding: 0;")
 
         # форматируем виджеты по размеру окна
         box_layout.addWidget(self.annotation)
@@ -88,8 +93,8 @@ class Window(QMainWindow):
         button.setStyleSheet('background-color: #ee5300;')
         return button
 
-    def create_copy_random(self, number: int) -> None:
-        '''создаем csv-файл по указанному пути; копируем данные с новым именем'''
+    def create_annotation(self) -> None:
+        '''создаем csv-файл по указанному пути'''
         try:
             folder = QFileDialog.getSaveFileName(
                 self,
@@ -99,36 +104,47 @@ class Window(QMainWindow):
                 QMessageBox.information(
                     None, "Ошибка работы программы!", "Не правильно выбрана папка")
                 return
-            if number == 0 or number == 1:
-                write_in_new(self.dataset_path, self.classes, folder, number)
-            else:
-                a = make_list(self.dataset_path, self.classes)
-                write_in_file(a, folder)
+            a = make_list(self.dataset_path, self.classes)
+            write_in_file(a, folder)
             QMessageBox.information(
-                None, "Результат нажатия книпки", "Датасет успешно скопирован!")
+                None, "Результат нажатия кнопки", "Действия успешно выполнены!")
         except:
             logging.error(f"Error in cteate_copy_random\n")
 
-    def create_annotation(self) -> None:
-        self.create_copy_random(7)
+    def copy_or_random(self, number: int) -> None:
+        '''копируем данные с новым именем'''
+        try:
+            folder = QFileDialog.getSaveFileName(
+                self,
+                "Введите название папки для создания csv-файла:",
+            )[0]
+            if folder == "":
+                QMessageBox.information(
+                    None, "Ошибка работы программы!", "Не правильно выбрана папка")
+                return
+            write_in_new(self.dataset_path, self.classes, folder, number)
+            QMessageBox.information(
+                None, "Результат нажатия кнопки", "Действия успешно выполнены!")
+        except:
+            logging.error(f"Error in cteate_copy_random\n")
 
     def copy(self) -> None:
-        self.create_copy_random(0)
+        self.copy_or_random(Action.COPY.value)
 
     def random(self) -> None:
-        self.create_copy_random(1)
+        self.copy_or_random(Action.RANDOM.value)
 
     def csv_path(self) -> None:
         '''запрашиваем путь к файлу для итерации и куда итеруем'''
         try:
-            path_1 = QFileDialog.getOpenFileName(
+            path_base = QFileDialog.getOpenFileName(
                 self, "Выберите файл для итерации:")[0]
-            path = QFileDialog.getSaveFileName(
-                self, "Выберите файл куда итеруем:")[0]
-            if path == "":
+            path_new = QFileDialog.getSaveFileName(
+                self, "Выберите файл куда итерируем:")[0]
+            if path_new == "" or path_base == "":
                 return
-            self.choice_iterator = ChoiceIterator(os.path.relpath(path_1.rpartition('.')[0]),
-                                                os.path.relpath(path), self.classes[0], self.classes[1])
+            self.choice_iterator = ChoiceIterator(os.path.relpath(path_base.rpartition('.')[0]),
+                                                os.path.relpath(path_new), self.classes[0], self.classes[1])
         except:
             logging.error(f"Error in csv_path\n")
 
