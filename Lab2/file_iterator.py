@@ -3,17 +3,11 @@ import os
 import json
 
 class FileIterator:
-    def __init__(self, csv_path: str, class_name: str):
-        self.file_paths = []
-        self.class_name = class_name
-        with open(csv_path, 'r') as file:
-            reader = csv.reader(file)
-            for row in reader:
-                if self.class_name == row[2]:
-                    self.file_paths.append(row[0])
+    def __init__(self, file_paths: list):
+        self.file_paths = file_paths
+        self.current_index = 0
 
     def __iter__(self):
-        self.current_index = 0
         return self
     
     def __next__(self) -> str:
@@ -25,28 +19,20 @@ class FileIterator:
             raise StopIteration
 
     def next_good(self) -> str:
-        """Возвращает следующий элемент для класса 'good'"""
-        if self.class_name != 'good':
-            return None
-        
-        if self.current_index < len(self.file_paths):
-            current_path = self.file_paths[self.current_index]
-            self.current_index += 1
-            return current_path
-        else:
-            return None
+        """Returns the next element for class 'good'"""
+        for idx in range(self.current_index, len(self.file_paths)):
+            if "good" in self.file_paths[idx]:
+                self.current_index = idx + 1
+                return self.file_paths[idx]
+        return None
 
     def next_bad(self) -> str:
-        """Возвращает следующий элемент для класса 'bad'"""
-        if self.class_name != 'bad':
-            return None
-        
-        if self.current_index < len(self.file_paths):
-            current_path = self.file_paths[self.current_index]
-            self.current_index += 1
-            return current_path
-        else:
-            return None
+        """Returns the next element for class 'bad'"""
+        for idx in range(self.current_index, len(self.file_paths)):
+            if "bad" in self.file_paths[idx]:
+                self.current_index = idx + 1
+                return self.file_paths[idx]
+        return None
 
 if __name__ == "__main__":
     with open(os.path.join("Lab2", "settings.json"), "r") as settings_file:

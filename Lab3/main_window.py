@@ -1,13 +1,14 @@
 import sys
 import os
 import logging
-from PyQt6.QtWidgets import QApplication, QMainWindow, QLabel, QPushButton, QVBoxLayout, QFileDialog, QMessageBox, QTextBrowser, QComboBox
+from PyQt6.QtWidgets import QWidget, QApplication, QMainWindow, QLabel, QPushButton, QVBoxLayout, QFileDialog, QMessageBox, QTextBrowser, QComboBox, QInputDialog
 
 # Importing functions from other modules
 sys.path.insert(1, "C:\\Users\\ksush\\OneDrive\\Рабочий стол\\python-v8\\Lab2")
 from create_annotation import create_annotation_file
 from random_dataset import random_dataset
 from file_iterator import FileIterator
+
 class MainWindow(QMainWindow):
     def __init__(self):
         super().__init__()
@@ -18,7 +19,7 @@ class MainWindow(QMainWindow):
         self.randomized_dataset_path = ""
         self.dataset_iterator = None
         self.classes = ["bad", "good"]
-        self.default_size = 0
+        self.default_size = 1000
         # Создание ComboBox и добавление вариантов
         self.combo = QComboBox(self)
         self.combo.addItems(self.classes)
@@ -42,14 +43,16 @@ class MainWindow(QMainWindow):
         self.browse_dataset_btn.clicked.connect(self.browse_dataset)
         self.create_annotation_btn.clicked.connect(self.create_annotation)
         self.create_random_dataset_btn.clicked.connect(self.create_random_dataset)
-        self.next_good_review_btn.clicked.connect(lambda: self.show_next_review('Positive Review'))
-        self.next_bad_review_btn.clicked.connect(lambda: self.show_next_review('Negative Review'))
+        self.next_good_review_btn.clicked.connect(lambda: self.next('good'))
+        self.next_bad_review_btn.clicked.connect(lambda: self.next('bad'))
 
         # Display image
         self.txt_file = QLabel(self)
-
-
-        # Layout
+        self.text_label = QTextBrowser(self)
+        self.text_label.setText("Здесь будет отзыв")
+        self.text_label.setFixedSize(600, 400)
+        
+        # Layout для кнопок и других элементов
         layout = QVBoxLayout()
         layout.addWidget(self.browse_dataset_btn)
         layout.addWidget(self.create_annotation_btn)
@@ -57,7 +60,12 @@ class MainWindow(QMainWindow):
         layout.addWidget(self.next_bad_review_btn)
         layout.addWidget(self.next_good_review_btn)
         layout.addWidget(self.txt_file)
-        self.setLayout(layout)
+        layout.addWidget(self.text_label)  # Добавление text_label в этот layout
+
+        # Установка layout в качестве центрального виджета
+        central_widget = QWidget(self)
+        central_widget.setLayout(layout)
+        self.setCentralWidget(central_widget)
 
 
     def create_annotation(self):
@@ -79,23 +87,33 @@ class MainWindow(QMainWindow):
                 self, "Select Folder for Random Dataset"
             )
             if self.randomized_dataset_path:
-                self.random_annotation_file_path, _ = QFileDialog.getSaveFileName(
-                    self, "Save Random Annotation File", "", "CSV Files (*.csv)"
+                subfolder_name, _ = QInputDialog.getText(
+                    self, 'Subfolder Name', 'Enter Subfolder Name:'
                 )
-                if self.random_annotation_file_path:
-                    random_dataset(
-                        self.dataset_path,
-                        self.random_annotation_file_path,
-                        self.randomized_dataset_path,
-                        self.classes,
-                        self.default_size,
+                if subfolder_name:
+                    subfolder_path = os.path.join(self.randomized_dataset_path, subfolder_name)
+                    if not os.path.exists(subfolder_path):
+                        os.makedirs(subfolder_path)
+
+                    self.random_annotation_file_path, _ = QFileDialog.getSaveFileName(
+                        self, "Save Random Annotation File", "", "CSV Files (*.csv)"
                     )
+                    if self.random_annotation_file_path:
+                        random_dataset(
+                            self.dataset_path,
+                            subfolder_path,
+                            self.default_size,
+                            self.classes,
+                            self.random_annotation_file_path,
+                        )
 
     def browse_dataset(self):
         """Open dialog to select the data folder."""
         self.dataset_path = QFileDialog.getExistingDirectory(self, "Select Data Folder")
         if self.dataset_path:
-            self.dataset_iterator = self.get_dataset_files()
+            dataset_iterator = self.get_dataset_files()
+            dataset_files = list(dataset_iterator)  # Convert generator to list
+            self.iter = FileIterator(dataset_files)
 
     def get_dataset_files(self):
         """Generator to enumerate file paths in the dataset."""
@@ -104,18 +122,16 @@ class MainWindow(QMainWindow):
                 for file in files:
                     yield os.path.join(root, file)
 
-    def next(self):
+    def next(self, review_type):
         """Function returns the path to the next element of the class
         and opens text review in the widget"""
         if self.iter is None:
             QMessageBox.information(None, "Не выбран файл", "Не выбран файл для итерации")
             return
 
-        current_text = self.combo.currentText()
-
-        if current_text == "good":
+        if review_type == "good":
             element = self.iter.next_good()
-        elif current_text == "bad":
+        elif review_type == "bad":
             element = self.iter.next_bad()
         else:
             QMessageBox.information(None, "Недопустимое значение", "Выбрано недопустимое значение")
@@ -128,9 +144,11 @@ class MainWindow(QMainWindow):
             return
 
         self.text_label.update()
+        # Logic to display the file content in the widget
         with open(self.review_path, 'r', encoding='utf-8') as file:
             self.txt_file.setText(self.review_path)
             self.text_label.setText(file.read())
+
 
 if __name__ == '__main__':
     app = QApplication(sys.argv)
