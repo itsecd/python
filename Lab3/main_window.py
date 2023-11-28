@@ -6,7 +6,7 @@ from PyQt6.QtWidgets import (QApplication, QMainWindow,
                              QPushButton, QMessageBox,QLabel, 
                              QFileDialog, QVBoxLayout, 
                              QWidget, QGridLayout,
-                             QComboBox)
+                             QComboBox, QTextBrowser)
 
 sys.path.insert(1, "D:/AppProgPython/appprog/Lab2")
 from iterator import ClassIterator
@@ -51,9 +51,8 @@ class MainWindow(QMainWindow):
 
         self.btn_close = self.add_button("Закрыть программу", 200, 30)
 
-        self.text_label = QLabel(self)
+        self.text_label = QTextBrowser(self)
         self.text_label.setText("Здесь будет отзыв")
-        self.text_label.setWordWrap(True)
         self.text_label.setFixedSize(600, 400)
 
         box_layout.addWidget(self.btn_create)
