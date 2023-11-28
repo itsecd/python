@@ -26,36 +26,16 @@ class PathIterator:
             return None
 
 class ClassIterator:
-    def __init__(self, path, cls0, cls1, cls2, cls3, cls4, cls5):
-        self.__iter0 = PathIterator(path, cls0)
-        self.__iter1 = PathIterator(path, cls1)
-        self.__iter2 = PathIterator(path, cls2)
-        self.__iter3 = PathIterator(path, cls3)
-        self.__iter4 = PathIterator(path, cls4)
-        self.__iter5 = PathIterator(path, cls5)
+    def __init__(self, path, cls: list):
+        self.__iters = [PathIterator(path, cls[i]) for i in range(0, 6)]
 
-    def next_0(self):
-        return next(self.__iter0)
-
-    def next_1(self):
-        return next(self.__iter1)
-    
-    def next_2(self):
-        return next(self.__iter2)
-    
-    def next_3(self):
-        return next(self.__iter3)
-    
-    def next_4(self):
-        return next(self.__iter4)
-    
-    def next_5(self):
-        return next(self.__iter5)
+    def next(self, stars: int):
+        return next(self.__iters[stars])
 
 
 if __name__ == "__main__":
     with open(os.path.join("Lab2", "settings.json"), "r") as settings:
         settings = json.load(settings)
-    iter = ClassIterator(os.path.join(settings["csv_folder"], settings["pathfile_csv"]), settings["classes"][0],settings["classes"][1],settings["classes"][2],settings["classes"][3],settings["classes"][4],settings["classes"][5])
+    iter = ClassIterator(os.path.join(settings["csv_folder"], settings["pathfile_csv"]), [settings["classes"][0],settings["classes"][1],settings["classes"][2],settings["classes"][3],settings["classes"][4],settings["classes"][5]])
     for i in range(5):
-        print(iter.next_1())
+        print(iter.next(5))

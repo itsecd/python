@@ -29,7 +29,7 @@ def randomize_dataset(dataset: str, rand_dataset: str, classes: list, size: int)
     cnt = 0
     for cls in classes:
         files_count = len(os.listdir(os.path.join(dataset, cls)))
-        for i in range(files_count):
+        for i in range(files_count-10):
             normal = os.path.abspath(os.path.join(dataset, cls, f'{i:04}.txt'))
             randomized = os.path.abspath(os.path.join(rand_dataset, f'{rand_list[cnt]:04}.txt'))
             shutil.copy(normal, randomized)

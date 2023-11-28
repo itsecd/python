@@ -15,7 +15,7 @@ def unify_dataset(dataset: str, unified_dataset: str, classes: list) -> None:
     cnt = 0
     for cls in classes:
         files_count = len(os.listdir(os.path.join(dataset, cls)))
-        for i in range(files_count):
+        for i in range(files_count-10):
             normal = os.path.abspath(os.path.join(dataset, cls, f'{i:04}.txt'))
             unified = os.path.abspath(os.path.join(unified_dataset, f'{cls}_{i:04}.txt'))
             shutil.copy(normal, unified)
