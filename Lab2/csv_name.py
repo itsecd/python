@@ -16,9 +16,9 @@ def make_list(
         count = len(os.listdir(os.path.join(folder, s)))
         for photo in range(count):
             string = [[
-                os.path.abspath(os.path.join(folder, s, f"{photo:04}.jpg")),
+                os.path.abspath(os.path.join(folder, s, os.listdir(os.path.join(folder, s))[photo])),
                 os.path.relpath(os.path.abspath(
-                    os.path.join(folder, s, f"{photo:04}.jpg"))),
+                    os.path.join(folder, s, os.listdir(os.path.join(folder, s))[photo]))),
                 s, ]
             ]
             list += string
