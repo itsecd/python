@@ -162,6 +162,7 @@ class MainWindow(QMainWindow):
         self.image_path = next_image
         self.image.update()
         self.image.setPixmap(QPixmap(next_image))
+        self.image.setScaledContents(True)
 
 
 if __name__ == "__main__":
