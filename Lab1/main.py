@@ -4,15 +4,17 @@ import logging
 import requests
 from bs4 import BeautifulSoup
 
+
 logging.basicConfig(level=logging.INFO)
+
 
 def create_directory(folder: str) -> str:
     '''принимает путь к папке и ее имя'''
     try:
         if not os.path.exists(folder):
             os.makedirs(folder)
-    except:
-        logging.error(f"Error in create_directory")
+    except Exception as ex:
+        logging.error(f"Couldn't create folder: {ex.message}\n{ex.args}\n")
 
 
 def make_list(url: str) -> list:
@@ -22,50 +24,55 @@ def make_list(url: str) -> list:
         for pages in range(main["pages"]):
             url_new = url[:-1]
             url_pages: str = f"{url_new}{pages}"
-            responce = requests.get(url_pages, main['headers']).text
-            soup = BeautifulSoup(responce, "lxml")
+            html = requests.get(url_pages, main['headers'])
+            soup = BeautifulSoup(html.text, "lxml")
             animals = soup.findAll("img")
             list_url += animals
         return list_url
-    except:
-        logging.error(f"Error in make_list")
+    except Exception as ex:
+        logging.error(f"List don't create: \n")
 
 
 def download(
-    folder: str,
-    search: str,
-    url: str,
     max_files: int,
+    classes: str,
+    url: str,
+    main_folder: str,
 ) -> str:
     ''' принимает имя папки, классы, URL и количество файлов'''
     count = 0
-    incorrect_url = 0
-    for cd in search:
-        url_list = make_list(url.replace("search", cd))
-        for exile in url_list:
-            total_files = len(os.listdir(os.path.join(folder, cd)))
-            if total_files > max_files:
+    except_count = 0
+    for c in classes:
+        url_list = make_list(url.replace("classes", c))
+        for link in url_list:
+            count_files = len(os.listdir(os.path.join(main_folder, c)))
+            if count_files > max_files:
+                count = 0
                 continue
             try:
-                src = exile["src"]
+                src = link["src"]
                 print(src)
                 response = requests.get(src)
-                create_directory(os.path.join(folder, cd).replace("\\", "/"))
+                create_directory(os.path.join(
+                    main_folder, c).replace("\\", "/"))
                 try:
-                    with open(os.path.join(folder, cd, f"{count:04}.jpg").replace("\\", "/"), "wb") as file:
+                    # 
+                    with open(os.path.join(main_folder, c, f"{count:04}.jpg").replace("\\", "/"), "wb") as file:
+                        print(os.path.splitext(os.path.abspath("dataset/cat"))[1])
                         file.write(response.content)
                         count += 1
                 except Exception as ex:
-                    logging.error(f"Incorrect path: {ex}")
+                    logging.error(f"Uncorrect path: {ex.message}\n{ex.args}\n")
             except Exception as ex:
-                incorrect_url += 1
-                logging.error(f"Total incorrect URL: {incorrect_url}")
-    logging.info(f"Completoin of data loading")
+                except_count += 1
+                logging.error(
+                    f"Quantity uncorrect URL={except_count}:{src}\n")
+        logging.info(
+            f"Quantity downloaded files in {c} class is {count_files}")
 
 
 if __name__ == "__main__":
-    with open(os.path.join("Lab1", "main.json"), "r") as main_file:
-        main = json.load(main_file)
+    with open(os.path.join("Lab1", "main.json"), "r") as file:
+        main = json.load(file)
 
-    download(main["folder"], main["search"], main["url"], main["max_file"])
-    
+    download(main["max_files"], main["classes"], main["search_url"], main["main_folder"])
