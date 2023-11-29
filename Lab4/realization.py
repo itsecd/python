@@ -1,5 +1,4 @@
 import cv2
-import os
 import logging
 import pandas as pd
 import matplotlib.pyplot as plt
@@ -23,7 +22,7 @@ def generate_frame(frame: pd.DataFrame, label_class: str) -> pd.DataFrame:
             height_image.append(cv_image[0])
             width_image.append(cv_image[1])
             depth_image.append(cv_image[2])
-            if frame.loc[count, "Class"] == label_class:  
+            if frame.loc[count, "Class"] == label_class:
                 label = 0
             else:
                 label = 1
@@ -44,9 +43,9 @@ def balance_test(frame: pd.DataFrame) -> pd.DataFrame:
         label_info = frame["Label"].value_counts()
         balanced = label_info.values[0] / label_info.values[1]
         if balanced >= 0.9 and balanced <= 1.1:
-            logging.info(f"Набор сбалансирован")
+            logging.info(f"Набор сбалансирован \n")
         else:
-            logging.info("Набор не сбалансирован")
+            logging.info("Набор не сбалансирован \n")
         return frame[["Height", "Width", "Depth"]].describe()
     except:
         logging.error("Errot in balance_test")
@@ -73,6 +72,34 @@ def grouping(frame: pd.DataFrame) -> pd.DataFrame:
     return frame_groupy
 
 
+def histogram(frame: pd.DataFrame, label: int) -> list:
+    '''строит гистограмму с использованием средств библиотеки OpenCV'''
+    try:
+        image = filter(frame, label)["Absolute path"].sample().values[0]
+        image_bgr = cv2.imread(image)
+        b, g, r = cv2.split(image_bgr)
+        hist_b = cv2.calcHist([b], [0], None, [256], [0, 256])
+        hist_g = cv2.calcHist([g], [0], None, [256], [0, 256])
+        hist_r = cv2.calcHist([r], [0], None, [256], [0, 256])
+        hists = [hist_b, hist_g, hist_r]
+        return hists
+    except:
+        logging.error(f"Error in histogram\n")
+
+
+def draw_histogram(hists: list) -> None:
+    '''отрисовка гистограмм'''
+    colors = ["blue", "green", "red"]
+    for i in range(len(hists)):
+        plt.plot(hists[i], color=colors[i], label=f"Histogram_{colors[i]}")
+        plt.xlim([0, 256])
+    plt.ylabel("saturation")
+    plt.title("Histograms BGR")
+    plt.xlabel("range")
+    plt.legend()
+    plt.show()
+
+
 def open_new_csv(csv_path: str) -> pd.DataFrame:
     '''открытие файла для именования столбцов и удаления Relative path'''
     frame = pd.read_csv(
@@ -84,12 +111,11 @@ def open_new_csv(csv_path: str) -> pd.DataFrame:
 
 def save_csv(frame: pd.DataFrame, file_path: str) -> None:
     '''сохранение DataFrame в файл'''
-    frame.to_csv(file_path, index=False) 
+    frame.to_csv(file_path, index=False)
 
 
 if __name__ == "__main__":
     frame = generate_frame(open_new_csv('lab4/set/dataset.csv'), "cat")
-    print(frame)
     save_csv(frame, 'lab4/set/frame.csv')
     save_csv(balance_test(frame), 'lab4/set/balance_test.csv')
     save_csv(filter(frame, 1), 'lab4/set/filter.csv')
@@ -97,3 +123,6 @@ if __name__ == "__main__":
     max_height = frame['Height'].max()
     save_csv(max_filter(frame, max_width, max_height,  1), 'lab4/set/max_filter.csv')
     save_csv(grouping(frame), 'lab4/set/grouping.csv')
+    print(grouping(frame), "\n")
+    print(frame[["Height", "Width", "Depth"]].describe(), "\n")
+    draw_histogram(histogram(frame, 0))
