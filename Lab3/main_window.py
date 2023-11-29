@@ -154,13 +154,13 @@ class Window(QMainWindow):
         except:
             logging.error(f"Error in csv_path\n")
 
-    def next(self, number: int) -> None:
+    def next(self, number: Enum) -> None:
         '''возвращаем путь следующего элемента'''
         if self.choice_iterator == None:
             QMessageBox.information(
                 None, "Ошибка работы программы!", "Не выбран файл для итерации")
             return
-        if number == 0:
+        if number == Animal.Cat:
             choice = self.choice_iterator.next_cat()
         else:
             choice = self.choice_iterator.next_dog()
