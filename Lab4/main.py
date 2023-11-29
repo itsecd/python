@@ -41,3 +41,15 @@ def make_stats(dframe : pd.DataFrame) -> pd.DataFrame:
     stats_frame = dframe[["Height", "Width", "Channels"]].describe()
     return pd.DataFrame.join(type_count, dframe.describe())
     
+
+def filter_by_type(dframe : pd.DataFrame, type : int) -> pd.DataFrame:
+    return pd.DataFrame(dframe["Type"] == type)
+
+def filter_by_size(dframe : pd.DataFrame,
+                   type : int,
+                   max_height : int,
+                   max_width : int) -> pd.DataFrame:
+    return pd.DataFrame(filter_by_type(dframe, type) and dframe["Height"] <= max_height
+                        and dframe["Width"] <= max_width)
+
+
