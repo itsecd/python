@@ -33,7 +33,7 @@ def make_dframe(csv_path : str) -> pd.DataFrame:
 def make_stats(dframe : pd.DataFrame) -> pd.DataFrame:
     type_count = dframe["Type"].value_counts().values
     coefficient = type_count[0]/type_count[1]
-    if coefficient >= 0.95 and coefficient <= 1.05:
+    if coefficient >= 0.98 and coefficient <= 1.02:
         print("DataFrame is Balanced")
     else:
         print(f"DataFrame is not Balanced\nCoefficient: {coefficient}")
@@ -53,3 +53,6 @@ def filter_by_size(dframe : pd.DataFrame,
                         and dframe["Width"] <= max_width)
 
 
+def grouping(dframe : pd.DataFrame) -> pd.DataFrame:
+    dframe["Pixels"] = dframe["Height"] * dframe["Width"]
+    dframe.groupby("Type").agg({"Pixels": ["max", "min", "mean"]})
