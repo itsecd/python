@@ -77,10 +77,11 @@ def histogram(frame: pd.DataFrame, label: int) -> list:
     try:
         image = filter(frame, label)["Absolute path"].sample().values[0]
         image_bgr = cv2.imread(image)
+        height, width, depth =image_bgr.shape
         b, g, r = cv2.split(image_bgr)
-        hist_b = cv2.calcHist([b], [0], None, [256], [0, 256])
-        hist_g = cv2.calcHist([g], [0], None, [256], [0, 256])
-        hist_r = cv2.calcHist([r], [0], None, [256], [0, 256])
+        hist_b = cv2.calcHist([b], [0], None, [256], [0, 256]) / (height * width)
+        hist_g = cv2.calcHist([g], [0], None, [256], [0, 256]) / (height * width)
+        hist_r = cv2.calcHist([r], [0], None, [256], [0, 256]) / (height * width)
         hists = [hist_b, hist_g, hist_r]
         return hists
     except:
@@ -93,7 +94,7 @@ def draw_histogram(hists: list) -> None:
     for i in range(len(hists)):
         plt.plot(hists[i], color=colors[i], label=f"Histogram_{colors[i]}")
         plt.xlim([0, 256])
-    plt.ylabel("saturation")
+    plt.ylabel("density")
     plt.title("Histograms BGR")
     plt.xlabel("range")
     plt.legend()
