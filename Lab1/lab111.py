@@ -108,7 +108,7 @@ def random_user_agent() -> str:
     return u.random
 
 
-def create_directories(args:argparse):
+def create_directories(page: int, urls: str, out_dir: str):
     """
         Создаем директорию для сохранения рецензий если он еще не создана
 
@@ -143,9 +143,9 @@ def save_review_to_file(review_text: str, status_review: bool, review_n_g: int, 
         logging.exception(f"Ошибка при сохранении рецензии : {e}")
 
 
-def parsing_review(args:argparse):
+def parsing_review(page: int, urls: str, out_dir: str):
     """
-    итоговая функция которая используя все пердидущие функции  полностью выполняет задачу
+    итоговая функция которая используя все предидущие функции  полностью выполняет задачу
 
     """
     try:
@@ -170,6 +170,6 @@ def parsing_review(args:argparse):
 
 if __name__ == "__main__":
     args = parse_arguments()
-    create_directories(args)
-    parsing_review(args)
+    create_directories(*(vars(args).values()))
+    parsing_review(*(vars(args).values()))
 
