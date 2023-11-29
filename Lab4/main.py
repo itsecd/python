@@ -2,7 +2,7 @@ import pandas as pd
 import cv2
 from csv_open_save import open_csv, save_csv 
 
-def make_dframe(csv_path : str):
+def make_dframe(csv_path : str) -> pd.DataFrame:
     dframe = open_csv(csv_path)
     abs_path = dframe["Absolute path"]
     height = []
@@ -28,3 +28,16 @@ def make_dframe(csv_path : str):
     dframe["Type"] = type
 
     return dframe
+
+
+def make_stats(dframe : pd.DataFrame) -> pd.DataFrame:
+    type_count = dframe["Type"].value_counts().values
+    coefficient = type_count[0]/type_count[1]
+    if coefficient >= 0.95 and coefficient <= 1.05:
+        print("DataFrame is Balanced")
+    else:
+        print(f"DataFrame is not Balanced\nCoefficient: {coefficient}")
+
+    stats_frame = dframe[["Height", "Width", "Channels"]].describe()
+    return pd.DataFrame.join(type_count, dframe.describe())
+    
