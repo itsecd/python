@@ -145,7 +145,7 @@ def save_review_to_file(review_text: str, status_review: bool, review_n_g: int, 
 
 def parsing_review(page: int, urls: str, out_dir: str) -> None:
     """
-    итоговая функция которая используя все предидущие функции  полностью выполняет задачу
+    Итоговая функция которая используя все предидущие функции  полностью выполняет задачу
 
     """
     try:
