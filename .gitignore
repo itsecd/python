@@ -134,3 +134,4 @@ dmypy.json
 Lab1/dataset
 Lab2/app/csv
 Lab2/app/data
+*.ipynb
