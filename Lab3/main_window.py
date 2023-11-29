@@ -51,7 +51,7 @@ class MainWindow(QMainWindow):
         box_layout.addWidget(self.combo_operation)
 
         #Executes operation selected above
-        self.btn_execute = self.create_button("Execute operation", 300, 40)
+        self.btn_execute = self.create_button("Execute operation", 300, 40, True)
         self.btn_execute.clicked.connect(self.execute)
         box_layout.addWidget(self.btn_execute)
 
@@ -67,15 +67,15 @@ class MainWindow(QMainWindow):
         self.path_label=QLabel("Path to displayed file")
         box_layout.addWidget(self.path_label)
 
-        self.btn_iterator = self.create_button("Iterate", 250, 40)
+        self.btn_iterator = self.create_button("Iterate", 250, 40, True)
         self.btn_iterator.clicked.connect(self.csv_path)
         box_layout.addWidget(self.btn_iterator)
 
-        self.btn_next = self.create_disabled_button("Next", 250, 30)
+        self.btn_next = self.create_button("Next", 250, 30, False)
         self.btn_next.clicked.connect(self.next)
         box_layout.addWidget(self.btn_next)
 
-        self.btn_close = self.create_button("Close", 200, 30)
+        self.btn_close = self.create_button("Close", 200, 30, True)
 
         self.text_label = QTextBrowser(self)
         self.text_label.setText("Review content will be displayed here")
@@ -96,22 +96,15 @@ class MainWindow(QMainWindow):
         self.classes_iterator = None
         self.review_path = None
 
-    def create_button(self, name:str, width: int, height: int):
+    def create_button(self, name:str, width: int, height: int, enabled: bool) -> QPushButton:
         """Creates active button {width} x {height}"""
         button = QPushButton(name, self)
+        button.setEnabled(enabled)
         button.resize(button.sizeHint())
         button.setFixedSize(QSize(width, height))
         return button
     
-    def create_disabled_button(self, name:str, width: int, height: int):
-        """Creates inactive button {width} x {height}"""
-        button = QPushButton(name, self)
-        button.setEnabled(False)
-        button.resize(button.sizeHint())
-        button.setFixedSize(QSize(width, height))
-        return button
-    
-    def csv_path(self):
+    def csv_path(self) -> None:
         """Opens .csv file to read review in window application"""
         try:
             path = QFileDialog.getOpenFileName(self, "Choose pathfile for iteration:", "", "CSV File(*.csv)")[0]
@@ -122,7 +115,7 @@ class MainWindow(QMainWindow):
         except Exception as exc:
             logging.error(f"Incorrect path: {exc.args}\n{exc.message}\n")
 
-    def next(self):
+    def next(self) -> None:
         """Switches iterator to the next file of the given class"""
         if self.classes_iterator == None:
             QMessageBox.information(None, "No file selected", "No ")
@@ -138,7 +131,7 @@ class MainWindow(QMainWindow):
         self.path_label.setText(self.review_path)
         self.text_label.setText(file.read())
 
-    def execute(self):
+    def execute(self) -> None:
         """Carries out an operation chosen via QComboBox """
         try:
             file = QFileDialog.getSaveFileName(self, "Choose directory to create .csv:", "", "CSV File(*.csv)")[0]
