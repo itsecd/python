@@ -109,14 +109,6 @@ class DatasetApp(QWidget):
                 for file in files:
                     yield os.path.join(root, file)
 
-    def show_next_brown_bear(self):
-        """Display the next image of a brown bear in the dataset."""
-        self.show_next_animal('brown_bear')
-
-    def show_next_polar_bear(self):
-        """Display the next image of a polar bear in the dataset."""
-        self.show_next_animal('polar_bear')
-
     def show_next_animal(self, animal_type):
         """Display the next image of the specified animal type in the dataset."""
         if self.dataset_iterator:
