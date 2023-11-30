@@ -1,58 +1,48 @@
-import pandas as pd
-import cv2
-from csv_open_save import open_csv, save_csv 
+from functions import (make_dframe,
+                       make_stats,
+                       filter_by_type,
+                       filter_by_size,
+                       grouping,
+                       make_hists,
+                       draw_hists)
+from csv_open_save import open_csv, save_csv
+import os
+import argparse
 
-def make_dframe(csv_path : str) -> pd.DataFrame:
-    dframe = open_csv(csv_path)
-    abs_path = dframe["Absolute path"]
-    height = []
-    width = []
-    channels = []
-    type = []
-    counter = 0
-    for path in abs_path:
-        img = cv2.imread(path)
-        height.append(img.shape[0])
-        height.append(img.shape[1])
-        height.append(img.shape[2])
-        if(dframe[counter, "Class"] == "rose"):
-            type.append(0)
-        elif(dframe[counter, "Class"] == "tulip"):
-            type.append(1)
-
-        counter+=1
-
-    dframe["Height"] = height
-    dframe["Width"] = width
-    dframe["Channels"] = channels
-    dframe["Type"] = type
-
-    return dframe
-
-
-def make_stats(dframe : pd.DataFrame) -> pd.DataFrame:
-    type_count = dframe["Type"].value_counts().values
-    coefficient = type_count[0]/type_count[1]
-    if coefficient >= 0.98 and coefficient <= 1.02:
-        print("DataFrame is Balanced")
-    else:
-        print(f"DataFrame is not Balanced\nCoefficient: {coefficient}")
-
-    stats_frame = dframe[["Height", "Width", "Channels"]].describe()
-    return pd.DataFrame.join(type_count, dframe.describe())
+if __name__ == "__main__":
+    parser = argparse.ArgumentParser(description = "Choosing mode")
+    parser.add_argument('-o', '--option', type=int, default=5, help='0 - Test for balance'
+                                                                    '1 - Filter by type'
+                                                                    '2 - Filter by max height, width and type,'
+                                                                    '3 - Grouping'
+                                                                    '4 - Make histogram by random image')
     
+    parser.add_argument("-p", "--csv_path", help="Path to csv file")
+    parser.add_argument("-t", "--type", type=int, help="Type of image (0 or 1)")
+    parser.add_argument("-w", "--width", type=int, help="Width of image")
+    parser.add_argument("-h", "--height", type=int, help="Height of image")
+    parser.add_argument("-c", "--class", help="Class of image (rose or tulip)")
+    parser.add_argument("-n", "--new_file_path", help="Path to save")
+    
+    args = parser.parse_args()
 
-def filter_by_type(dframe : pd.DataFrame, type : int) -> pd.DataFrame:
-    return pd.DataFrame(dframe["Type"] == type)
+    match args.option:
+        case 0:
+            dfame = make_dframe(open_csv(args.csv_path), "rose")
+            save_csv(make_stats(dfame), args.new_file_path)
+        case 1:
+            dframe = open_csv(args.csv_path)
+            print(filter_by_type(dframe, args.type))
+        case 2:
+            dframe = open_csv(args.csv_path)
+            print(filter_by_size(dframe, args.width, args.height, args.type))
+        case 3:
+            dframe = open_csv(args.csv_path)
+            print(grouping(dframe))
+        case 4:
+            dframe = open_csv(args.csv_path)
+            draw_hists(make_hists(dframe, args.type))
+        case _:
+            print("You dont choose any option!\nBye!")
 
-def filter_by_size(dframe : pd.DataFrame,
-                   type : int,
-                   max_height : int,
-                   max_width : int) -> pd.DataFrame:
-    return pd.DataFrame(filter_by_type(dframe, type) and dframe["Height"] <= max_height
-                        and dframe["Width"] <= max_width)
-
-
-def grouping(dframe : pd.DataFrame) -> pd.DataFrame:
-    dframe["Pixels"] = dframe["Height"] * dframe["Width"]
-    dframe.groupby("Type").agg({"Pixels": ["max", "min", "mean"]})
+            
