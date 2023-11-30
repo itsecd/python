@@ -1,7 +1,14 @@
 import sys
 import os
 import logging
-from PyQt6.QtWidgets import (QApplication, QWidget, QLabel, QPushButton, QVBoxLayout, QFileDialog)
+from PyQt6.QtWidgets import (
+    QApplication,
+    QWidget,
+    QLabel,
+    QPushButton,
+    QVBoxLayout,
+    QFileDialog
+)
 from PyQt6.QtGui import QPixmap
 sys.path.insert(1, "K:/Pyth/PLab1/Lab2")
 from generate_annotation import generate_annotation_file
@@ -35,16 +42,16 @@ class DatasetApp(QWidget):
         self.create_annotation_btn.clicked.connect(self.create_annotation)
 
         self.create_randomized_dataset_btn = QPushButton('Create Randomized Dataset', self)
-        self.create_randomized_dataset_btn.clicked.connect(self.create_randomized_dataset)
+        self.create_randomized_dataset_btn.clicked.connect(lambda: self.create_dataset(randomize=True))
 
         self.create_copied_dataset_btn = QPushButton('Create Copied Dataset', self)
-        self.create_copied_dataset_btn.clicked.connect(self.create_copied_dataset) 
+        self.create_copied_dataset_btn.clicked.connect(lambda: self.create_dataset(randomize=False)) 
 
         self.next_brown_bear_btn = QPushButton('Next brown bear', self)
-        self.next_brown_bear_btn.clicked.connect(self.show_next_brown_bear)
+        self.next_brown_bear_btn.clicked.connect(lambda: self.show_next_animal('brown_bear'))
 
         self.next_polar_bear_btn = QPushButton('Next polar bear', self)
-        self.next_polar_bear_btn.clicked.connect(self.show_next_polar_bear)
+        self.next_polar_bear_btn.clicked.connect(lambda: self.show_next_animal('polar_bear'))
 
         self.brown_iterator = None
         self.polar_iterator = None
@@ -81,24 +88,19 @@ class DatasetApp(QWidget):
         except Exception as ex:
             logging.error(f"Couldn't create annotation: {ex.message}\n{ex.args}\n")            
 
-    def create_randomized_dataset(self):
-        """This function create a randomized dataset and csv file using the selected dataset folder."""
+    def create_dataset(self, randomize: bool):
+        """Create a randomized or copied dataset and corresponding CSV file using the selected dataset folder."""
         if self.dataset_path:
-            self.randomized_dataset_path = QFileDialog.getExistingDirectory(self, "Select Randomized Dataset Folder")
-            if self.randomized_dataset_path:
-                self.randomized_annotation_file_path, _ = QFileDialog.getSaveFileName(self, "Save Randomized Annotation File", "", "CSV Files (*.csv)")
-                if self.randomized_annotation_file_path:
-                    randomize_dataset_with_annotation(self.dataset_path, self.randomized_annotation_file_path,
-                                                      self.randomized_dataset_path, self.classes, self.default_size)
-                    
-    def create_copied_dataset(self):
-        """This function create a copied dataset and csv file using the selected dataset folder."""
-        if self.dataset_path:
-            self.copied_dataset_path = QFileDialog.getExistingDirectory(self, "Select Copied Dataset Folder")
-            if self.copied_dataset_path:
-                self.annotation_file_path, _ = QFileDialog.getSaveFileName(self, "Save Copied Annotation File", "", "CSV Files (*.csv)")
-                if self.annotation_file_path:
-                    copy_dataset_with_annotation(self.dataset_path, self.copied_dataset_path, self.annotation_file_path)
+            if randomize:
+                dataset_path = QFileDialog.getExistingDirectory(self, "Select Randomized Dataset Folder")
+                annotation_file_path, _ = QFileDialog.getSaveFileName(self, "Save Randomized Annotation File", "", "CSV Files (*.csv)")
+                if dataset_path and annotation_file_path:
+                    randomize_dataset_with_annotation(self.dataset_path, annotation_file_path, dataset_path, self.classes, self.default_size)
+            else:
+                dataset_path = QFileDialog.getExistingDirectory(self, "Select Copied Dataset Folder")
+                annotation_file_path, _ = QFileDialog.getSaveFileName(self, "Save Copied Annotation File", "", "CSV Files (*.csv)")
+                if dataset_path and annotation_file_path:
+                    copy_dataset_with_annotation(self.dataset_path, dataset_path, annotation_file_path)
 
     def get_dataset_files(self):
         """Generator function to yield file paths in the selected dataset folder."""
