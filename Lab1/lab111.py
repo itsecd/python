@@ -26,7 +26,7 @@ def parse_arguments() -> argparse:
 
 def get_html_code(page: int , url: str) -> BeautifulSoup:
     """
-               Получаем html код страницы
+               Получаем html код страницы.
 
     """
 
