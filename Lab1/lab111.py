@@ -12,7 +12,7 @@ from typing import List
 FOLDER_NAME_G = "good"
 FOLDER_NAME_B = "bad"
 
-def parse_arguments():
+def parse_arguments() -> argparse:
     """
             Получаем ссылку путь директории и количество страниц
 
