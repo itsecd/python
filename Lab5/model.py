@@ -5,6 +5,7 @@ import torch.nn as nn
 import torch.optim as optim
 from torch.utils.data import DataLoader, TensorDataset, random_split
 
+
 def load_data(file_path: str) -> torch.Tensor:
     """
     Loads data from a CSV file.
@@ -18,7 +19,9 @@ def load_data(file_path: str) -> torch.Tensor:
     data = pd.read_csv(file_path)
     data['Date'] = pd.to_datetime(data['Date'])
     data.set_index('Date', inplace=True)
+    data['Value'] = (data['Value'] - data['Value'].min()) / (data['Value'].max() - data['Value'].min())
     return torch.tensor(data['Value'].values).float()
+
 
 def split_data(all_data: torch.Tensor, train_ratio: float = 0.8, val_ratio: float = 0.1) -> (torch.utils.data.Dataset, torch.utils.data.Dataset, torch.utils.data.Dataset):
     """
@@ -38,8 +41,9 @@ def split_data(all_data: torch.Tensor, train_ratio: float = 0.8, val_ratio: floa
     val_size = int(val_ratio * len(all_data))
     test_size = len(all_data) - train_size - val_size
 
-    train_data, val_data, test_data = torch.utils.data.random_split(all_data, [train_size, val_size, test_size])
+    train_data, val_data, test_data = random_split(all_data, [train_size, val_size, test_size])
     return train_data, val_data, test_data
+
 
 def create_sequences(data: torch.Tensor, seq_length: int) -> (torch.Tensor, torch.Tensor):
     """
@@ -64,31 +68,42 @@ def create_sequences(data: torch.Tensor, seq_length: int) -> (torch.Tensor, torc
 
     return torch.stack(sequences), torch.stack(labels)
 
-def train_lstm_model(model: nn.Module, train_loader: DataLoader, criterion: nn.Module, optimizer: optim.Optimizer, epochs: int):
+
+def train_lstm_model(model: nn.Module, train_loader: DataLoader, val_loader: DataLoader, criterion: nn.Module, optimizer: optim.Optimizer, epochs: int) -> (list,list):
     """
     Trains the LSTM model.
 
     Parameters:
     - model (nn.Module): LSTM model.
     - train_loader (DataLoader): DataLoader for training data.
+    - val_loader (DataLoader): DataLoader for validate data.
     - criterion (nn.Module): Loss function.
     - optimizer (optim.Optimizer): Optimizer.
     - epochs (int): Number of epochs.
+    
+    Returns:
+    - (list,list): Lists of loss value in train and validation mode.
     """
-    model.train()
+    epoch_train_losses = []
+    epoch_val_losses = []
     for epoch in range(epochs):
-        total_loss = 0.0
+        list_of_losses = []
         for inputs, labels in train_loader:
+            model.train()
             optimizer.zero_grad()
             outputs = model(inputs.unsqueeze(-1).float())
             loss = criterion(outputs.squeeze(), labels.float())
             loss.backward()
             optimizer.step()
-            total_loss += loss.item()
+            list_of_losses.append(loss.item())
+        epoch_train_losses.append(sum(list_of_losses)/len(list_of_losses))
+        epoch_val_losses.append(evaluate_model(model, val_loader))
+        print(f'Epoch: {epoch+1}/{epochs}, Train Loss: {epoch_train_losses[epoch]}\t Validation loss: {epoch_val_losses[epoch]}')  
+        
+    return epoch_train_losses,epoch_val_losses
 
-        print(f'Epoch: {epoch+1}/{epochs}, Train Loss: {total_loss/len(train_loader)}')
 
-def plot_loss_history(train_losses: list, val_losses: list, epochs_list: list, lr: float, batch_size: int):
+def plot_loss_history(train_losses: list, val_losses: list, epochs_list: list, lr: float, batch_size: int, ax=None) -> None:
     """
     Plots the loss history.
 
@@ -98,38 +113,38 @@ def plot_loss_history(train_losses: list, val_losses: list, epochs_list: list, l
     - epochs_list (list): List of epochs.
     - lr (float): Learning rate.
     - batch_size (int): Batch size.
+    - ax (Axes, optional): Axes object to draw the plot. If not provided, a new plot will be created.
     """
-    plt.plot(epochs_list, train_losses, label=f'Train Loss (LR: {lr}, Batch Size: {batch_size})')
-    plt.plot(epochs_list, val_losses, label=f'Validation Loss (LR: {lr}, Batch Size: {batch_size})')
-    plt.xlabel('Epochs')
-    plt.ylabel('Loss')
-    plt.title(f'Training and Validation Loss (LR: {lr}, Batch Size: {batch_size})')
-    plt.legend()
-    plt.show()
+    if ax is None:
+        fig, ax = plt.subplots()
+    ax.plot(epochs_list, train_losses, label=f'Train Loss (LR: {lr}, Batch Size: {batch_size})')
+    ax.plot(epochs_list, val_losses, label=f'Validation Loss (LR: {lr}, Batch Size: {batch_size})')
+    ax.set_xlabel('Epochs')
+    ax.set_ylabel('Loss')
+    ax.set_title(f'Training and Validation Loss (LR: {lr}, Batch Size: {batch_size})')
+    ax.legend()
 
-def evaluate_model(model: nn.Module, data_loader: DataLoader, label: str) -> float:
+def evaluate_model(model: nn.Module, data_loader: DataLoader) -> float:
     """
     Evaluates the model on data.
 
     Parameters:
     - model (nn.Module): Model.
     - data_loader (DataLoader): DataLoader for data.
-    - label (str): Label for output.
 
     Returns:
-    - float: Loss value.
+    - float: loss value.
     """
-    model.eval()
     criterion = nn.MSELoss()
     total_loss = 0.0
     with torch.no_grad():
+        model.eval()
         for inputs, labels in data_loader:
             outputs = model(inputs.unsqueeze(-1).float())
             loss = criterion(outputs.squeeze(), labels.float())
             total_loss += loss.item()
-
-    print(f'{label} Loss: {total_loss/len(data_loader)}')
     return total_loss
+
 
 def test_model(model: nn.Module, test_loader: DataLoader) -> float:
     """
@@ -148,9 +163,8 @@ def test_model(model: nn.Module, test_loader: DataLoader) -> float:
         for inputs, labels in test_loader:
             outputs = model(inputs.unsqueeze(-1).float())
             loss = criterion(outputs.squeeze(), labels.float())
-
-    print(f'Test Loss: {loss.item()}')
     return loss.item()
+
 
 class SimpleLSTM(nn.Module):
     def __init__(self, input_size, hidden_size, output_size):
@@ -163,7 +177,8 @@ class SimpleLSTM(nn.Module):
         out = self.fc(out[:, -1, :])
         return out
 
-def main(file_path: str = 'dataset/dataset.csv', seq_length: int = 10, input_size: int = 1, hidden_size: int = 50, output_size: int = 1,
+
+def main(file_path: str = 'dataset/dataset.csv', seq_length: int = 10, input_size: int = 1, hidden_size: int = 64, output_size: int = 1,
          learning_rates: list = [0.001, 0.01, 0.1], batch_sizes: list = [32, 64, 128], epochs: int = 10):
     """
     Main function to execute the entire process.
@@ -185,29 +200,33 @@ def main(file_path: str = 'dataset/dataset.csv', seq_length: int = 10, input_siz
     X_val, y_val = create_sequences(val_data, seq_length)
     X_test, y_test = create_sequences(test_data, seq_length)
 
-    model = SimpleLSTM(input_size, hidden_size, output_size)
+    
     criterion = nn.MSELoss()
 
     train_losses = []
     val_losses = []
     epochs_list = []
-
-    for lr in learning_rates:
-        for batch_size in batch_sizes:
+    
+    fig, axes = plt.subplots(len(learning_rates), len(batch_sizes), figsize=(12, 12))
+    axes = axes.flatten()
+    
+    for i, lr in enumerate(learning_rates):
+        for j, batch_size in enumerate(batch_sizes):
+            model = SimpleLSTM(input_size, hidden_size, output_size)
             optimizer = optim.Adam(model.parameters(), lr=lr)
             train_loader = DataLoader(TensorDataset(X_train, y_train), batch_size=batch_size, shuffle=True)
-
-            train_lstm_model(model, train_loader, criterion, optimizer, epochs)
-
-            epoch_train_losses = evaluate_model(model, train_loader, 'Train')
-            epoch_val_losses = evaluate_model(model, DataLoader(TensorDataset(X_val, y_val), batch_size=batch_size), 'Validation')
+            val_loader = DataLoader(TensorDataset(X_val, y_val), batch_size=batch_size)
+            
+            print(f"Learning rate: {lr}, batch size: {batch_size}")
+            train_losses,val_losses = train_lstm_model(model, train_loader, val_loader, criterion, optimizer, epochs)
 
             epochs_list = list(range(1, epochs + 1))
-            train_losses.append(epoch_train_losses)
-            val_losses.append(epoch_val_losses)
             
-            plot_loss_history(train_losses, val_losses, epochs_list, lr, batch_size)
+            plot_loss_history(train_losses, val_losses, epochs_list, lr, batch_size, ax=axes[i * len(batch_sizes) + j])
 
+    plt.tight_layout()
+    plt.show()
+    
     test_loss = test_model(model, DataLoader(TensorDataset(X_test, y_test), batch_size=1))
     print(f'Test Loss: {test_loss}')
 
