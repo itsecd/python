@@ -5,8 +5,7 @@ from functions import (make_dframe,
                        grouping,
                        make_hists,
                        draw_hists)
-from csv_open_save import open_csv, save_csv
-import os
+from csv_open_save import open_csv, save_csv, open_new_csv
 import argparse
 
 if __name__ == "__main__":
@@ -20,7 +19,7 @@ if __name__ == "__main__":
     parser.add_argument("-p", "--csv_path", help="Path to csv file")
     parser.add_argument("-t", "--type", type=int, help="Type of image (0 or 1)")
     parser.add_argument("-w", "--width", type=int, help="Width of image")
-    parser.add_argument("-h", "--height", type=int, help="Height of image")
+    parser.add_argument("--height", type=int, help="Height of image")
     parser.add_argument("-c", "--class", help="Class of image (rose or tulip)")
     parser.add_argument("-n", "--new_file_path", help="Path to save")
     
@@ -28,13 +27,13 @@ if __name__ == "__main__":
 
     match args.option:
         case 0:
-            dfame = make_dframe(open_csv(args.csv_path), "rose")
+            dfame = make_dframe(open_new_csv(args.csv_path))
             save_csv(make_stats(dfame), args.new_file_path)
         case 1:
-            dframe = open_csv(args.csv_path)
+            dframe = make_dframe(args.csv_path)
             print(filter_by_type(dframe, args.type))
         case 2:
-            dframe = open_csv(args.csv_path)
+            dframe = make_dframe(args.csv_path)
             print(filter_by_size(dframe, args.width, args.height, args.type))
         case 3:
             dframe = open_csv(args.csv_path)
