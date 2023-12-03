@@ -7,6 +7,9 @@ from functions import (make_dframe,
                        draw_hists)
 from csv_open_save import open_csv, save_csv, open_new_csv
 import argparse
+import logging
+
+logging.basicConfig(level=logging.INFO)
 
 if __name__ == "__main__":
     parser = argparse.ArgumentParser(description = "Choosing mode")
@@ -29,19 +32,24 @@ if __name__ == "__main__":
         case 0:
             dfame = make_dframe(open_new_csv(args.csv_path))
             save_csv(make_stats(dfame), args.new_file_path)
+            logging.info("Balance check is successfull")
         case 1:
             dframe = make_dframe(args.csv_path)
             print(filter_by_type(dframe, args.type))
+            logging.info("Filter by type is successfull")
         case 2:
             dframe = make_dframe(args.csv_path)
             print(filter_by_size(dframe, args.width, args.height, args.type))
+            logging.info("Filter by size and type is successfull")
         case 3:
             dframe = open_csv(args.csv_path)
             print(grouping(dframe))
+            logging.info("Grouping is successfull")
         case 4:
             dframe = open_csv(args.csv_path)
             draw_hists(make_hists(dframe, args.type))
+            logging.info("Draw histogram is successfull")
         case _:
-            print("You dont choose any option!\nBye!")
+            logging.warning("You dont choose any option!")
 
             

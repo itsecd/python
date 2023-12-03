@@ -1,6 +1,9 @@
 import pandas as pd
 import matplotlib.pyplot as plt
 import cv2
+import logging
+
+logging.basicConfig(level=logging.INFO)
 
 def make_dframe(dframe: pd.DataFrame) -> pd.DataFrame:
     """
@@ -33,7 +36,7 @@ def make_dframe(dframe: pd.DataFrame) -> pd.DataFrame:
 
         return dframe
     except Exception as ex:
-        print(ex)
+        logging.error(f"Make frame error: {ex}")
 
 
 def make_stats(dframe : pd.DataFrame) -> pd.DataFrame:
@@ -48,14 +51,14 @@ def make_stats(dframe : pd.DataFrame) -> pd.DataFrame:
         df["Quantity"] = type_count
         df["Balance"] = f"{coefficient:.1f}"
         if coefficient >= 0.98 and coefficient <= 1.02:
-            print("DataFrame is Balanced")
+            logging.info("DataFrame is Balanced")
         else:
-            print(f"DataFrame is not Balanced\nCoefficient: {coefficient}")
+            logging.info(f"DataFrame is not Balanced\nCoefficient: {coefficient}")
 
         stats_frame = dframe[["Height", "Width", "Channels"]].describe()
         return pd.concat([stats_frame, df], axis=1)
     except Exception as ex:
-        print(ex)
+        logging.error(f"Balance check error: {ex}")
     
 
 def filter_by_type(dframe : pd.DataFrame, class_ : str) -> pd.DataFrame:
@@ -63,6 +66,7 @@ def filter_by_type(dframe : pd.DataFrame, class_ : str) -> pd.DataFrame:
     Filter dataframe by type of image
     """
     return dframe[dframe["Class"] == class_]
+
 
 def filter_by_size(dframe : pd.DataFrame,
                    type : int,
@@ -83,7 +87,6 @@ def grouping(dframe : pd.DataFrame) -> pd.DataFrame:
     return dframe.groupby("Type").agg({"Pixels": ["max", "min", "mean"]})
     
 
-
 def make_hists(dframe : pd.DataFrame, type : int) -> list:
     """
     Make histogramm by dataframe
@@ -99,7 +102,8 @@ def make_hists(dframe : pd.DataFrame, type : int) -> list:
         hists = [hist_b, hist_g, hist_r]
         return hists
     except Exception as ex:
-        print(ex)
+        logging.error(f"Make historam error: {ex}")
+
 
 def draw_hists(hists :  list) -> None:
     """
@@ -113,6 +117,4 @@ def draw_hists(hists :  list) -> None:
     plt.ylabel("density")
     plt.title("Histograms")
     plt.legend()
-    plt.show()
-
-    
+    plt.show()  
