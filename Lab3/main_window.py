@@ -23,7 +23,7 @@ class MainWindow(QMainWindow):
         self.combo = QComboBox(self)
         self.combo.addItems(self.classes)
         self.combo.setCurrentIndex(0)
-
+        self.dataset_type = ["copy","random"]
         self.init_ui()
 
     def init_ui(self):
@@ -39,8 +39,8 @@ class MainWindow(QMainWindow):
 
         self.browse_dataset_btn.clicked.connect(self.browse_dataset)
         self.create_annotation_btn.clicked.connect(self.create_annotation)
-        self.create_random_dataset_btn.clicked.connect(self.create_random_dataset)
-        self.create_copy_dataset_btn.clicked.connect(self.create_copy_dataset)
+        self.create_random_dataset_btn.clicked.connect(lambda: self.create_dataset('random'))
+        self.create_copy_dataset_btn.clicked.connect(lambda: self.create_dataset('copy'))
         self.next_good_review_btn.clicked.connect(lambda: self.next('good'))
         self.next_bad_review_btn.clicked.connect(lambda: self.next('bad'))
 
@@ -77,59 +77,44 @@ class MainWindow(QMainWindow):
             logging.error(f"Failed to create annotation: {ex}\n")
 
 
-    def create_copy_dataset(self):
-        """Create a copy dataset."""
+    def create_dataset(self, dataset_type):
+        """Create a dataset based on the given type ('copy' or 'random')."""
         if self.dataset_path:
-            self.copy_dataset_path = QFileDialog.getExistingDirectory(
-                self, "Select Folder for Copy Dataset"
+            dataset_path = QFileDialog.getExistingDirectory(
+                self, f"Select Folder for {dataset_type.capitalize()} Dataset"
             )
-            if self.copy_dataset_path:
+            if dataset_path:
                 subfolder_name, _ = QInputDialog.getText(
                     self, 'Subfolder Name', 'Enter Subfolder Name:'
                 )
                 if subfolder_name:
-                    subfolder_path = os.path.join(self.copy_dataset_path, subfolder_name)
+                    subfolder_path = os.path.join(dataset_path, subfolder_name)
                     if not os.path.exists(subfolder_path):
                         os.makedirs(subfolder_path)
 
-                    self.copy_annotation_file_path, _ = QFileDialog.getSaveFileName(
-                        self, "Save Copy Annotation File", "", "CSV Files (*.csv)"
+                    annotation_file_path, _ = QFileDialog.getSaveFileName(
+                        self, f"Save {dataset_type.capitalize()} Annotation File", "", "CSV Files (*.csv)"
                     )
-                    if self.copy_annotation_file_path:
-                        copy_dataset(
-                            self.dataset_path,
-                            subfolder_path,
-                            self.classes,
-                            self.copy_annotation_file_path,
-                        )
-
-
-    def create_random_dataset(self):
-        """Create a random dataset."""
-        if self.dataset_path:
-            self.random_dataset_path = QFileDialog.getExistingDirectory(
-                self, "Select Folder for Random Dataset"
-            )
-            if self.random_dataset_path:
-                subfolder_name, _ = QInputDialog.getText(
-                    self, 'Subfolder Name', 'Enter Subfolder Name:'
-                )
-                if subfolder_name:
-                    subfolder_path = os.path.join(self.random_dataset_path, subfolder_name)
-                    if not os.path.exists(subfolder_path):
-                        os.makedirs(subfolder_path)
-
-                    self.random_annotation_file_path, _ = QFileDialog.getSaveFileName(
-                        self, "Save Random Annotation File", "", "CSV Files (*.csv)"
-                    )
-                    if self.random_annotation_file_path:
-                        random_dataset(
-                            self.dataset_path,
-                            subfolder_path,
-                            self.default_size,
-                            self.classes,
-                            self.random_annotation_file_path,
-                        )
+                    if annotation_file_path:
+                        if dataset_type == 'copy':
+                            copy_dataset(
+                                self.dataset_path,
+                                subfolder_path,
+                                self.classes,
+                                annotation_file_path,
+                            )
+                            self.copy_dataset_path = dataset_path
+                            self.copy_annotation_file_path = annotation_file_path
+                        elif dataset_type == 'random':
+                            random_dataset(
+                                self.dataset_path,
+                                subfolder_path,
+                                self.default_size,
+                                self.classes,
+                                annotation_file_path,
+                            )
+                            self.random_dataset_path = dataset_path
+                            self.random_annotation_file_path = annotation_file_path
 
 
     def browse_dataset(self):
