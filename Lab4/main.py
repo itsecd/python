@@ -35,15 +35,15 @@ if __name__ == "__main__":
             logging.info("Balance check is successfull")
         case 1:
             dframe = make_dframe(args.csv_path)
-            print(filter_by_type(dframe, args.type))
+            logging.info(filter_by_type(dframe, args.type))
             logging.info("Filter by type is successfull")
         case 2:
             dframe = make_dframe(args.csv_path)
-            print(filter_by_size(dframe, args.width, args.height, args.type))
+            logging.info(filter_by_size(dframe, args.width, args.height, args.type))
             logging.info("Filter by size and type is successfull")
         case 3:
             dframe = open_csv(args.csv_path)
-            print(grouping(dframe))
+            logging.info(grouping(dframe))
             logging.info("Grouping is successfull")
         case 4:
             dframe = open_csv(args.csv_path)
