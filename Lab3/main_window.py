@@ -1,7 +1,14 @@
 import sys
 import os
 import logging
-from PyQt6.QtWidgets import QWidget, QApplication, QMainWindow, QLabel, QPushButton, QVBoxLayout, QFileDialog, QMessageBox, QTextBrowser, QComboBox, QInputDialog
+from PyQt6.QtWidgets import (
+    QWidget, 
+    QApplication, QMainWindow, 
+    QLabel,QPushButton, 
+    QVBoxLayout,QFileDialog, 
+    QMessageBox, QTextBrowser, 
+    QComboBox, QInputDialog
+    )
 
 
 sys.path.insert(1, "C:\\Users\\ksush\\OneDrive\\Рабочий стол\\python-v8\\Lab2")
@@ -78,7 +85,7 @@ class MainWindow(QMainWindow):
 
 
     def create_dataset(self, dataset_type):
-        """Create a dataset based on the given type ('copy' or 'random')."""
+        """Create a dataset based on the given type (copy or random)."""
         if self.dataset_path:
             dataset_path = QFileDialog.getExistingDirectory(
                 self, f"Select Folder for {dataset_type.capitalize()} Dataset"
