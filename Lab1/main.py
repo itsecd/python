@@ -30,7 +30,7 @@ def make_list(url: str) -> list:
         for pages in range(fcc["pages"]):
             url_new = url[:-1]
             url_pages: str = f"{url_new}{pages}"
-            html = requests.get(url_pages, fcc['headers'])
+            html = requests.get(url_pages, fcc["headers"])
             soup = BeautifulSoup(html.text, "lxml")
             flowers = soup.findAll("img")
             list_url += flowers
@@ -62,25 +62,36 @@ def download(
                 src = link["src"]
                 print(src)
                 response = requests.get(src)
-                create_directory(os.path.join(
-                    main_folder, c).replace("\\", "/"))
+                create_directory(os.path.join(main_folder, c).replace("\\", "/"))
                 try:
-                    with open(os.path.join(main_folder, c, f"{count:04}.jpg").replace("\\", "/"), "wb") as file:
+                    with open(
+                        os.path.join(main_folder, c, f"{count:04}.jpg").replace(
+                            "\\", "/"
+                        ),
+                        "wb",
+                    ) as file:
                         file.write(response.content)
                         count += 1
                 except Exception as ex:
                     logging.error(f"Uncorrect path: {ex.message}\n{ex.args}\n")
             except Exception as ex:
                 except_count += 1
-                logging.error(
-                    f"Quantity uncorrect URL={except_count}:{src}\n")
-        logging.info(
-            f"Quantity downloaded files in {c} class is {count_files}")
+                logging.error(f"Quantity uncorrect URL={except_count}:{src}\n")
+        logging.info(f"Quantity downloaded files in {c} class is {count_files}")
+
+
+def rename(dir, classes):
+    os.chdir(os.path.join(dir, classes))
+    print(os.getcwd())
+    for count, f in enumerate(os.listdir()):
+        f_name, f_ext = os.path.splitext(f)
+        f_name = f"{count:04}"
+        new_name = f"{f_name}{f_ext}"
+        os.rename(f, new_name)
 
 
 if __name__ == "__main__":
     with open(os.path.join("Lab1", "fcc.json"), "r") as fcc_file:
         fcc = json.load(fcc_file)
-
-    download(fcc["max_files"], fcc["classes"],
-             fcc["search_url"], fcc["main_folder"])
+    rename("dataset", "rose")
+    # download(fcc["max_files"], fcc["classes"], fcc["search_url"], fcc["main_folder"])
