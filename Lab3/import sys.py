@@ -22,3 +22,11 @@ def show_data(self) -> None:
                 self.result_label.setText("No data for the selected time")
         else:
             self.result_label.setText("Please select a file")
+
+def browse_data(self) -> None:
+        """
+        Open a file dialog to browse and select data file.
+        """
+        self.data_path = QFileDialog.getOpenFileName(self, "Select Data File")[0]
+        self.select_datafile.setText(self.data_path)
+
