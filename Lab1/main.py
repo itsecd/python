@@ -93,5 +93,5 @@ def rename(dir, classes):
 if __name__ == "__main__":
     with open(os.path.join("Lab1", "fcc.json"), "r") as fcc_file:
         fcc = json.load(fcc_file)
-    rename("dataset", "rose")
+    rename("dataset", "tulip")
     # download(fcc["max_files"], fcc["classes"], fcc["search_url"], fcc["main_folder"])
