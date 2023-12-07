@@ -67,3 +67,8 @@ def browse_data(self) -> None:
         self.data_path = QFileDialog.getOpenFileName(self, "Select Data File")[0]
         self.select_datafile.setText(self.data_path)
 
+if __name__ == '__main__':
+    app = QApplication(sys.argv)
+    window = DateApp()
+    window.show()
+    app.exec() 
