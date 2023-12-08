@@ -13,7 +13,8 @@ import torch.nn.functional as F
 from torchvision import transforms
 
 
-def load_dataset(csv_path: str):
+def load_dataset(csv_path: str) -> list:
+    """Function for uploading data from an annotation file to a list"""
     dframe = pd.read_csv(
         csv_path, delimiter=",", names=["Absolute path", "Relative path", "Class"]
     )
@@ -22,7 +23,9 @@ def load_dataset(csv_path: str):
     return img_list
 
 
-def split_data(img_list):
+def split_data(img_list) -> list:
+    """Function splits the list into three sublists
+    (train_list, test_list, val_list) in a ratio of 80:10:10"""
     train_list = img_list[0 : int(len(img_list) * 0.8)]
     test_list = img_list[int(len(img_list) * 0.8) : int(len(img_list) * 0.9)]
     val_list = img_list[int(len(img_list) * 0.9) : int(len(img_list))]
@@ -30,6 +33,9 @@ def split_data(img_list):
 
 
 class dataset(torch.utils.data.Dataset):
+    """Class will store uploaded and converted images
+    and labels of classes 0 - roses 1 - tulips"""
+
     def __init__(self, file_list, transform=None):
         self.file_list = file_list
         self.transform = transform
@@ -55,7 +61,9 @@ class dataset(torch.utils.data.Dataset):
         return img_transformed, label
 
 
-def transform_data(train_list, test_list, val_list):
+def transform_data(train_list, test_list, val_list) -> dataset:
+    """Pipeline of data preprocessing and the formation of a dataset
+    that will directly participate in the training"""
     fixed_transforms = transforms.Compose(
         [
             transforms.Resize((224, 224)),
@@ -71,6 +79,8 @@ def transform_data(train_list, test_list, val_list):
 
 
 class Cnn(nn.Module):
+    """Convolutional neural network model"""
+
     def __init__(self):
         super(Cnn, self).__init__()
 
@@ -110,7 +120,8 @@ class Cnn(nn.Module):
         return out
 
 
-def show_results(epochs, acc, loss):
+def show_results(epochs, acc, loss) -> None:
+    """Function creates graphs based on the received learning results"""
     plt.figure(figsize=(15, 5))
     plt.plot(range(epochs), acc, color="green")
     plt.legend(["Accuracy"])
@@ -124,7 +135,9 @@ def show_results(epochs, acc, loss):
     print(acc, "\n", loss)
 
 
-def train_loop(epochs, batch_size, lear, val_data, train_data, test_data):
+def train_loop(epochs, batch_size, lear, val_data, train_data, test_data) -> list:
+    """Function is intended for creating and training a neural network model,
+    as well as graphing and analyzing the results."""
     device = "cuda" if torch.cuda.is_available() else "cpu"
     torch.manual_seed(1234)
     if device == "cuda":
@@ -212,14 +225,18 @@ def train_loop(epochs, batch_size, lear, val_data, train_data, test_data):
     return rose_probs, model
 
 
-def save_result(rose_probs, csv_path):
+def save_result(rose_probs, csv_path) -> None:
+    """Function for saving the result in csv"""
     idx = list(i for i in range(len(rose_probs)))
     prob = list(map(lambda x: x[1], rose_probs))
     submission = pd.DataFrame({"id": idx, "label": prob})
     submission.to_csv(csv_path, index=False)
 
 
-def main(csv_dataset, epochs, batch_size, lear, result, model_path):
+def main(csv_dataset, epochs, batch_size, lear, result, model_path) -> None:
+    """Function that goes through the full training cycle of a neural network
+    with a given number of epochs, learning rate and shows the result of work in 5 pictures
+    """
     img_list = load_dataset(csv_dataset)
     train_list, test_list, val_list = split_data(img_list)
     train_data, test_data, val_data = transform_data(train_list, test_list, val_list)
@@ -245,10 +262,9 @@ def main(csv_dataset, epochs, batch_size, lear, result, model_path):
         ax.imshow(img)
     plt.show()
     torch.save(model.state_dict(), model_path)
-    return train_list
 
 
 if __name__ == "__main__":
     train_list = main(
-        "Lab2\csv_files\datasets.csv", 3, 100, 0.001, "result.csv", "Lab5\weight1.pt"
+        "Lab2\csv_files\datasets.csv", 10, 100, 0.001, "result.csv", "Lab5\weight1.pt"
     )
