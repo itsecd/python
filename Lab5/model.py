@@ -120,19 +120,16 @@ class Cnn(nn.Module):
         return out
 
 
-def show_results(epochs, acc, loss) -> None:
+def show_results(epochs, acc, loss, v_acc, v_loss) -> None:
     """Function creates graphs based on the received learning results"""
-    plt.figure(figsize=(15, 5))
-    plt.plot(range(epochs), acc, color="green")
-    plt.legend(["Accuracy"])
+    fig, (ax1, ax2) = plt.subplots(1, 2, figsize=(15, 5))
+    ax1.plot(range(epochs), acc, color="orange", label="Train accuracy")
+    ax2.plot(range(epochs), loss, color="orange", label="Train loss")
+    ax1.plot(range(epochs), v_acc, color="steelblue", label="Validation accuracy")
+    ax2.plot(range(epochs), v_loss, color="steelblue", label="Validation loss")
+    ax1.legend()
+    ax2.legend()
     plt.show()
-
-    plt.figure(figsize=(15, 5))
-    plt.plot(range(epochs), loss, color="blue")
-    plt.legend(["Loss"])
-    plt.show()
-
-    print(acc, "\n", loss)
 
 
 def train_loop(epochs, batch_size, lear, val_data, train_data, test_data) -> list:
