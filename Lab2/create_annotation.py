@@ -1,5 +1,6 @@
 import os
 import csv
+import json
 import logging
 
 
@@ -30,6 +31,6 @@ def create_annotation_file(dataset_path: str, output_file: str) -> None:
 
 
 if __name__ == "__main__":
-    dataset_path = r"C:\Users\Ceh9\PycharmProjects\pythonProject\Lab1\dataset"
-    output_file = "annotation.csv"
-    create_annotation_file(dataset_path, output_file)
+    with open("C://Users/Ceh9/PycharmProjects/pythonProject/Lab2/options.json", "r") as options_file:
+        options = json.load(options_file)
+        create_annotation_file(options["dataset_path"], options["output_file"])
