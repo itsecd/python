@@ -30,6 +30,6 @@ def create_annotation_file(dataset_path, output_file):
 
 
 if __name__ == "__main__":
-    dataset_path = r"C:\Users\Ceh9\PycharmProjects\pythonProject"
+    dataset_path = r"C:\Users\Ceh9\PycharmProjects\pythonProject\Lab1\dataset"
     output_file = "annotation.csv"
     create_annotation_file(dataset_path, output_file)
