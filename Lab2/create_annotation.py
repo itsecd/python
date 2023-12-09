@@ -3,7 +3,7 @@ import csv
 import logging
 
 
-def create_annotation_file(dataset_path, output_file):
+def create_annotation_file(dataset_path: str, output_file: str) -> None:
     """
     Функция создания аннотации
 
