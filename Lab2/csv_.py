@@ -28,7 +28,7 @@ def write_csv(name_csv: str, img_list: list) -> None:
         logging.info("in function make_csv")
         logging.info("make_csv")
         for img in img_list:
-            with open(f"Lab3\{name_csv}", "a") as f:
+            with open(f"Lab3\{name_csv}.csv", "a") as f:
                 csv.writer(f, lineterminator="\n").writerow(img)
         logging.info("csv done!")
     except Exception as e:
