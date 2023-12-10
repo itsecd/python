@@ -44,4 +44,4 @@ if __name__ == "__main__":
     with open("C://Users/Ceh9/PycharmProjects/pythonProject/Lab2/options.json", "r") as options_file:
         options = json.load(options_file)
         copy_and_rename_dataset(options["dataset_path"], options["output_dataset_path"], options["name_of_output_file"], RANDOM)
-        create_annotation_file(options["output_dataset_path"], options["output_file"])
+        create_annotation_file(options["output_dataset_path"], options["output_file_"])

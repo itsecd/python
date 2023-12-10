@@ -3,5 +3,6 @@
     "output_file":"annotation.csv",
     "output_dataset_path": "C://Users//Ceh9//PycharmProjects//pythonProject//Lab2/",
     "output_file_":"_annotation.csv",
-    "name_of_output_file": "_dataset"
+    "name_of_output_file": "_dataset",
+    "class_label": ["good","bad"]
 }
