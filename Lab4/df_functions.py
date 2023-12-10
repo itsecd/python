@@ -2,6 +2,7 @@ import logging
 import os
 import pandas as pd
 
+
 logging.basicConfig(level=logging.INFO)
 
 
@@ -48,8 +49,3 @@ def group_by_class(df: pd.DataFrame) -> pd.DataFrame:
         return grouped_df
     except Exception as exc:
         logging.error(f"Can't group Dataframe: {exc}\n{exc.args}\n")
-
-
-def build_histogram(df: pd.DataFrame, class_label: int) -> list:
-    filtered_df = class_filter(df, class_label)
-    

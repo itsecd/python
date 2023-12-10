@@ -35,7 +35,7 @@ def write_into_csv(csv_name: str, csv_list: list) -> None:
         csv_list(list): list filled with csv rows"""
     try:
         for c in csv_list:
-            with open(f"{csv_name}.csv", "a") as file:
+            with open(f"{csv_name}", "a") as file:
                 write = csv.writer(file, lineterminator="\n")
                 write.writerow(c)
     except Exception as exc: 
