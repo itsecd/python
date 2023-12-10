@@ -4,6 +4,8 @@ import logging
 import sys
 
 from PyQt5 import QtWidgets, QtGui, QtCore
+from PyQt5.QtWidgets import QMessageBox
+
 
 sys.path.insert(0, "Lab2")
 from create_annotation import get_absolute_paths, get_relative_paths, write_annotation_to_csv
@@ -104,10 +106,15 @@ class MainWindow(QtWidgets.QMainWindow):
                 cat_annotation_file = annotation_file_path.replace('.csv', '_cat.csv')
                 dog_annotation_file = annotation_file_path.replace('.csv', '_dog.csv')
 
-                write_annotation_to_csv(
-                    cat_annotation_file, cat_absolute_paths, cat_relative_paths, 'cat')
-                write_annotation_to_csv(
-                    dog_annotation_file, dog_absolute_paths, dog_relative_paths, 'dog')
+                try:
+                    write_annotation_to_csv(
+                        cat_annotation_file, cat_absolute_paths, cat_relative_paths, 'cat')
+                    write_annotation_to_csv(
+                        dog_annotation_file, dog_absolute_paths, dog_relative_paths, 'dog')
+
+                    QMessageBox.information(self, "Success", "Annotation file created successfully.")
+                except Exception as e:
+                    QMessageBox.critical(self, "Error", f"An error occurred: {str(e)}")
 
 
 
