@@ -1,8 +1,10 @@
-import sys
-from PyQt5 import QtWidgets, QtGui, QtCore
 import os
 import random
 import logging
+import sys
+
+from PyQt5 import QtWidgets, QtGui, QtCore
+
 sys.path.insert(0, "Lab2")
 from create_annotation import get_absolute_paths, get_relative_paths, write_annotation_to_csv
 from copy_dataset_in_new_folder import replace_images
@@ -98,10 +100,16 @@ class MainWindow(QtWidgets.QMainWindow):
                 dog_absolute_paths = get_absolute_paths('dog', folder_path)
                 dog_relative_paths = get_relative_paths('dog', folder_path)
 
+                # Combine paths to create a CSV file for each class
+                cat_annotation_file = annotation_file_path.replace('.csv', '_cat.csv')
+                dog_annotation_file = annotation_file_path.replace('.csv', '_dog.csv')
+
                 write_annotation_to_csv(
-                    annotation_file_path, cat_absolute_paths, cat_relative_paths, 'cat')
+                    cat_annotation_file, cat_absolute_paths, cat_relative_paths, 'cat')
                 write_annotation_to_csv(
-                    annotation_file_path, dog_absolute_paths, dog_relative_paths, 'dog')
+                    dog_annotation_file, dog_absolute_paths, dog_relative_paths, 'dog')
+
+
 
     def get_dataset_path(self):
         """
@@ -179,9 +187,6 @@ class MainWindow(QtWidgets.QMainWindow):
 
         Parameters:
         - class_name (str): The class name ('cat' or 'dog').
-
-        Returns:
-        - None
         """
         csv_path, _ = QtWidgets.QFileDialog.getOpenFileName(
             self, 'Select Annotation File', '', 'CSV Files (*.csv)')
@@ -214,16 +219,16 @@ class MainWindow(QtWidgets.QMainWindow):
             self, 'Select Annotation File', '', 'CSV Files (*.csv)')
 
         if csv_path:
-            iterator = DirectoryIterator(class_name, csv_path)
             class_iterator = self.cat_iterator if class_name == 'cat' else self.dog_iterator
-            class_iterator = DirectoryIterator(class_name, csv_path)
-            next_path = next(class_iterator, None)
+            iterator = DirectoryIterator(class_name, csv_path)
+            next_path = next(iterator, None)
 
             if next_path:
                 self.display_image(next_path)
             else:
                 QtWidgets.QMessageBox.warning(
                     self, "Error", f"No more instances of {class_name}.")
+
 
     def display_image(self, image_path: str) -> None:
         """
