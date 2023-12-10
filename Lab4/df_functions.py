@@ -1,5 +1,4 @@
 import logging
-import os
 import pandas as pd
 
 
@@ -9,6 +8,7 @@ logging.basicConfig(level=logging.INFO)
 def make_dataframe(csv_path: str) -> pd.DataFrame:
     try:
         df = pd.read_csv(csv_path, delimiter=",", names=['Абсолютный путь', 'Относительный путь', 'Рейтинг'])
+        df = df.drop('Относительный путь', axis=1)
 
         abs_path = df['Абсолютный путь']
         reviews = []
