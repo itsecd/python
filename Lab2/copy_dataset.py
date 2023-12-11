@@ -6,20 +6,25 @@ import logging
 import random
 from create_annotation import create_annotation_file
 
+
 def copy_and_rename_dataset(input_path: str, output_path: str, name_of_output_file: str, random_or_not :bool) -> None:
     """
     Функция копирования и изменения имени датасета рандомом и нет
     """
     try:
+        existing_random_numbers = set ()
         if not os.path.exists(name_of_output_file):
             os.mkdir(name_of_output_file)
-            output_path = os.path.join(output_path, "/", name_of_output_file)
+            output_path = os.path.join(output_path, name_of_output_file)
         for root, dirs, files in os.walk(input_path):
             for file in files:
                 class_label = os.path.basename(root)
                 if (file.endswith(('.txt'))):
                         if (random_or_not):
                             random_number = random.randint(0, 10000)
+                            while random_number in existing_random_numbers:
+                                random_number = random.randint(0, 10000)
+                            existing_random_numbers.add(random_number)
                             new_file_name = f"{random_number}.txt"
                         else:
                             new_file_name = f"{class_label}_{file}.txt"

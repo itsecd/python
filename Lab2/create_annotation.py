@@ -2,6 +2,7 @@ import os
 import csv
 import json
 import logging
+
 FIELDNAMES = ['absolute_path', 'relative_path', 'class_label']
 
 
@@ -16,17 +17,16 @@ def create_annotation_file(dataset_path: str, output_file: str) -> None:
             writer.writeheader()
             for root, dirs, files in os.walk(dataset_path):
                 for file in files:
-                    if file.endswith(('.txt')):
+                    if file.endswith('.txt'):
                         absolute_path = os.path.join(root, file)
                         relative_path = os.path.relpath(absolute_path, dataset_path)
                         class_label = os.path.basename(root)
 
-                        writer.writerow({'absolute_path': absolute_path,
-                                        'relative_path': relative_path,
-                                        'class_label': class_label})
+                        writer.writerow({FIELDNAMES[0]: absolute_path,
+                                        FIELDNAMES[1]: relative_path,
+                                        FIELDNAMES[2]: class_label})
     except Exception as e:
         logging.error(f"Произошла ошибка: {e}", exc_info=True)
-
 
 
 if __name__ == "__main__":

@@ -3,6 +3,7 @@ import random
 import csv
 import json
 
+
 class ReviewIterator:
 
     def __init__(self, output_file_annotation: str, class_label: str) -> None:
@@ -35,6 +36,6 @@ class ReviewIterator:
 if __name__ == "__main__":
     with open("C://Users/Ceh9/PycharmProjects/pythonProject/Lab2/options.json", "r") as options_file:
         options = json.load(options_file)
-    iterator =ReviewIterator(options["output_file_annotation"], options["class_label"][0])
+    iterator = ReviewIterator(options["output_file_annotation"], options["class_label"][0])
     for iter in iterator:
         print("Следующий экземпляр:", iter)
