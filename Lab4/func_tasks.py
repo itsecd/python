@@ -53,9 +53,15 @@ def compute_image_stats(df: pd.DataFrame) -> Tuple[pd.DataFrame, pd.Series]:
         image_size_stats = df[image_size_columns].describe()
         class_label_stats = df[class_label_column].value_counts()
 
+        if len(class_label_stats) > 1:
+            logging.info("Dataset is balanced")
+        else:
+            logging.warning("Dataset may be unbalanced")
+        
         return image_size_stats, class_label_stats
-    except:
-        logging.error(f"Balance check error")
+    except Exception as ex:
+        logging.error(f"Balance check error: {ex}")
+
 
 def filter_dataframe_by_label(df: pd.DataFrame, label: Any) -> pd.DataFrame:
     '''function for filtering data frame by label'''
@@ -73,6 +79,7 @@ def filter_dataframe_by_params(df: pd.DataFrame, label: str, max_width: int, max
         return filtered_df
     except:
         logging.error(f"Filter for params error")
+
 
 def calculate_pixels_stats(df: pd.DataFrame) -> pd.DataFrame:
     '''a function for grouping a DataFrame by class label with calculation of the maximum, minimum and average values by the number of pixels'''

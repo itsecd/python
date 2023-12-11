@@ -7,6 +7,7 @@ from func_tasks import(process_dataframe,
 from open_save import read_csv_to_dataframe, save_to_csv
 from graphic import plot_histograms
 
+
 def main():
     csv_file = input("Введите путь к CSV файлу: ")
     output_csv = input("Введите путь для сохранения обработанных данных: ")
@@ -39,6 +40,7 @@ def main():
     hist_blue, hist_green, hist_red = generate_histogram(processed_df, label)
     
     plot_histograms(hist_blue, hist_green, hist_red)
+
 
 if __name__ == "__main__":
     main()
