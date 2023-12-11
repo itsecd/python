@@ -21,6 +21,23 @@ def preparing_dataframe(file_path):
     return statistics
 
 
+def filter_by_mean_deviation(dataframe, deviation_value):
+    filtered_dataframe = dataframe[dataframe['Mean_Deviation'] >= deviation_value]
+    return filtered_dataframe
+
+
+def filter_by_date_range(dataframe, start_date, end_date):
+    filtered_dataframe = dataframe[(dataframe['Date'] >= start_date) & (dataframe['Date'] <= end_date)]
+    return filtered_dataframe
+
+
+def group_by_month_and_mean(dataframe):
+    dataframe['Date'] = pd.to_datetime(dataframe['Date'])
+    grouped_by_month = dataframe.groupby(pd.Grouper(key='Date', freq='M')).mean()
+
+    return grouped_by_month
+
+
 def main(file_path):
     data = preparing_dataframe(file_path)
     return data
