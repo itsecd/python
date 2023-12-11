@@ -1,6 +1,5 @@
 import pandas as pd
 
-
 def preparing_dataframe(file_path):
     data = pd.read_csv(file_path)
     data.columns = ['Date', 'Value']
@@ -27,12 +26,12 @@ def filter_by_mean_deviation(dataframe, deviation_value):
 
 
 def filter_by_date_range(dataframe, start_date, end_date):
+    dataframe['Date'] = pd.to_datetime(dataframe['Date'])
     filtered_dataframe = dataframe[(dataframe['Date'] >= start_date) & (dataframe['Date'] <= end_date)]
     return filtered_dataframe
 
 
-def group_by_month_and_mean(dataframe):
+def group_by_month(dataframe):
     dataframe['Date'] = pd.to_datetime(dataframe['Date'])
-    grouped_by_month = dataframe.groupby(pd.Grouper(key='Date', freq='M')).mean()
-
-    return grouped_by_month
+    dataframe['Month'] = dataframe['Date'].dt.to_period('M')
+    return dataframe

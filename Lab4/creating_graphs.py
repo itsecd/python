@@ -20,17 +20,22 @@ def create_graph(file_path):
 
 def create_monthly_graph(dataframe, month):
     dataframe['Date'] = pd.to_datetime(dataframe['Date'])
-    filtered_data = dataframe[dataframe['Date'].dt.month == month]
+    dataframe['Month'] = dataframe['Date'].dt.to_period('M')
 
-    plt.figure(figsize=(10, 6)) 
-    plt.plot(filtered_data['Date'], filtered_data['Value'], label='Значение курса', color='blue') 
-    plt.axhline(y=filtered_data['Value'].median(), color='red', linestyle='--', label='Медиана') 
-    plt.axhline(y=filtered_data['Value'].mean(), color='green', linestyle='--', label='Среднее значение')
-
+    filtered_data = dataframe[dataframe['Month'] == month]
+    
+    plt.figure(figsize=(10, 6))
+    plt.plot(filtered_data['Date'], filtered_data['Value'], label='Изменение курса')
+    
+    monthly_mean = filtered_data['Value'].mean()
+    monthly_median = filtered_data['Value'].median()
+    
+    plt.axhline(y=monthly_mean, color='r', linestyle='--', label=f'Среднее значение: {monthly_mean:.2f}')
+    plt.axhline(y=monthly_median, color='g', linestyle='-.', label=f'Медиана: {monthly_median:.2f}')
+    
+    plt.title(f'Изменение курса для месяца {month}')
     plt.xlabel('Дата')
-    plt.ylabel('Значение курса')
-    plt.title(f'Изменение курса в месяце {month}')
+    plt.ylabel('Курс доллара')
     plt.legend()
-
-    plt.tight_layout()
+    plt.grid(True)
     plt.show()
