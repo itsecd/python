@@ -1,6 +1,7 @@
 import cv2
 import pandas as pd
 import numpy as np
+import matplotlib.pyplot as plt
 
 def read_csv_to_dataframe(csv_file):
     return pd.read_csv(csv_file, delimiter=";", names=["Absolute path", "Relative path", "Class"])
@@ -71,6 +72,29 @@ def generate_histogram(df, label):
     hist_r = cv2.calcHist([r], [0], None, [256], [0, 256])
     
     return hist_b, hist_g, hist_r
+def plot_histograms(hist_blue, hist_green, hist_red):
+    plt.figure(figsize=(10, 5))
+
+    plt.subplot(1, 3, 1)
+    plt.title('Blue Channel Histogram')
+    plt.xlabel('Pixel Value')
+    plt.ylabel('Frequency')
+    plt.plot(hist_blue, color='blue')
+
+    plt.subplot(1, 3, 2)
+    plt.title('Green Channel Histogram')
+    plt.xlabel('Pixel Value')
+    plt.ylabel('Frequency')
+    plt.plot(hist_green, color='green')
+  
+    plt.subplot(1, 3, 3)
+    plt.title('Red Channel Histogram')
+    plt.xlabel('Pixel Value')
+    plt.ylabel('Frequency')
+    plt.plot(hist_red, color='red')
+    
+    plt.tight_layout()
+    plt.show()
 
 def main():
     csv_file = 'C:/Users/zhura/Desktop/paths.csv'
@@ -102,6 +126,15 @@ def main():
     filtered_data = filter_dataframe_by_params(processed_df, label='polar bear', max_width=1000, max_height=800)
     print("\nОтфильтрованный DataFrame:")
     print(filtered_data)
+    pixels_stats = calculate_pixels_stats(processed_df)
+    
+    # Вывод статистики
+    print("\nСтатистика по количеству пикселей:")
+    print(pixels_stats)
+    label = 'polar bear'  # Метка класса
+    hist_blue, hist_green, hist_red = generate_histogram(processed_df, label)
+    
+    plot_histograms(hist_blue, hist_green, hist_red)
 
 if __name__ == "__main__":
     main()
