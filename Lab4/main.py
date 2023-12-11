@@ -33,4 +33,4 @@ if __name__ == "__main__":
         filtered_data = group_by_month(resulting_dataframe)
         create_monthly_graph(filtered_data, month_to_plot)
     else:
-        print("Выбрано недопустимое действие. Пожалуйста, выберите номер действия от 1 до 3.")
+        print("Выбрано недопустимое действие. Пожалуйста, выберите номер действия от 1 до 5.")
