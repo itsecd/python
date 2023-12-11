@@ -1,13 +1,12 @@
 import cv2
 import pandas as pd
-import os
+import numpy as np
 
 def read_csv_to_dataframe(csv_file):
-    # Чтение CSV файла без заголовков столбцов
     return pd.read_csv(csv_file, delimiter=";", names=["Absolute path", "Relative path", "Class"])
 
 def process_dataframe(df):
-    df = df.drop("Relative path", axis=1)  # Удаляем столбец "Relative path"
+    df = df.drop("Relative path", axis=1)
     
     heights = []
     widths = []
@@ -38,14 +37,12 @@ def process_dataframe(df):
     return df[['Absolute path', 'Class', 'Label', 'Height', 'Width', 'Channels']]
 
 def save_to_csv(df, output_csv):
-    df.to_csv(output_csv, index=False, sep=';')  # Сохранить DataFrame в CSV без индексов
+    df.to_csv(output_csv, index=False, sep=';')
 
 def compute_image_stats(df):
-    # Определение столбцов с размерами изображений и метками класса
     image_size_columns = ['Height', 'Width', 'Channels']
     class_label_column = 'Label'
 
-    # Вычисление статистической информации
     image_size_stats = df[image_size_columns].describe()
     class_label_stats = df[class_label_column].value_counts()
 
@@ -57,11 +54,26 @@ def filter_dataframe_by_label(df, label):
 def filter_dataframe_by_params(df, label, max_width, max_height):
     filtered_df = df[(df['Class'] == label) & (df['Width'] <= max_width) & (df['Height'] <= max_height)]
     return filtered_df
+def calculate_pixels_stats(df):
+    df['Pixels'] = df['Width'] * df['Height']
+    grouped_df = df.groupby('Class')['Pixels'].agg(['min', 'max', 'mean'])
+    return grouped_df
+def generate_histogram(df, label):
+    filtered_df = df[df['Class'] == label]
+    random_row = filtered_df.sample(n=1)
 
+    image_path = random_row['Absolute path'].values[0]
+    image = cv2.imread(image_path)
+    b, g, r = cv2.split(image)
 
-# Пример использования функций
+    hist_b = cv2.calcHist([b], [0], None, [256], [0, 256])
+    hist_g = cv2.calcHist([g], [0], None, [256], [0, 256])
+    hist_r = cv2.calcHist([r], [0], None, [256], [0, 256])
+    
+    return hist_b, hist_g, hist_r
+
 def main():
-    csv_file = 'C:/Users/zhura/Desktop/paths.csv'  # Имя CSV файла
+    csv_file = 'C:/Users/zhura/Desktop/paths.csv'
     # output_csv = 'C:/Users/zhura/Desktop/processed_data.csv'  # Имя файла для сохранения обработанных данных
     
     # # Чтение данных из CSV файла в DataFrame без заголовков столбцов
