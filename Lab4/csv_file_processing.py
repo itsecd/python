@@ -17,8 +17,8 @@ def preparing_dataframe(file_path):
     data['Median_Deviation'] = data['Value'] - median_value
     data['Mean_Deviation'] = data['Value'] - mean_value
     statistics = data[['Value', 'Median_Deviation', 'Mean_Deviation']].describe()
-
-    return statistics
+    print(statistics)
+    return data
 
 
 def filter_by_mean_deviation(dataframe, deviation_value):
@@ -36,13 +36,3 @@ def group_by_month_and_mean(dataframe):
     grouped_by_month = dataframe.groupby(pd.Grouper(key='Date', freq='M')).mean()
 
     return grouped_by_month
-
-
-def main(file_path):
-    data = preparing_dataframe(file_path)
-    return data
-
-
-file_path = "Lab4/dataset/data.csv"
-resulting_dataframe = main(file_path)
-print(resulting_dataframe)
