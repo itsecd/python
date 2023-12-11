@@ -1,7 +1,9 @@
 import matplotlib.pyplot as plt
+import numpy as np
 
 
-def plot_histograms(hist_blue, hist_green, hist_red):
+def plot_histograms(hist_blue: np.ndarray, hist_green: np.ndarray, hist_red: np.ndarray) -> None:
+    '''a function for drawing histograms'''
     plt.figure(figsize=(10, 5))
 
     plt.subplot(1, 3, 1)
