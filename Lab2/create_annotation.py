@@ -2,6 +2,7 @@ import os
 import csv
 import json
 import logging
+FIELDNAMES = ['absolute_path', 'relative_path', 'class_label']
 
 
 def create_annotation_file(dataset_path: str, output_file: str) -> None:
@@ -11,10 +12,8 @@ def create_annotation_file(dataset_path: str, output_file: str) -> None:
     """
     try:
         with open(output_file, 'w', newline='') as csvfile:
-            fieldnames = ['absolute_path', 'relative_path', 'class_label']
-            writer = csv.DictWriter(csvfile, fieldnames=fieldnames)
+            writer = csv.DictWriter(csvfile, fieldnames=FIELDNAMES)
             writer.writeheader()
-
             for root, dirs, files in os.walk(dataset_path):
                 for file in files:
                     if file.endswith(('.txt')):
@@ -22,12 +21,12 @@ def create_annotation_file(dataset_path: str, output_file: str) -> None:
                         relative_path = os.path.relpath(absolute_path, dataset_path)
                         class_label = os.path.basename(root)
 
-                        writer.writerow({'absolute_path': 'Абсолютный путь : '+absolute_path,
-                                        'relative_path': ' Относительный путь: '+relative_path,
-                                        'class_label': ' Тип рецензии: '+class_label})
+                        writer.writerow({'absolute_path': absolute_path,
+                                        'relative_path': relative_path,
+                                        'class_label': class_label})
     except Exception as e:
         logging.error(f"Произошла ошибка: {e}", exc_info=True)
-    return None
+
 
 
 if __name__ == "__main__":
