@@ -1,36 +1,47 @@
+import argparse
 from csv_file_processing import preparing_dataframe, filter_by_date_range, filter_by_mean_deviation, group_by_month
 from creating_graphs import create_graph, create_monthly_graph
 
 file_path = "Lab4/dataset/data.csv"
 
 if __name__ == "__main__":
+    parser = argparse.ArgumentParser(description="get statistics on a csv file")
     resulting_dataframe = preparing_dataframe(file_path)
-    print("Выберите действие:")
-    print("1. Фильтрация по отклонению от среднего значения курса")
-    print("2. Фильтрация по дате")
-    print("3. Фильтрация по месяцу")
-    print("4. Построение графика для всего периода")
-    print("5. Построение графика для определенного месяца")
+    group = parser.add_mutually_exclusive_group()
+    group.add_argument("--option1", action="store_true", help="Фильтрация по отклонению от среднего значения курса")
+    group.add_argument("--option2", action="store_true", help="Фильтрация по дате")
+    group.add_argument("--option3", action="store_true", help="Фильтрация по месяцу")
+    group.add_argument("--option4", action="store_true", help="Построение графика для всего периода")
+    group.add_argument("--option5", action="store_true", help="Построение графика для определенного месяца")
 
-    choice = input("Введите номер действия: ")
+    parser.add_argument("--deviation_value",
+                        type=float, default=30,
+                        help="deviation value for filter")
+    parser.add_argument("--start_date",
+                        type=str, default="2015-10-10",
+                        help="start date for filter")
+    parser.add_argument("--end_date",
+                        type=str, default="2016-10-10",
+                        help="end date for filter")
+    parser.add_argument("--month_to_plot",
+                        type=str, default="2015-05",
+                        help="month for filter")
+    
+    args = parser.parse_args()
 
-    if choice == "1":
-        deviation_value = float(input("Введите значение отклонения от среднего значения курса: "))
-        filtered_data = filter_by_mean_deviation(resulting_dataframe, deviation_value)
+    if args.option1:
+        filtered_data = filter_by_mean_deviation(resulting_dataframe, args.deviation_value)
         print(filtered_data)
-    elif choice == "2":
-        start_date = input("Введите начальную дату в формате YYYY-MM-DD: ")
-        end_date = input("Введите конечную дату в формате YYYY-MM-DD: ")
-        filtered_data = filter_by_date_range(resulting_dataframe, start_date, end_date)
+    elif args.option2:
+        filtered_data = filter_by_date_range(resulting_dataframe, args.start_date, args.end_date)
         print(filtered_data)
-    elif choice == "3":
+    elif args.option3:
         filtered_data = group_by_month(resulting_dataframe)
         print(filtered_data)
-    elif choice == "4":
+    elif args.option4:
         create_graph(file_path)
-    elif choice == "5":
-        month_to_plot = input("Введите номер месяца для построения графика(YYYY-MM): ")
+    elif args.option5:
         filtered_data = group_by_month(resulting_dataframe)
-        create_monthly_graph(filtered_data, month_to_plot)
+        create_monthly_graph(filtered_data, args.month_to_plot)
     else:
-        print("Выбрано недопустимое действие. Пожалуйста, выберите номер действия от 1 до 5.")
+        print("Выбран неправильный номер")
