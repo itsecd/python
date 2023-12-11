@@ -1,5 +1,3 @@
-import pandas as pd
-import matplotlib.pyplot as plt
 from csv_file_processing import preparing_dataframe, filter_by_date_range, filter_by_mean_deviation, group_by_month
 from creating_graphs import create_graph, create_monthly_graph
 
