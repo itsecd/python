@@ -1,11 +1,8 @@
-import os
-import random
-import logging
 import sys
-
-from PyQt5 import QtWidgets, QtGui, QtCore
-from PyQt5.QtWidgets import QMessageBox
-
+import os
+import logging
+from PyQt5.QtWidgets import QApplication, QWidget, QVBoxLayout, QLabel, QPushButton, QFileDialog, QMessageBox
+from PyQt5.QtGui import QPixmap
 
 sys.path.insert(0, "Lab2")
 from create_annotation import get_absolute_paths, get_relative_paths, write_annotation_to_csv
@@ -15,263 +12,190 @@ from iterator import DirectoryIterator
 
 
 logging.basicConfig(level=logging.INFO)
-  
-  
-class MainWindow(QtWidgets.QMainWindow):
-    """
-    Main window class for the Dataset Annotation App.
 
-    Attributes:
-    - dataset_path: The path to the dataset folder.
-    - cat_iterator: Iterator for the 'cat' class in the dataset.
-    - dog_iterator: Iterator for the 'dog' class in the dataset.
-    """
-    def __init__(self):
+class MainWindow(QWidget):
+    def __init__(self) -> None:
         """
-        Initialize the main window and set up the user interface.
+        Initialize the main window for managing datasets.
         """
         super().__init__()
+        self.setWindowTitle('Dataset Manager')
+        self.layout = QVBoxLayout()
+        self.setLayout(self.layout)
+        self.setMinimumSize(800, 600)
 
-        self.setWindowTitle("Dataset Annotation App")
-        self.setGeometry(100, 100, 800, 600)
+        self.image_label = QLabel()
+        self.layout.addWidget(self.image_label)
 
-        self.central_widget = QtWidgets.QWidget()
-        self.setCentralWidget(self.central_widget)
+        self.select_dataset_button = QPushButton('Select Dataset')
+        self.layout.addWidget(self.select_dataset_button)
+        self.select_dataset_button.clicked.connect(self.select_dataset)
 
-        self.layout = QtWidgets.QVBoxLayout()
-
-        self.folder_path_label = QtWidgets.QLabel("Dataset Folder:")
-        self.layout.addWidget(self.folder_path_label)
-
-        self.create_annotation_button = QtWidgets.QPushButton("Create Annotation File")
-        self.create_annotation_button.clicked.connect(self.create_annotation_file)
+        self.create_annotation_button = QPushButton('Create Annotation')
         self.layout.addWidget(self.create_annotation_button)
+        self.create_annotation_button.clicked.connect(self.create_annotation)
 
-        self.create_dataset_button = QtWidgets.QPushButton("Create Dataset")
-        self.create_dataset_button.clicked.connect(self.create_dataset)
+        self.create_random_dataset_button = QPushButton('Create Random Dataset')
+        self.layout.addWidget(self.create_random_dataset_button)
+        self.create_random_dataset_button.clicked.connect(lambda: self.copy_dataset(True))
+
+        self.create_dataset_button = QPushButton('Create No Random Dataset')
         self.layout.addWidget(self.create_dataset_button)
+        self.create_dataset_button.clicked.connect(lambda: self.copy_dataset(False))
 
-        self.copy_dataset_button = QtWidgets.QPushButton("Copy Dataset")
-        self.copy_dataset_button.clicked.connect(lambda: self.copy_dataset())
-        self.layout.addWidget(self.copy_dataset_button)
+        self.next_cat_instance_button = QPushButton('Next cat')
+        self.layout.addWidget(self.next_cat_instance_button)
+        self.next_cat_instance_button.clicked.connect(lambda: self.show_next_instance('cat'))
 
-        self.copy_random_dataset_button = QtWidgets.QPushButton("Copy Dataset Randomly")
-        self.copy_random_dataset_button.clicked.connect(lambda: self.copy_dataset(random_suffix=str(random.randint(1, 1000))))
-        self.layout.addWidget(self.copy_random_dataset_button)
+        self.next_dog_instance_button = QPushButton('Next dog')
+        self.layout.addWidget(self.next_dog_instance_button)
+        self.next_dog_instance_button.clicked.connect(lambda: self.show_next_instance('dog'))
+        
+        self.quit_button = QPushButton('Exit')
+        self.layout.addWidget(self.quit_button)
+        self.quit_button.clicked.connect(self.close_application)
 
-        self.next_cat_button = QtWidgets.QPushButton("Next Cat")
-        self.next_cat_button.clicked.connect(lambda: self.show_next_instance('cat'))        
-        self.layout.addWidget(self.next_cat_button)
-
-        self.next_dog_button = QtWidgets.QPushButton("Next Dog")
-        self.next_dog_button.clicked.connect(lambda: self.show_next_instance('dog'))
-        self.layout.addWidget(self.next_dog_button)
-
-        self.exit_button = QtWidgets.QPushButton("EXIT", self)
-        self.exit_button.clicked.connect(self.close)
-        self.layout.addWidget(self.exit_button)
-
-        self.scroll_area = QtWidgets.QScrollArea()
-        self.scroll_area.setWidgetResizable(True)
-        self.central_layout = QtWidgets.QVBoxLayout(self.central_widget)
-        self.central_layout.addLayout(self.layout)
-        self.central_layout.addWidget(self.scroll_area)
-
-        self.dataset_path = None
         self.cat_iterator = None
         self.dog_iterator = None
+        self.dataset_path = None
+        self.annotation_path = None
+        self.destination_path = None
 
-    def create_annotation_file(self):
+    def select_dataset(self) -> None:
         """
-        Create an annotation file for the dataset.
+        Open a dialog for selecting a dataset folder.
 
-        This method prompts the user to select a folder, and then creates an annotation
-        file by collecting absolute and relative paths for 'cat' and 'dog' classes.
-
-        Returns:
-        - None
+        Once a folder is selected, create the CSV file containing annotation information
+        and initialize iterators for cat and dog instances.
         """
-        annotation_file_path, _ = QtWidgets.QFileDialog.getSaveFileName(
-            self, 'Save Annotation File', '', 'CSV Files (*.csv)')
+        self.dataset_path = QFileDialog.getExistingDirectory(self, 'Select Dataset Folder')
+        if self.dataset_path:
+            QMessageBox.about(self, "Directory Selected", f"Selected Directory: {self.dataset_path}")
+            self.create_csv(self.dataset_path)
+            self.cat_iterator = DirectoryIterator('cat', f'{self.dataset_path}/data.csv')
+            self.dog_iterator = DirectoryIterator('dog', f'{self.dataset_path}/data.csv')
+        else:
+            QMessageBox.about(self, "Error", "Please select a directory")
 
-        if annotation_file_path:
-            folder_path = self.get_dataset_path()
-            if folder_path:
-                cat_absolute_paths = get_absolute_paths('cat', folder_path)
-                cat_relative_paths = get_relative_paths('cat', folder_path)
-                dog_absolute_paths = get_absolute_paths('dog', folder_path)
-                dog_relative_paths = get_relative_paths('dog', folder_path)
-
-                # Combine paths to create a CSV file for each class
-                cat_annotation_file = annotation_file_path.replace('.csv', '_cat.csv')
-                dog_annotation_file = annotation_file_path.replace('.csv', '_dog.csv')
-
-                try:
-                    write_annotation_to_csv(
-                        cat_annotation_file, cat_absolute_paths, cat_relative_paths, 'cat')
-                    write_annotation_to_csv(
-                        dog_annotation_file, dog_absolute_paths, dog_relative_paths, 'dog')
-
-                    QMessageBox.information(self, "Success", "Annotation file created successfully.")
-                except Exception as e:
-                    QMessageBox.critical(self, "Error", f"An error occurred: {str(e)}")
-
-
-
-    def get_dataset_path(self):
+    def create_csv(self, dataset_folder: str) -> None:
         """
-        Open a dialog to select the dataset folder and set the dataset_path attribute.
-
-        Returns:
-        - str: The selected dataset folder path.
+        Create an annotation file in CSV format based on the dataset.
         """
-        folder_path = QtWidgets.QFileDialog.getExistingDirectory(self, 'Select Folder')
-        self.folder_path_label.setText(f"Dataset Folder: {folder_path}")
+        try:
+            cat_absolute_paths = get_absolute_paths('cat', dataset_folder)
+            cat_relative_paths = get_relative_paths('cat', dataset_folder)
+            dog_absolute_paths = get_absolute_paths('dog', dataset_folder)
+            dog_relative_paths = get_relative_paths('dog', dataset_folder)
 
-        self.dataset_path = folder_path
-        self.cat_iterator = DirectoryIterator('cat', folder_path)
-        self.dog_iterator = DirectoryIterator('dog', folder_path)
+            annotation_file = os.path.join(dataset_folder, 'data.csv')
+            if os.path.exists(annotation_file):
+                os.remove(annotation_file)
 
-        return folder_path
+            write_annotation_to_csv(annotation_file, cat_absolute_paths, cat_relative_paths, 'cat')
+            write_annotation_to_csv(annotation_file, dog_absolute_paths, dog_relative_paths, 'dog')
+        except Exception as error:
+            logging.error(f"Failed to create annotation: {error}")
 
-    def create_dataset(self):
+    def create_annotation(self) -> None:
         """
-        Create a new dataset by replacing images in the original dataset.
-
-        This method prompts the user to select a destination folder and then replaces
-        images for 'cat' and 'dog' classes in the original dataset.
-
-        Returns:
-        - None
+        Open a dialog for creating an annotation file manually.
+        The user can specify the location and filename for the annotation file.
         """
-        folder_path = self.get_dataset_path()
-        new_dataset_path = QtWidgets.QFileDialog.getExistingDirectory(
-            self, 'Select Destination Folder')
+        try:
+            if self.dataset_path:
+                self.annotation_path, _ = QFileDialog.getSaveFileName(
+                    self, 'Specify Annotation File', '', 'CSV Files (*.csv)')
 
-        if new_dataset_path:
-            replace_images('cat', folder_path)
-            replace_images('dog', folder_path)
+                if self.annotation_path:
+                    cat_abs_paths = get_absolute_paths('cat', self.dataset_path)
+                    cat_rel_paths = get_relative_paths('cat', self.dataset_path)
+                    dog_abs_paths = get_absolute_paths('dog', self.dataset_path)
+                    dog_rel_paths = get_relative_paths('dog', self.dataset_path)
 
-            process_images('cat', folder_path, new_dataset_path)
-            process_images('dog', folder_path, new_dataset_path)
+                    write_annotation_to_csv(self.annotation_path, cat_abs_paths, cat_rel_paths, 'cat')
+                    write_annotation_to_csv(self.annotation_path, dog_abs_paths, dog_rel_paths, 'dog')
 
-    def copy_dataset(self, random_suffix=None):
-        """
-        Copy the dataset to a new location.
-
-        This method prompts the user to select a destination folder and copies the dataset
-        to that location. If a random_suffix is provided, it will be added to the folder name.
-
-        Parameters:
-        - random_suffix (str or None): Random suffix to be added to the folder name (default is None).
-        """
-        source_folder = self.get_dataset_path()
-        destination_folder = QtWidgets.QFileDialog.getExistingDirectory(
-            self, 'Select Destination Folder for Copy')
-
-        if destination_folder:
-            if random_suffix is not None:
-                destination_folder = os.path.join(destination_folder, f"{os.path.basename(source_folder)}_copy_{random_suffix}")
+                    QMessageBox.about(self, "Success", "Annotation file successfully created.")
             else:
-                destination_folder = os.path.join(destination_folder, f"{os.path.basename(source_folder)}_copy")
+                QMessageBox.about(self, "Error", "Please select a directory")
+        except Exception as ex:
+            logging.error(f"Couldn't create annotation: {ex.message}\n{ex.args}\n")
 
+    def copy_dataset(self, with_random: bool) -> None:
+            """
+            Create a dataset with or without randomization.
+            """
             try:
-                replace_images('cat', source_folder)
-                replace_images('dog', source_folder)
-                process_images('cat', source_folder, destination_folder)
-                process_images('dog', source_folder, destination_folder)
+                if self.dataset_path:
+                    if not self.destination_path:
+                        self.destination_path = QFileDialog.getExistingDirectory(self, 'Select Destination Folder')
 
-                QtWidgets.QMessageBox.information(self, "Dataset Copy", "Dataset copied successfully.")
-            except Exception as e:
-                QtWidgets.QMessageBox.critical(self, "Error", f"An error occurred: {str(e)}")
-
-    def get_next_instance(self, class_name):
-        """
-        Get the next instance of the specified class from an annotation file.
-
-        This method prompts the user to select an annotation file and displays the path
-        of the next instance of the specified class using the DirectoryIterator.
-
-        Parameters:
-        - class_name (str): The class name ('cat' or 'dog').
-        """
-        csv_path, _ = QtWidgets.QFileDialog.getOpenFileName(
-            self, 'Select Annotation File', '', 'CSV Files (*.csv)')
-
-        if csv_path:
-            iterator = DirectoryIterator(class_name, csv_path)
-            next_path = next(iterator, None)
-
-            if next_path:
-                QtWidgets.QMessageBox.information(
-                    self, "Next Instance", f"Next {class_name}: {next_path}")
-            else:
-                QtWidgets.QMessageBox.warning(
-                    self, "Error", f"No more instances of {class_name}.")
-
-    def show_next_instance(self, class_name):
-        """
-        Show the next instance of the specified class from an annotation file.
-
-        This method prompts the user to select an annotation file and displays the
-        next instance of the specified class using the corresponding iterator.
-
-        Parameters:
-        - class_name (str): The class name ('cat' or 'dog').
-
-        Returns:
-        - None
-        """
-        csv_path, _ = QtWidgets.QFileDialog.getOpenFileName(
-            self, 'Select Annotation File', '', 'CSV Files (*.csv)')
-
-        if csv_path:
-            class_iterator = self.cat_iterator if class_name == 'cat' else self.dog_iterator
-            iterator = DirectoryIterator(class_name, csv_path)
-            next_path = next(iterator, None)
-
-            if next_path:
-                self.display_image(next_path)
-            else:
-                QtWidgets.QMessageBox.warning(
-                    self, "Error", f"No more instances of {class_name}.")
-
+                    if self.destination_path:
+                        if with_random:
+                            process_images('cat', self.dataset_path, self.destination_path)
+                            process_images('dog', self.dataset_path, self.destination_path)
+                        else:
+                            replace_images('cat', self.dataset_path)
+                            replace_images('dog', self.dataset_path)
+                        QMessageBox.about(self, "Success", "Dataset successfully created.")
+                else:
+                    QMessageBox.about(self, "Error", "Please select a directory")
+            except Exception as ex:
+                logging.error(f"Couldn't create dataset: {ex.message}\n{ex.args}\n")
 
     def display_image(self, image_path: str) -> None:
         """
-        Display the image at the specified path in the scroll area.
-
-        This method loads the image, scales it to fit the width of the scroll area,
-        and displays it using a QLabel.
-
-        Parameters:
-        - image_path (str): The path of the image to be displayed.
-
-        Returns:
-        - None
+        Display an image in the QLabel.
         """
-        pixmap = QtGui.QPixmap(image_path)
-        if pixmap.isNull():
-            logging.error(f"Failed to load image: {image_path}")
+        pixmap = QPixmap(image_path)
+        if not pixmap.isNull():
+            window_width = self.size().width()
+            window_height = self.size().height()
+
+            width_factor = window_width / pixmap.width()
+            height_factor = window_height / pixmap.height()
+            scale_factor = min(width_factor, height_factor)
+
+            scaled_width = int(pixmap.width() * scale_factor)
+            scaled_height = int(pixmap.height() * scale_factor)
+
+            scaled_pixmap = pixmap.scaled(scaled_width, scaled_height)
+            self.image_label.setPixmap(scaled_pixmap)
         else:
-            logging.info("Image loaded successfully.")
-            pixmap = pixmap.scaledToWidth(self.scroll_area.width())
+            self.image_label.setText('Image not found')
 
-            label = QtWidgets.QLabel()
-            label.setAlignment(QtCore.Qt.AlignmentFlag.AlignCenter)
-            label.setPixmap(pixmap)
+    def show_next_instance(self, instance_class: str) -> None:
+        """
+        Display the next instance of the specified class.
 
-            container_widget = QtWidgets.QWidget()
-            container_layout = QtWidgets.QVBoxLayout(container_widget)
-            container_layout.addWidget(label)
-            container_layout.setAlignment(
-                QtCore.Qt.AlignmentFlag.AlignTop)
+        Args:
+        - instance_class (str): The class of the instance to display ('cat' or 'dog').
+        """
+        iterator = None
 
-            self.scroll_area.setWidget(container_widget)
+        if instance_class == 'cat':
+            iterator = self.cat_iterator
+        elif instance_class == 'dog':
+            iterator = self.dog_iterator
+
+        if self.dataset_path and iterator:
+            next_path = next(iterator)
+            if next_path:
+                self.display_image  (next_path)
+        else:
+            QMessageBox.about(self, "Error", "Please select a directory")
+            
+    def close_application(self) -> None:
+        choice = QMessageBox.question(
+            self, 'Exit', 'Are you sure you want to exit?',
+            QMessageBox.Yes | QMessageBox.No
+        )
+        if choice == QMessageBox.Yes:
+            sys.exit()
 
 
-if __name__ == "__main__":
-    app = QtWidgets.QApplication([])
-    main_window = MainWindow()
-    main_window.show()
-    app.exec_()
+if __name__ == '__main__':
+    app = QApplication(sys.argv)
+    window = MainWindow()
+    window.show()
+    sys.exit(app.exec())
