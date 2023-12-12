@@ -1,6 +1,11 @@
+import logging
 import argparse
 from csv_file_processing import preparing_dataframe, filter_by_date_range, filter_by_mean_deviation, group_by_month
 from creating_graphs import create_graph, create_monthly_graph
+
+
+logging.basicConfig(level=logging.INFO)
+
 
 file_path = "Lab4/dataset/data.csv"
 
@@ -29,19 +34,22 @@ if __name__ == "__main__":
     
     args = parser.parse_args()
 
-    if args.option1:
-        filtered_data = filter_by_mean_deviation(resulting_dataframe, args.deviation_value)
-        print(filtered_data)
-    elif args.option2:
-        filtered_data = filter_by_date_range(resulting_dataframe, args.start_date, args.end_date)
-        print(filtered_data)
-    elif args.option3:
-        filtered_data = group_by_month(resulting_dataframe)
-        print(filtered_data)
-    elif args.option4:
-        create_graph(file_path)
-    elif args.option5:
-        filtered_data = group_by_month(resulting_dataframe)
-        create_monthly_graph(filtered_data, args.month_to_plot)
-    else:
-        print("Выбран неправильный номер")
+    try:
+        if args.option1:
+            filtered_data = filter_by_mean_deviation(resulting_dataframe, args.deviation_value)
+            print(filtered_data)
+        elif args.option2:
+            filtered_data = filter_by_date_range(resulting_dataframe, args.start_date, args.end_date)
+            print(filtered_data)
+        elif args.option3:
+            filtered_data = group_by_month(resulting_dataframe)
+            print(filtered_data)
+        elif args.option4:
+            create_graph(file_path)
+        elif args.option5:
+            filtered_data = group_by_month(resulting_dataframe)
+            create_monthly_graph(filtered_data, args.month_to_plot)
+        else:
+            print("Выбран неправильный номер")
+    except Exception as ex:
+        logging.error(f"option can't be executed: {ex}\n{ex.args}\n")
