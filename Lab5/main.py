@@ -48,7 +48,7 @@ class dataset(torch.utils.data.Dataset):
 
 def transform_data(train_list, test_list, valid_list) -> Tuple[dataset, dataset, dataset]:
     """Transform dataset"""
-    fixed_transforms = transforms.Compose(
+    custom_transforms = transforms.Compose(
         [
             transforms.Resize((224, 224)),
             transforms.RandomResizedCrop(224),
@@ -56,9 +56,9 @@ def transform_data(train_list, test_list, valid_list) -> Tuple[dataset, dataset,
             transforms.ToTensor(),
         ]
     )
-    train_data = dataset(train_list, transform=fixed_transforms)
-    test_data = dataset(test_list, transform=fixed_transforms)
-    valid_data = dataset(valid_list, transform=fixed_transforms)
+    train_data = dataset(train_list, transform=custom_transforms)
+    test_data = dataset(test_list, transform=custom_transforms)
+    valid_data = dataset(valid_list, transform=custom_transforms)
     return train_data, test_data, valid_data
 
 
