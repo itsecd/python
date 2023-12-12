@@ -107,7 +107,7 @@ class ImageClient(QWidget):
             classes.append(row[DataWriteReader.key3])
         return classes 
            
-    def create_iters_btns(self, classes) -> None:
+    def create_iters_btns(self, classes: List[str]) -> None:
         '''this method generates a button widget for each image class,\n
            and connects the corresponding slot to it
         '''
