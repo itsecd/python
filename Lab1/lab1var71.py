@@ -46,3 +46,24 @@ def img_download(subfolder_path: str, folder_path: str, num_images: int) -> None
     page = 1
     k = 0
     headers = Headers(os="mac", headers=True).generate()
+    while k < num_images:
+        url = f"{BASE_URL}{subfolder_path}&first={page}"
+        try:
+            response = requests.get(url, headers)
+            soup = BeautifulSoup(response.text, 'lxml')
+            img_tags = soup.find_all('img', {"src": True}, class_='mimg')
+            image_urls = [img['src'] for img in img_tags]
+
+            for img_url in image_urls:
+                try:
+                    response = requests.get(img_url)
+                    filename = os.path.join(folder_path, subfolder_path, f"{k:04}.jpg")
+
+                    with open(filename, 'wb') as f:
+                        f.write(response.content)
+                    k += 1
+                except Exception as e:
+                    logging.exception(f"Error downloading image: {e}")
+                page += 1
+        except Exception as e:
+            logging.exception(f"Error fetching data: {e}")
