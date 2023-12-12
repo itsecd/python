@@ -10,7 +10,6 @@ from copy_dataset_in_new_folder import replace_images
 from copy_dataset_random_names import process_images
 from iterator import DirectoryIterator
 
-
 logging.basicConfig(level=logging.INFO)
 
 class MainWindow(QWidget):
@@ -50,7 +49,7 @@ class MainWindow(QWidget):
         self.next_dog_instance_button = QPushButton('Next dog')
         self.layout.addWidget(self.next_dog_instance_button)
         self.next_dog_instance_button.clicked.connect(lambda: self.show_next_instance('dog'))
-        
+
         self.quit_button = QPushButton('Exit')
         self.layout.addWidget(self.quit_button)
         self.quit_button.clicked.connect(self.close_application)
@@ -97,24 +96,13 @@ class MainWindow(QWidget):
             logging.error(f"Failed to create annotation: {error}")
 
     def create_annotation(self) -> None:
-        """
-        Open a dialog for creating an annotation file manually.
-        The user can specify the location and filename for the annotation file.
-        """
         try:
             if self.dataset_path:
                 self.annotation_path, _ = QFileDialog.getSaveFileName(
                     self, 'Specify Annotation File', '', 'CSV Files (*.csv)')
 
                 if self.annotation_path:
-                    cat_abs_paths = get_absolute_paths('cat', self.dataset_path)
-                    cat_rel_paths = get_relative_paths('cat', self.dataset_path)
-                    dog_abs_paths = get_absolute_paths('dog', self.dataset_path)
-                    dog_rel_paths = get_relative_paths('dog', self.dataset_path)
-
-                    write_annotation_to_csv(self.annotation_path, cat_abs_paths, cat_rel_paths, 'cat')
-                    write_annotation_to_csv(self.annotation_path, dog_abs_paths, dog_rel_paths, 'dog')
-
+                    self.create_csv_annotation(self.dataset_path, self.annotation_path)
                     QMessageBox.about(self, "Success", "Annotation file successfully created.")
             else:
                 QMessageBox.about(self, "Error", "Please select a directory")
