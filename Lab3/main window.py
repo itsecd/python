@@ -77,22 +77,10 @@ class MainWindow(QWidget):
 
     def create_csv(self, dataset_folder: str) -> None:
         try:
-            cat_absolute_paths = get_absolute_paths('cat', dataset_folder)
-            cat_relative_paths = get_relative_paths('cat', dataset_folder)
-            dog_absolute_paths = get_absolute_paths('dog', dataset_folder)
-            dog_relative_paths = get_relative_paths('dog', dataset_folder)
-
-            annotation_file = os.path.join(dataset_folder, 'data.csv')
-            if os.path.exists(annotation_file):
-                os.remove(annotation_file)
-
-            write_annotation_to_csv(annotation_file, cat_absolute_paths, cat_relative_paths, 'cat')
-            write_annotation_to_csv(annotation_file, dog_absolute_paths, dog_relative_paths, 'dog')
-
-            self.annotation_path = annotation_file
+            self.create_annotation_file()
         except Exception as error:
-            logger.log_error(f"Failed to create annotation: {error}")
-            QMessageBox.critical(self, "Error", f"Failed to create annotation: {error}")
+             logger.log_error(f"Couldn't create annotation: {error}")
+             QMessageBox.critical(self, "Error", f"Couldn't create annotation: {error}")
 
     def create_annotation(self) -> None:
         try:
@@ -114,7 +102,7 @@ class MainWindow(QWidget):
                     rel_paths = get_relative_paths(class_name, self.dataset_path)
                     write_annotation_to_csv(self.annotation_path, abs_paths, rel_paths, class_name)
 
-                QMessageBox.about(self, "Success", "Annotation file successfully created.")
+                QMessageBox.about(self, "Success", "Annotation file successfully created.") #это выводится когда создаешь аннотацию и она успешно создана
         except Exception as ex:
             logger.log_error(f"Couldn't create annotation: {ex}")
             QMessageBox.critical(self, "Error", f"Couldn't create annotation: {ex}")
