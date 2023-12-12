@@ -39,6 +39,7 @@ def count_filter(df: pd.DataFrame, count: int) -> pd.DataFrame:
 
 
 def class_filter(df: pd.DataFrame, class_label: int) -> pd.DataFrame:
+    df['Рейтинг'] = pd.to_numeric(df['Рейтинг'], errors = 'coerce')
     filtered_df = df[df['Рейтинг'] == class_label].reset_index()
     return filtered_df
 
