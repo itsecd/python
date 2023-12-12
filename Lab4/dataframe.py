@@ -7,7 +7,7 @@ import matplotlib.pyplot as plt
 logging.basicConfig(filename="log.log", filemode="a", level=logging.INFO)
 
 
-def dataframe(df: pd.DataFrame, tag: str) -> pd.DataFrame:
+def make_dataframe(df: pd.DataFrame, tag: str) -> pd.DataFrame:
     """The function generates a dataframe with columns 
     Absolute path, Height, Width, Depth and Label"""
     try:
@@ -38,7 +38,7 @@ def dataframe(df: pd.DataFrame, tag: str) -> pd.DataFrame:
         logging.error(f"Error get img by idx{e}")
 
 
-def balance(df: pd.DataFrame) -> pd.DataFrame:
+def make_stats(df: pd.DataFrame) -> pd.DataFrame:
     """The function receives the size of the image and 
     label and determines the balance of data"""
     img = df[["Height", "Width", "Depth"]].describe()

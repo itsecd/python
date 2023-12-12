@@ -1,5 +1,5 @@
 from turtle import width
-from csv_open_save import open_csv, open_new_csv, save_csv
+from csv_open_save import open_csv,  save_csv
 import dataframe
 import argparse
 import logging
@@ -15,8 +15,8 @@ def main():
         "--option",
         type=int,
         default=5,
-        help=
-        "0 - Test for balance"
+        choices=range(5),
+        help="0 - Test for balance"
         "1 - Filter by label"
         "2 - Filter by label with parameters"
         "3 - Groupping"
@@ -27,12 +27,18 @@ def main():
     parser.add_argument("--label", type=int, help="Label of image")
     parser.add_argument("--width", type=int, help="Width of image")
     parser.add_argument("--height", type=int, help="Height of image")
-    parser.add_argument("--tag", help="class of image (tiger or leopard)")
     parser.add_argument("--csv_save", help="Path to save file")
     args = parser.parse_args()
     if args.option == 0:
-        df = dataframe.dataframe(open_new_csv(args.csv_path), "tiger")
-        save_csv(dataframe.balance(df), args.csv_save)
+        df = dataframe.make_dataframe(
+            open_csv(
+                args.csv_path,
+                column_names=["Absolute path", "Relative path", "Tag"],
+                remove_column="Relative path",
+            ),
+            "tiger",
+        )
+        save_csv(dataframe.make_stats(df), args.csv_save)
         logging.info("Test for balance work")
     elif args.option == 1:
         df = open_csv(args.csv_path)
