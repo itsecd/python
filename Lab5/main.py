@@ -19,7 +19,7 @@ def load_data(csv_path : str) -> list:
     return list_
 
 
-def separation_data(images : list) -> list:
+def separation_data(images : list) -> Tuple[list, list, list]:
     """Separation data lika a train, test and valid"""
     train_data = images[0:int(len(images) * 0.8)]
     test_data = images[int(len(images) * 0.8) : int(len(images) * 0.9)]
@@ -46,6 +46,20 @@ class dataset(torch.utils.data.Dataset):
         return img, label
     
 
+def transform_data(train_list, test_list, valid_list) -> Tuple[dataset, dataset, dataset]:
+    """Transform dataset"""
+    fixed_transforms = transforms.Compose(
+        [
+            transforms.Resize((224, 224)),
+            transforms.RandomResizedCrop(224),
+            transforms.RandomHorizontalFlip(),
+            transforms.ToTensor(),
+        ]
+    )
+    train_data = dataset(train_list, transform=fixed_transforms)
+    test_data = dataset(test_list, transform=fixed_transforms)
+    valid_data = dataset(valid_list, transform=fixed_transforms)
+    return train_data, test_data, valid_data
 
 
 
