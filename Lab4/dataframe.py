@@ -46,14 +46,29 @@ def filter_dataframe_by_label(input_df, target_label):
     return filtered_df
 
 
+def filter_dataframe_by_params(input_df, target_label, max_height, max_width):
+    filtered_df = input_df[(input_df['numeric_label'] == target_label) &
+                           (input_df['height'] <= max_height) &
+                           (input_df['width'] <= max_width)].copy()
+    return filtered_df
+
+
 if __name__ == "__main__":
     with open("Lab4/options.json", "r") as options_file:
         options = json.load(options_file)
     df = create_dataframe(options['annotation'])
     print(df)
     compute_statistics(df)
+
     target_label = 0
-    filtered_df = filter_dataframe_by_label(df, target_label)
+    max_height = 180
+    max_width = 400
+
+    filtered_by_label_df = filter_dataframe_by_label(df, target_label)
+    filtered_by_params_df = filter_dataframe_by_params(
+        df, target_label, max_height, max_width)
 
     print(
-        f"\nFiltered DataFrame for class label {target_label}:\n", filtered_df)
+        f"\nFiltered DataFrame for class label {target_label}:\n", filtered_by_label_df)
+    print(
+        f"\nFiltered DataFrame for class label {target_label}, height <= {max_height}, width <= {max_width}:\n", filtered_by_params_df)
