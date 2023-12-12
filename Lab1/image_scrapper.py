@@ -39,7 +39,7 @@ class ImageScrapper():
         page = 1
         except_count=0  
         list_response = []
-        while len(self._dataset) < max_files:
+        while len(self._dirdataset) < max_files:
             src_list = self.get_page_imgs(page, min_width)
             for src in src_list: 
                 try:

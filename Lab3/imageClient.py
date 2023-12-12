@@ -13,7 +13,6 @@ from PyQt5.QtWidgets import (QApplication, QWidget,
                              QLayoutItem, QHeaderView)
 
 sys.path.insert(0,os.path.join(sys.path[0].replace("Lab3", "Lab2")))
-print(sys.path)
 from src.write_reader import ClassInstanceIterator, DataWriteReader 
 
 
@@ -82,9 +81,9 @@ class ImageClient(QWidget):
 
     def connects(self):
         '''this method slots for signals are declared'''
-        self.open_btn.clicked.connect(self.open)
+        self.open_btn.clicked.connect(self.open_dir)
         self.storage_list.itemClicked.connect(self.selectionDir)
-        self.file_list.itemClicked.connect(self.selectionItem)
+        self.file_list.itemClicked.connect(self.selection_item)
         self.read_anotation_btn.clicked.connect(self.read_annotation)
 
     def selectionDir(self):
@@ -128,12 +127,12 @@ class ImageClient(QWidget):
             else:
                 self.lh3.removeItem(item)
 
-    def selectionItem(self, item):
+    def selection_item(self, item):
         '''this method loads an image when you select it from the "Items" widget list'''
         path: str = self.file_list.currentItem().text()
         self.load_img(path)           
 
-    def open(self):
+    def open_dir(self):
         '''this method calls a file dialog to select the working directory,\n
            and creates an instance of the "DataWriteReader" class based on it
         '''
@@ -161,7 +160,7 @@ class ImageClient(QWidget):
         options = QFileDialog.Options()
         options |= QFileDialog.DontUseNativeDialog
         fileName, _ = QFileDialog.getSaveFileName(None,"Сохранить файл", "", "Data (*.csv)", options=options)
-        self.storages[index].write_to_csv(fileName + ".csv")
+        self.storages[index].write_to_csv(f"{fileName}.csv")
 
     def read_annotation(self):
         '''this method reads data from a "csv" file\n
@@ -182,6 +181,3 @@ class ImageClientApp(QApplication):
     def run(self):
         self.window = ImageClient()
         self.exec()
- 
-
-    
