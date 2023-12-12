@@ -28,13 +28,13 @@ class ImageClient(QWidget):
         self.connects()
         self.show()
 
-    def set_appears(self):
+    def set_appears(self) -> None:
         '''this method initializes the application window settings'''
         self.setWindowTitle(os.getenv("TITLE"))
         self.resize((int(os.getenv("WIDTH"))),int(os.getenv("HEIGHT")))
         self.move(int(os.getenv("X_OFF")),int(os.getenv("Y_OFF")))  
 
-    def initUI(self):
+    def initUI(self) -> None:
         '''this method initializes all Qt widgets used in the application window'''
         self.label3 = QLabel(os.getenv("LIST_LABEL")) 
         self.label4 = QLabel(os.getenv("LIST_ITEM")) 
@@ -79,14 +79,14 @@ class ImageClient(QWidget):
 
         self.setLayout(self.lh1)
 
-    def connects(self):
+    def connects(self) -> None:
         '''this method slots for signals are declared'''
         self.open_btn.clicked.connect(self.open_dir)
         self.storage_list.itemClicked.connect(self.selectionDir)
         self.file_list.itemClicked.connect(self.selection_item)
         self.read_anotation_btn.clicked.connect(self.read_annotation)
 
-    def selectionDir(self):
+    def selectionDir(self) -> None:
         '''this method fills the contents of the widgets when the active element is selected in the storageList'''
         self.file_list.clear()  
         index: int = self.storage_list.currentRow() 
@@ -107,7 +107,7 @@ class ImageClient(QWidget):
             classes.append(row[DataWriteReader.key3])
         return classes 
            
-    def create_iters_btns(self, classes):
+    def create_iters_btns(self, classes) -> None:
         '''this method generates a button widget for each image class,\n
            and connects the corresponding slot to it
         '''
@@ -117,7 +117,7 @@ class ImageClient(QWidget):
             btn_next.clicked.connect(partial(self.get_next_image, cl))
             self.lh3.addWidget(btn_next)     
 
-    def destroy_iters_btns(self):
+    def destroy_iters_btns(self) -> None:
         '''this method removes all button widgets from the layout'''
         while self.lh3.count():
             item: QLayoutItem = self.lh3.takeAt(0)
@@ -127,12 +127,12 @@ class ImageClient(QWidget):
             else:
                 self.lh3.removeItem(item)
 
-    def selection_item(self, item):
+    def selection_item(self) -> None:
         '''this method loads an image when you select it from the "Items" widget list'''
         path: str = self.file_list.currentItem().text()
         self.load_img(path)           
 
-    def open_dir(self):
+    def open_dir(self) -> None:
         '''this method calls a file dialog to select the working directory,\n
            and creates an instance of the "DataWriteReader" class based on it
         '''
@@ -142,27 +142,27 @@ class ImageClient(QWidget):
             self.storage_list.addItem(path)
             
 
-    def load_img(self, path: str):
+    def load_img(self, path: str) -> None:
         '''this method loads the image to display it on the widget'''
         pixmap = QPixmap(path)
         pixmap = pixmap.scaled(600, 600, Qt.KeepAspectRatio)
         self.image.setPixmap(pixmap)
         self.class_label.setText(f"<h1>{self.iter._ClassInstanceIterator__class_label}</h1>")        
             
-    def get_next_image(self, cl):
+    def get_next_image(self, cl: str) -> None:
         '''this method to iterate images over a selected image class'''
         self.iter.change_class_label(cl)
         path: str = next(self.iter)[DataWriteReader.key1]
         self.load_img(path)
 
-    def create_anotation(self, index):
+    def create_anotation(self, index: int) -> None:
         '''this method saves the data of the current instance of "DataWriteReader" in "csv" format'''
         options = QFileDialog.Options()
         options |= QFileDialog.DontUseNativeDialog
         fileName, _ = QFileDialog.getSaveFileName(None,"Сохранить файл", "", "Data (*.csv)", options=options)
         self.storages[index].write_to_csv(f"{fileName}.csv")
 
-    def read_annotation(self):
+    def read_annotation(self)-> None:
         '''this method reads data from a "csv" file\n
            and creates an instance of the "DataWriteReader" class based on it
         '''
@@ -178,6 +178,6 @@ class ImageClientApp(QApplication):
     def __init__(self, argv: List[str]):
         super().__init__(argv)
 
-    def run(self):
+    def run(self) -> None:
         self.window = ImageClient()
         self.exec()
