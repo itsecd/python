@@ -6,4 +6,5 @@
     "name_of_output_file": "_dataset",
     "class_label": ["good","bad"],
     "random_or_not": [true,false]
+
 }
