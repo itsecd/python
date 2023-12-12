@@ -38,11 +38,13 @@ class dataset(torch.utils.data.Dataset):
     
 
     def __getitem__(self,index : int) -> Tuple[torch.tensor, int]:
-        path_to_image = self.dataset.iloc[index, 0]
-        label = self.dataset.iloc[index, 1]
-        # image = cv2.cvtColor(cv2.imread(path_to_image), cv2.COLOR_BGR2RGB)
-        img = Image.open(path_to_image)
+        img_path = self.dataset[index]
+        img = Image.open(img_path)
         img = self.transform(img)
+        img_label = []
+        for i in range(len(self.dataset)):
+            img_label.append(os.path.basename(os.path.dirname(self.dataset[i])))
+        label = img_label[index]
         if label == "rose":
             label = 0
         elif label == "tulip":
@@ -194,13 +196,55 @@ def train_loop(epochs, batch_size, lear, train_data, test_data, valid_data) -> T
     return rose_probs, model
 
 
-def show_results(epochs, acc, loss, v_acc, v_loss) -> None:
+def show_results(epochs, acc, loss) -> None:
     """Creates graphs based on the learning results"""
     fig, (ax1, ax2) = plt.subplots(1, 2, figsize=(15, 5))
     ax1.plot(range(epochs), acc, color="green", label="Train accuracy")
     ax2.plot(range(epochs), loss, color="green", label="Train loss")
-    ax1.plot(range(epochs), v_acc, color="blue", label="Validation accuracy")
-    ax2.plot(range(epochs), v_loss, color="blue", label="Validation loss")
     ax1.legend()
     ax2.legend()
     plt.show()
+
+
+def save_result(rose_probs, csv_path) -> None:
+    """Function for saving the result in csv"""
+    idx = list(i for i in range(len(rose_probs)))
+    prob = list(map(lambda x: x[1], rose_probs))
+    submission = pd.DataFrame({"id": idx, "label": prob})
+    submission.to_csv(csv_path, index=False)
+
+
+def main(csv_dataset, epochs, batch_size, lear, result, model_path) -> None:
+    """
+    """
+    img_list = load_data(csv_dataset)
+    train_list, test_list, valid_list = separation_data(img_list)
+    train_data, test_data, valid_data = transform_data(train_list, test_list, valid_list)
+    rose_probs, model = train_loop(
+        epochs, batch_size, lear, train_data, test_data, valid_data
+    )
+    save_result(rose_probs, result)
+    class_ = {0: "rose", 1: "tulip"}
+    fig, axes = plt.subplots(1, 5, figsize=(20, 12), facecolor="w")
+    submission = pd.read_csv(result)
+    for ax in axes.ravel():
+        i = random.choice(submission["id"].values)
+        label = submission.loc[submission["id"] == i, "label"].values[0]
+        if label > 0.5:
+            label = 1
+        else:
+            label = 0
+
+        img_path = train_list[i]
+        img = Image.open(img_path)
+
+        ax.set_title(class_[label])
+        ax.imshow(img)
+    plt.show()
+    torch.save(model.state_dict(), model_path)
+
+
+if __name__ == "__main__":
+    train_list = main(
+        "dataset/dataset.csv", 1, 100, 0.001, "Lab5/result.csv", "Lab5/res.pt"
+    )
