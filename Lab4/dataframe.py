@@ -2,6 +2,8 @@ import pandas as pd
 import json
 from PIL import Image
 import cv2
+import numpy as np
+import matplotlib.pyplot as plt
 
 
 def get_image_dimensions(image_path):
@@ -70,9 +72,34 @@ def filter_dataframe(input_df, target_label=None, max_height=None, max_width=Non
 
 def group_by_label_and_pixel_count(df):
     grouped_df = df.groupby('numeric_label')['pixel_count'].agg(
-    ['min', 'max', 'mean']).reset_index()
-    grouped_df.columns = ['numeric_label', 'min_pixel_count', 'max_pixel_count', 'mean_pixel_count']
+        ['min', 'max', 'mean']).reset_index()
+    grouped_df.columns = ['numeric_label', 'min_pixel_count',
+                          'max_pixel_count', 'mean_pixel_count']
     return grouped_df
+
+
+def plot_histogram(dataframe, target_label):
+    filtered_df = dataframe[dataframe['numeric_label'] == target_label]
+    random_image_path = np.random.choice(filtered_df['absolute_path'].values)
+    image = cv2.imread(random_image_path)
+
+    b, g, r = cv2.split(image)
+
+    hist_b = cv2.calcHist([b], [0], None, [256], [0, 256])
+    hist_g = cv2.calcHist([g], [0], None, [256], [0, 256])
+    hist_r = cv2.calcHist([r], [0], None, [256], [0, 256])
+
+    plt.figure(figsize=(10, 6))
+    plt.title(f'Histogram for Class {target_label}')
+    plt.plot(hist_b, color='blue', label='Blue Channel')
+    plt.plot(hist_g, color='green', label='Green Channel')
+    plt.plot(hist_r, color='red', label='Red Channel')
+    plt.xlabel('Pixel Value')
+    plt.ylabel('Frequency')
+    plt.legend()
+    plt.show()
+
+    return hist_b, hist_g, hist_r
 
 
 if __name__ == "__main__":
@@ -90,11 +117,12 @@ if __name__ == "__main__":
         df, target_label=target_label, max_height=None, max_width=None)
     filtered_by_params_df = filter_dataframe(
         df, target_label=target_label, max_height=max_height, max_width=max_width)
+    grouped_df = group_by_label_and_pixel_count(df)
 
     print(
         f"\nFiltered DataFrame for class label {target_label}:\n", filtered_by_label_df)
     print(
         f"\nFiltered DataFrame for class label {target_label}, height <= {max_height}, width <= {max_width}:\n", filtered_by_params_df)
-
-    grouped_df = group_by_label_and_pixel_count(df)
     print("\nGrouped DataFrame by numeric label and pixel count:\n", grouped_df)
+
+    hist_b, hist_g, hist_r = plot_histogram(df, target_label)
