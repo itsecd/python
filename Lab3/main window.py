@@ -179,10 +179,10 @@ class MainWindow(QWidget):
         if self.dataset_path and iterator:
             next_path = next(iterator)
             if next_path:
-                self.display_image  (next_path)
+                self.display_image(next_path)
         else:
             QMessageBox.about(self, "Error", "Please select a directory")
-            
+
     def close_application(self) -> None:
         choice = QMessageBox.question(
             self, 'Exit', 'Are you sure you want to exit?',
@@ -190,7 +190,6 @@ class MainWindow(QWidget):
         )
         if choice == QMessageBox.Yes:
             sys.exit()
-
 
 if __name__ == '__main__':
     app = QApplication(sys.argv)
