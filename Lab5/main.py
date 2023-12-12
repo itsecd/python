@@ -43,6 +43,10 @@ class dataset(torch.utils.data.Dataset):
         # image = cv2.cvtColor(cv2.imread(path_to_image), cv2.COLOR_BGR2RGB)
         img = Image.open(path_to_image)
         img = self.transform(img)
+        if label == "rose":
+            label = 0
+        elif label == "tulip":
+            label = 1
         return img, label
     
 
@@ -118,7 +122,6 @@ def train_loop(epochs, batch_size, lear, train_data, test_data, valid_data) -> T
     optimizer = optim.Adam(params=model.parameters(), lr=lear)
     criterion = nn.CrossEntropyLoss()
 
-    epochs = epochs
     accuracy_values = []
     loss_values = []
     valid_accuracy_values = []
@@ -149,9 +152,7 @@ def train_loop(epochs, batch_size, lear, train_data, test_data, valid_data) -> T
             epoch_loss += loss / len(train_loader)
 
         print(
-            "Epoch : {}, train accuracy : {}, train loss : {}".format(
-                epoch + 1, epoch_accuracy, epoch_loss
-            )
+           f"Epoch : {epoch + 1}, train accuracy : {epoch_accuracy}, train loss : {epoch_loss}"
         )
         accuracy_values.append(epoch_accuracy.item())
         loss_values.append(epoch_loss.item())
@@ -171,9 +172,7 @@ def train_loop(epochs, batch_size, lear, train_data, test_data, valid_data) -> T
                 epoch_val_loss += val_loss / len(valid_loader)
 
             print(
-                "Epoch : {}, val_accuracy : {}, val_loss : {}".format(
-                    epoch + 1, epoch_val_accuracy, epoch_val_loss
-                )
+                f"Epoch : {epoch + 1}, val_accuracy : {epoch_val_accuracy}, val_loss : {epoch_val_loss}"
             )
             valid_accuracy_values.append(epoch_val_accuracy.item())
             valid_loss_values.append(epoch_val_loss.item())
@@ -195,3 +194,13 @@ def train_loop(epochs, batch_size, lear, train_data, test_data, valid_data) -> T
     return rose_probs, model
 
 
+def show_results(epochs, acc, loss, v_acc, v_loss) -> None:
+    """Creates graphs based on the learning results"""
+    fig, (ax1, ax2) = plt.subplots(1, 2, figsize=(15, 5))
+    ax1.plot(range(epochs), acc, color="green", label="Train accuracy")
+    ax2.plot(range(epochs), loss, color="green", label="Train loss")
+    ax1.plot(range(epochs), v_acc, color="blue", label="Validation accuracy")
+    ax2.plot(range(epochs), v_loss, color="blue", label="Validation loss")
+    ax1.legend()
+    ax2.legend()
+    plt.show()
