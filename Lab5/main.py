@@ -102,3 +102,96 @@ class CNN(nn.Module):
         output = self.relu(self.fc1(output))
         output = self.fc2(output)
         return output
+    
+
+
+def train_loop(epochs, batch_size, lear, train_data, test_data, valid_data) -> Tuple[list, CNN]:
+    """Function is intended for creating and training a neural network model,
+    as well as graphing and analyzing the results."""
+    device = "cuda" if torch.cuda.is_available() else "cpu"
+    torch.manual_seed(1234)
+    if device == "cuda":
+        torch.cuda.manual_seed_all(1234)
+    model = CNN()
+    model.train()
+
+    optimizer = optim.Adam(params=model.parameters(), lr=lear)
+    criterion = nn.CrossEntropyLoss()
+
+    epochs = epochs
+    accuracy_values = []
+    loss_values = []
+    valid_accuracy_values = []
+    valid_loss_values = []
+    valid_loader = torch.utils.data.DataLoader(
+        dataset=valid_data, batch_size=batch_size, shuffle=False
+    )
+    train_loader = torch.utils.data.DataLoader(
+        dataset=train_data, batch_size=batch_size, shuffle=True
+    )
+    for epoch in range(epochs):
+        epoch_loss = 0
+        epoch_accuracy = 0
+
+        for data, label in train_loader:
+            data = data.to(device)
+            label = label.to(device)
+
+            output = model(data)
+            loss = criterion(output, label)
+
+            optimizer.zero_grad()
+            loss.backward()
+            optimizer.step()
+
+            acc = (output.argmax(dim=1) == label).float().mean()
+            epoch_accuracy += acc / len(train_loader)
+            epoch_loss += loss / len(train_loader)
+
+        print(
+            "Epoch : {}, train accuracy : {}, train loss : {}".format(
+                epoch + 1, epoch_accuracy, epoch_loss
+            )
+        )
+        accuracy_values.append(epoch_accuracy.item())
+        loss_values.append(epoch_loss.item())
+
+        with torch.no_grad():
+            epoch_val_accuracy = 0
+            epoch_val_loss = 0
+            for data, label in valid_loader:
+                data = data.to(device)
+                label = label.to(device)
+
+                val_output = model(data)
+                val_loss = criterion(val_output, label)
+
+                acc = (val_output.argmax(dim=1) == label).float().mean()
+                epoch_val_accuracy += acc / len(valid_loader)
+                epoch_val_loss += val_loss / len(valid_loader)
+
+            print(
+                "Epoch : {}, val_accuracy : {}, val_loss : {}".format(
+                    epoch + 1, epoch_val_accuracy, epoch_val_loss
+                )
+            )
+            valid_accuracy_values.append(epoch_val_accuracy.item())
+            valid_loss_values.append(epoch_val_loss.item())
+    show_results(epochs, accuracy_values, loss_values)
+    show_results(epochs, valid_accuracy_values, valid_loss_values)
+
+    rose_probs = []
+    model.eval()
+    test_loader = torch.utils.data.DataLoader(
+        dataset=test_data, batch_size=100, shuffle=False
+    )
+    with torch.no_grad():
+        for data, fileid in test_loader:
+            data = data.to(device)
+            preds = model(data)
+            preds_list = functional.softmax(preds, dim=1)[:, 1].tolist()
+            rose_probs += list(zip(list(fileid), preds_list))
+    rose_probs.sort(key=lambda x: int(x[0]))
+    return rose_probs, model
+
+
