@@ -2,7 +2,7 @@ import logging
 import matplotlib.pyplot as plt
 import pandas as pd
 from collections import Counter
-from df_functions import class_filter, make_dataframe
+from df_functions import class_filter
 from preprocess import preprocess_text
 
 
@@ -12,9 +12,9 @@ logging.basicConfig(level=logging.INFO)
 
 
 def build_histogram(df: pd.DataFrame, class_label: int) -> None:
-    """the function takes dataframe and show it's graph by class"""
+    """This function takes dataframe and show it's graph by class"""
     try:
-        filtered_df = class_filter(df, class_label)
+        filtered_df = preprocess_text(class_filter(df, class_label))
         reviews = ''
         for review in filtered_df['Текст отзыва']:
             reviews += ' '
@@ -32,6 +32,3 @@ def build_histogram(df: pd.DataFrame, class_label: int) -> None:
         plt.show()        
     except Exception as exc:
         logging.error(f"Can not build histogram: {exc}\n{exc.args}\n")
-
-
-build_histogram(preprocess_text(make_dataframe('D:/AppProgPython/appprog/csv/3.csv')), 1)
