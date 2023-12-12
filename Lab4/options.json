@@ -1,4 +1,10 @@
 {
-    "queries": ["tiger", "leopard"],
-    "annotation": "annotation.csv"
+    "queries": [
+        "tiger",
+        "leopard"
+    ],
+    "annotation": "annotation.csv",
+    "target_label": 0,
+    "max_height": 100,
+    "max_width": 200
 }

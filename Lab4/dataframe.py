@@ -41,15 +41,18 @@ def compute_statistics(df):
     print("\nThe data set is balanced:", is_balanced)
 
 
-def filter_dataframe_by_label(input_df, target_label):
-    filtered_df = input_df[input_df['numeric_label'] == target_label].copy()
-    return filtered_df
+def filter_dataframe(input_df, target_label=None, max_height=None, max_width=None):
+    filtered_df = input_df.copy()
 
+    if target_label is not None:
+        filtered_df = filtered_df[filtered_df['numeric_label'] == target_label]
 
-def filter_dataframe_by_params(input_df, target_label, max_height, max_width):
-    filtered_df = input_df[(input_df['numeric_label'] == target_label) &
-                           (input_df['height'] <= max_height) &
-                           (input_df['width'] <= max_width)].copy()
+    if max_height is not None:
+        filtered_df = filtered_df[filtered_df['height'] <= max_height]
+
+    if max_width is not None:
+        filtered_df = filtered_df[filtered_df['width'] <= max_width]
+
     return filtered_df
 
 
@@ -60,13 +63,14 @@ if __name__ == "__main__":
     print(df)
     compute_statistics(df)
 
-    target_label = 0
-    max_height = 180
-    max_width = 400
+    target_label = options["target_label"]
+    max_height = options["max_height"]
+    max_width = options["max_width"]
 
-    filtered_by_label_df = filter_dataframe_by_label(df, target_label)
-    filtered_by_params_df = filter_dataframe_by_params(
-        df, target_label, max_height, max_width)
+    filtered_by_label_df = filter_dataframe(
+        df, target_label=target_label, max_height=None, max_width=None)
+    filtered_by_params_df = filter_dataframe(
+        df, target_label=target_label, max_height=max_height, max_width=max_width)
 
     print(
         f"\nFiltered DataFrame for class label {target_label}:\n", filtered_by_label_df)
