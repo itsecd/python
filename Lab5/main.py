@@ -62,4 +62,43 @@ def transform_data(train_list, test_list, valid_list) -> Tuple[dataset, dataset,
     return train_data, test_data, valid_data
 
 
-
+class CNN(nn.Module):
+    def __init__(self) -> None:
+        super(CNN,self).__init__()
+        
+        self.layer1 = nn.Sequential(
+            nn.Conv2d(3,16,kernel_size=3, padding=0,stride=2),
+            nn.BatchNorm2d(16),
+            nn.ReLU(),
+            nn.MaxPool2d(2)
+        )
+        
+        self.layer2 = nn.Sequential(
+            nn.Conv2d(16,32, kernel_size=3, padding=0, stride=2),
+            nn.BatchNorm2d(32),
+            nn.ReLU(),
+            nn.MaxPool2d(2)
+            )
+        
+        self.layer3 = nn.Sequential(
+            nn.Conv2d(32,64, kernel_size=3, padding=0, stride=2),
+            nn.BatchNorm2d(64),
+            nn.ReLU(),
+            nn.MaxPool2d(2)
+        )
+        
+        
+        self.fc1 = nn.Linear(576,10)
+        self.dropout = nn.Dropout(0.5)
+        self.fc2 = nn.Linear(10,2)
+        self.relu = nn.ReLU()
+        
+        
+    def forward(self,x):
+        output = self.layer1(x)
+        output = self.layer2(output)
+        output = self.layer3(output)
+        output = output.view(output.size(0),-1)
+        output = self.relu(self.fc1(output))
+        output = self.fc2(output)
+        return output
