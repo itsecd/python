@@ -76,7 +76,7 @@ class DataWriteReader:
         else:    
             self.data_list : list[dict[str, str]] = list()
             self.scan_instances(main_dir)
-        self.__iter : ClassInstanceIterator = ClassInstanceIterator(DataWriteReader.key3, None, *self.data_list)   
+        
 
     def scan_instances(self, main_dir : str) -> None:
         '''This method scans the directory and saves the data\n
@@ -99,7 +99,7 @@ class DataWriteReader:
                         logging.warning(f"directory '{catalog}' is empty")   
                 except:
                         relative_path : str = os.path.join(main_dir, catalog)
-                        absolute_path : str = os.path.abspath(catalog)
+                        absolute_path : str = os.path.abspath(relative_path)
                         class_label : str = catalog[:-4]
                         self.data_list.append({DataWriteReader.key1: absolute_path,
                                                DataWriteReader.key2: relative_path,
@@ -111,12 +111,6 @@ class DataWriteReader:
         '''This method returning an iterator object for the selected class label'''
         return ClassInstanceIterator(DataWriteReader.key3, class_label, *self.data_list)
       
-    def next(self, class_label: str) -> str:
-        '''This method that iterates over a set of data in the current object,\n
-           returns the path to the next instance corresponding to the class label
-        '''
-        self.__iter.change_class_label(class_label)
-        return next(self.__iter)[DataWriteReader.key2]
 
     def write_to_csv(self, path: str) -> None:
         '''This method writes file data contained in the current object to a CSV file'''   
@@ -135,6 +129,7 @@ class DataWriteReader:
         try:
             with open(path, 'r', newline='') as csvfile:
                 spamreader = csv.reader(csvfile, quotechar='|')
+                next(spamreader)
                 data_list : list[dict[str, Optional[str]]] = list()
                 for row in spamreader:     
                     data_list.append({DataWriteReader.key1: row[0],
