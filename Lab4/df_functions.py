@@ -6,7 +6,7 @@ logging.basicConfig(level=logging.INFO)
 
 
 def make_dataframe(csv_path: str) -> pd.DataFrame:
-    """the function takes a file path to the data file and returns dataframe with 2 new cols"""
+    """This function takes a file path to the data file and returns dataframe with 2 new cols"""
     try:
         df = pd.read_csv(csv_path, delimiter=",", names=['Абсолютный путь', 'Относительный путь', 'Рейтинг'])
         df = df.drop('Относительный путь', axis=1)
