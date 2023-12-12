@@ -37,18 +37,33 @@ if __name__ == "__main__":
     try:
         if args.option1:
             filtered_data = filter_by_mean_deviation(resulting_dataframe, args.deviation_value)
-            print(filtered_data)
+            try:        
+                print(filtered_data)
+            except Exception as ex:
+                logging.error(f"Cant print filtered data: {ex}\n{ex.args}\n")
         elif args.option2:
             filtered_data = filter_by_date_range(resulting_dataframe, args.start_date, args.end_date)
-            print(filtered_data)
+            try:        
+                print(filtered_data)
+            except Exception as ex:
+                logging.error(f"Cant print filtered data: {ex}\n{ex.args}\n")
         elif args.option3:
             filtered_data = group_by_month(resulting_dataframe)
-            print(filtered_data)
+            try:        
+                print(filtered_data)
+            except Exception as ex:
+                logging.error(f"Cant print filtered data: {ex}\n{ex.args}\n")
         elif args.option4:
-            create_graph(file_path)
+            try:
+                create_graph(file_path)
+            except Exception as ex:
+                logging.error(f"Cant create graph: {ex}\n{ex.args}\n")
         elif args.option5:
             filtered_data = group_by_month(resulting_dataframe)
-            create_monthly_graph(filtered_data, args.month_to_plot)
+            try:           
+                create_monthly_graph(filtered_data, args.month_to_plot)
+            except Exception as ex:
+                logging.error(f"Cant create monthly graph: {ex}\n{ex.args}\n")
         else:
             print("Выбран неправильный номер")
     except Exception as ex:
