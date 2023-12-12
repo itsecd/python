@@ -14,9 +14,6 @@ logging.basicConfig(level=logging.INFO)
 
 class MainWindow(QWidget):
     def __init__(self) -> None:
-        """
-        Initialize the main window for managing datasets.
-        """
         super().__init__()
         self.setWindowTitle('Dataset Manager')
         self.layout = QVBoxLayout()
@@ -61,12 +58,6 @@ class MainWindow(QWidget):
         self.destination_path = None
 
     def select_dataset(self) -> None:
-        """
-        Open a dialog for selecting a dataset folder.
-
-        Once a folder is selected, create the CSV file containing annotation information
-        and initialize iterators for cat and dog instances.
-        """
         self.dataset_path = QFileDialog.getExistingDirectory(self, 'Select Dataset Folder')
         if self.dataset_path:
             QMessageBox.about(self, "Directory Selected", f"Selected Directory: {self.dataset_path}")
@@ -77,9 +68,6 @@ class MainWindow(QWidget):
             QMessageBox.about(self, "Error", "Please select a directory")
 
     def create_csv(self, dataset_folder: str) -> None:
-        """
-        Create an annotation file in CSV format based on the dataset.
-        """
         try:
             cat_absolute_paths = get_absolute_paths('cat', dataset_folder)
             cat_relative_paths = get_relative_paths('cat', dataset_folder)
@@ -92,6 +80,9 @@ class MainWindow(QWidget):
 
             write_annotation_to_csv(annotation_file, cat_absolute_paths, cat_relative_paths, 'cat')
             write_annotation_to_csv(annotation_file, dog_absolute_paths, dog_relative_paths, 'dog')
+
+            self.annotation_path = annotation_file
+            self.create_annotation_file()
         except Exception as error:
             logging.error(f"Failed to create annotation: {error}")
 
@@ -102,34 +93,40 @@ class MainWindow(QWidget):
                     self, 'Specify Annotation File', '', 'CSV Files (*.csv)')
 
                 if self.annotation_path:
-                    self.create_csv_annotation(self.dataset_path, self.annotation_path)
-                    QMessageBox.about(self, "Success", "Annotation file successfully created.")
+                    self.create_annotation_file()
+        except Exception as ex:
+            logging.error(f"Couldn't create annotation: {ex}")
+
+    def create_annotation_file(self) -> None:
+        try:
+            if self.annotation_path and self.dataset_path:
+                for class_name in ['cat', 'dog']:
+                    abs_paths = get_absolute_paths(class_name, self.dataset_path)
+                    rel_paths = get_relative_paths(class_name, self.dataset_path)
+                    write_annotation_to_csv(self.annotation_path, abs_paths, rel_paths, class_name)
+
+                QMessageBox.about(self, "Success", "Annotation file successfully created.")
+        except Exception as ex:
+            logging.error(f"Couldn't create annotation: {ex}")
+
+    def copy_dataset(self, with_random: bool) -> None:
+        try:
+            if self.dataset_path:
+                if not self.destination_path:
+                    self.destination_path = QFileDialog.getExistingDirectory(self, 'Select Destination Folder')
+
+                if self.destination_path:
+                    for class_name in ['cat', 'dog']:
+                        if with_random:
+                            process_images(class_name, self.dataset_path, self.destination_path)
+                        else:
+                            replace_images(class_name, self.dataset_path)
+
+                    QMessageBox.about(self, "Success", "Dataset successfully created.")
             else:
                 QMessageBox.about(self, "Error", "Please select a directory")
         except Exception as ex:
-            logging.error(f"Couldn't create annotation: {ex.message}\n{ex.args}\n")
-
-    def copy_dataset(self, with_random: bool) -> None:
-            """
-            Create a dataset with or without randomization.
-            """
-            try:
-                if self.dataset_path:
-                    if not self.destination_path:
-                        self.destination_path = QFileDialog.getExistingDirectory(self, 'Select Destination Folder')
-
-                    if self.destination_path:
-                        if with_random:
-                            process_images('cat', self.dataset_path, self.destination_path)
-                            process_images('dog', self.dataset_path, self.destination_path)
-                        else:
-                            replace_images('cat', self.dataset_path)
-                            replace_images('dog', self.dataset_path)
-                        QMessageBox.about(self, "Success", "Dataset successfully created.")
-                else:
-                    QMessageBox.about(self, "Error", "Please select a directory")
-            except Exception as ex:
-                logging.error(f"Couldn't create dataset: {ex.message}\n{ex.args}\n")
+            logging.error(f"Couldn't create dataset: {ex}")
 
     def display_image(self, image_path: str) -> None:
         """
