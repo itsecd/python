@@ -102,6 +102,31 @@ def plot_histogram(dataframe, target_label):
     return hist_b, hist_g, hist_r
 
 
+def plot_histogram_matplotlib(hist_b, hist_g, hist_r, target_label):
+    plt.figure(figsize=(15, 8))
+
+    plt.subplot(3, 1, 1)
+    plt.plot(hist_b, color='blue')
+    plt.title(f'Blue Channel Histogram for Class {target_label}')
+    plt.xlabel('Pixel Value')
+    plt.ylabel('Frequency')
+
+    plt.subplot(3, 1, 2)
+    plt.plot(hist_g, color='green')
+    plt.title(f'Green Channel Histogram for Class {target_label}')
+    plt.xlabel('Pixel Value')
+    plt.ylabel('Frequency')
+
+    plt.subplot(3, 1, 3)
+    plt.plot(hist_r, color='red')
+    plt.title(f'Red Channel Histogram for Class {target_label}')
+    plt.xlabel('Pixel Value')
+    plt.ylabel('Frequency')
+
+    plt.tight_layout()
+    plt.show()
+
+
 if __name__ == "__main__":
     with open("Lab4/options.json", "r") as options_file:
         options = json.load(options_file)
@@ -126,3 +151,4 @@ if __name__ == "__main__":
     print("\nGrouped DataFrame by numeric label and pixel count:\n", grouped_df)
 
     hist_b, hist_g, hist_r = plot_histogram(df, target_label)
+    plot_histogram_matplotlib(hist_b, hist_g, hist_r, target_label)
