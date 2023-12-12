@@ -27,7 +27,7 @@ def separation_data(images : list) -> list:
     return train_data, test_data, valid_data
 
 
-class dataset(torch.utils.data.Datase):
+class dataset(torch.utils.data.Dataset):
     def __init__(self, list_, transform:Any=None) -> None:
         self.dataset = list_
         self.transform = transform
@@ -46,5 +46,6 @@ class dataset(torch.utils.data.Datase):
         return img, label
     
 
-    
+
+
 
