@@ -1,8 +1,8 @@
 import sys
 import os
-import logging
 from PyQt5.QtWidgets import QApplication, QWidget, QVBoxLayout, QLabel, QPushButton, QFileDialog, QMessageBox
 from PyQt5.QtGui import QPixmap
+import logging
 
 sys.path.insert(0, "Lab2")
 from create_annotation import get_absolute_paths, get_relative_paths, write_annotation_to_csv
@@ -10,7 +10,15 @@ from copy_dataset_in_new_folder import replace_images
 from copy_dataset_random_names import process_images
 from iterator import DirectoryIterator
 
-logging.basicConfig(level=logging.INFO)
+class AppLogger:
+    def __init__(self, log_file="app.log"):
+        logging.basicConfig(filename=log_file, level=logging.ERROR)
+        self.logger = logging.getLogger()
+
+    def log_error(self, message):
+        self.logger.error(message)
+
+logger = AppLogger()
 
 class MainWindow(QWidget):
     def __init__(self) -> None:
@@ -82,9 +90,9 @@ class MainWindow(QWidget):
             write_annotation_to_csv(annotation_file, dog_absolute_paths, dog_relative_paths, 'dog')
 
             self.annotation_path = annotation_file
-            self.create_annotation_file()
         except Exception as error:
-            logging.error(f"Failed to create annotation: {error}")
+            logger.log_error(f"Failed to create annotation: {error}")
+            QMessageBox.critical(self, "Error", f"Failed to create annotation: {error}")
 
     def create_annotation(self) -> None:
         try:
@@ -95,7 +103,8 @@ class MainWindow(QWidget):
                 if self.annotation_path:
                     self.create_annotation_file()
         except Exception as ex:
-            logging.error(f"Couldn't create annotation: {ex}")
+            logger.log_error(f"Couldn't create annotation: {ex}")
+            QMessageBox.critical(self, "Error", f"Couldn't create annotation: {ex}")
 
     def create_annotation_file(self) -> None:
         try:
@@ -107,7 +116,8 @@ class MainWindow(QWidget):
 
                 QMessageBox.about(self, "Success", "Annotation file successfully created.")
         except Exception as ex:
-            logging.error(f"Couldn't create annotation: {ex}")
+            logger.log_error(f"Couldn't create annotation: {ex}")
+            QMessageBox.critical(self, "Error", f"Couldn't create annotation: {ex}")
 
     def copy_dataset(self, with_random: bool) -> None:
         try:
@@ -116,6 +126,8 @@ class MainWindow(QWidget):
                     self.destination_path = QFileDialog.getExistingDirectory(self, 'Select Destination Folder')
 
                 if self.destination_path:
+                    self.create_annotation_file()  # Вызываем создание аннотации перед копированием
+
                     for class_name in ['cat', 'dog']:
                         if with_random:
                             process_images(class_name, self.dataset_path, self.destination_path)
@@ -126,7 +138,8 @@ class MainWindow(QWidget):
             else:
                 QMessageBox.about(self, "Error", "Please select a directory")
         except Exception as ex:
-            logging.error(f"Couldn't create dataset: {ex}")
+            logger.log_error(f"Couldn't create dataset: {ex}")
+            QMessageBox.critical(self, "Error", f"Couldn't create dataset: {ex}")
 
     def display_image(self, image_path: str) -> None:
         """
