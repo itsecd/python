@@ -28,8 +28,7 @@ def build_histogram(df: pd.DataFrame, class_label: int) -> None:
         plt.xticks(rotation=45)
         plt.ylabel('Количество слов')
         plt.title('График частоты слов по рейтингу')
-        plt.legend()
-
-        plt.show()        
+        plt.tight_layout()
+        plt.show(block=True)  
     except Exception as exc:
         logging.error(f"Can not build histogram: {exc}\n{exc.args}\n")
