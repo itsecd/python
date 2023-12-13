@@ -135,11 +135,7 @@ copy_dataset/
 copy_dataset.csv
 random_copy_dataset
 random_copy_dataset.csv
-
 .vscode/
-Lab4/data.csv
-
-
 df.csv
 stats.csv
 filter.csv
