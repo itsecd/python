@@ -1,4 +1,5 @@
 import argparse
+import logging
 from func_tasks import(process_dataframe,
                        compute_image_stats,
                        filter_dataframe_by_label,
@@ -9,14 +10,17 @@ from open_save import read_csv_to_dataframe, save_to_csv
 from graphic import plot_histograms
 
 
+logging.basicConfig(level=logging.INFO)
+
+
 def main():
     parser = argparse.ArgumentParser()
     group = parser.add_mutually_exclusive_group()
-    group.add_argument("--func1", action="store_true", help="Проверка датасета на сбалансированность")
-    group.add_argument("--func2", action="store_true", help="Фильтрация датафрейма")
-    group.add_argument("--func3", action="store_true", help="Фильтрация датафрейма по макс. ширине, высоте и метке")
-    group.add_argument("--func4", action="store_true", help="Группировка датафрейма")
-    group.add_argument("--func5", action="store_true", help="Создание гистограммы по рандомному изображению")
+    group.add_argument("--check_balance", action="store_true", help="Проверка датасета на сбалансированность")
+    group.add_argument("--filter_df_label", action="store_true", help="Фильтрация датафрейма")
+    group.add_argument("--filter_df_params", action="store_true", help="Фильтрация датафрейма по макс. ширине, высоте и метке")
+    group.add_argument("--grouping", action="store_true", help="Группировка датафрейма")
+    group.add_argument("--make_hist", action="store_true", help="Создание гистограммы по рандомному изображению")
     
     parser.add_argument("--input_csv",
                         type=str,
@@ -44,38 +48,36 @@ def main():
     processed_df = process_dataframe(data_frame)
 
     save_to_csv(processed_df, args.output_csv)
-    print(f"Данные сохранены в файл {args.output_csv}")
+    logging.info(f"Данные сохранены в файл {args.output_csv}")
 
-    if args.func1:
+    if args.check_balance:
         image_stats, label_stats = compute_image_stats(processed_df)
 
-        print("Статистика по размерам изображений:")
-        print(image_stats)
-        print("\nСтатистика меток класса:")
-        print(label_stats)
+        logging.info("Статистика по размерам изображений:",image_stats)
+        logging.info("\nСтатистика меток класса:",label_stats)
 
-    if args.func2:
+    elif args.filter_df_label:
         filtered_data = filter_dataframe_by_label(processed_df, args.label)
 
-        print("\nОтфильтрованный DataFrame по метке:")
-        print(filtered_data)
+        logging.info("\nОтфильтрованный DataFrame по метке:",filtered_data)
 
-    if args.func3:
+    elif args.filter_df_params:
         filtered_data = filter_dataframe_by_params(processed_df, args.label, args.max_width, args.max_height)
         
-        print("\nОтфильтрованный DataFrame по параметрам:")
-        print(filtered_data)
+        logging.info("\nОтфильтрованный DataFrame по параметрам:",filtered_data)
 
-    if args.func4:
+    elif args.grouping:
         pixels_stats = calculate_pixels_stats(processed_df)
 
-        print("\nСтатистика по количеству пикселей:")
-        print(pixels_stats)
+        logging.info("\nСтатистика по количеству пикселей:",pixels_stats)
         
-    if args.func5:
+    elif args.make_hist:
         hist_blue, hist_green, hist_red = generate_histogram(processed_df, args.label)
     
         plot_histograms(hist_blue, hist_green, hist_red)
+    
+    else:
+        logging.error("None of the functions were selected")
 
 
 if __name__ == "__main__":
