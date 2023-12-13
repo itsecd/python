@@ -60,5 +60,14 @@ def group_by_stats(dataframe: pd.DataFrame) -> pd.DataFrame:
     grouped_stats = dataframe.groupby('Class')['Pixels'].agg(['max', 'min', 'mean'])
     return grouped_stats
 
-
-
+def create_histogram(dataframe, class_label):
+    filter_df = filter_by_label(dataframe, class_label)
+    img = filter_df["Absolute path"].sample().values[0]
+    image_bgr = cv2.imread(img)
+    height, width, channels = image_bgr.shape
+    b, g, r = cv2.split(image_bgr)
+    hist_b = cv2.calcHist([b], [0], None, [256], [0, 256]) / (height * width)
+    hist_g = cv2.calcHist([g], [0], None, [256], [0, 256]) / (height * width)
+    hist_r = cv2.calcHist([r], [0], None, [256], [0, 256]) / (height * width)
+    histograms = [hist_b, hist_g, hist_r]
+    return histograms
