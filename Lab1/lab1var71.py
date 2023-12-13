@@ -67,3 +67,13 @@ def img_download(subfolder_path: str, folder_path: str, num_images: int) -> None
                 page += 1
         except Exception as e:
             logging.exception(f"Error fetching data: {e}")
+if __name__ == "__main__":
+    parser = argparse.ArgumentParser(description = 'Download images from Bing Images')
+    parser.add_argument('subfolder_path1', type = str, default = 'zebra', help = 'Name of the image 1st class')
+    parser.add_argument('subfolder_path2', type = str, default = 'dogs', help = 'Name of the image 2nd class')
+    parser.add_argument('folder_path', type = str, default = 'dataset', help = 'Output directory for saving images')
+    parser.add_argument('num_images', type = int, default = 1000, help = 'Number of images to download')
+
+    args = parser.parse_args()
+    img_download(args.subfolder_path1, args.folder_path, args.num_images)
+    img_download(args.subfolder_path2, args.folder_path, args.num_images)
