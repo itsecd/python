@@ -1,14 +1,15 @@
 import cv2
 import pandas as pd
 
-def process_dataframe(df: pd.DataFrame) -> pd.DataFrame:
-    df = df.drop("Relative path", axis=1, errors='ignore')
+
+def process_dataframe(dataframe: pd.DataFrame) -> pd.DataFrame:
+    dataframe = dataframe.drop("Relative path", axis=1, errors='ignore')
     heights = []
     widths = []
     channels = []
-    abs_paths = df["Absolute path"]
+    abs_paths = dataframe["Absolute path"]
     class_labels = {'brown bear': 0, 'polar bear': 1}
-    df['Label'] = df['Class'].map(class_labels)
+    dataframe['Label'] = dataframe['Class'].map(class_labels)
     for path in abs_paths:
         try:
             image = cv2.imread(path)
@@ -22,11 +23,20 @@ def process_dataframe(df: pd.DataFrame) -> pd.DataFrame:
                 widths.append(None)
                 channels.append(None)
         except Exception as e:
-            print(f"Ошибка при обработке изображения {absolute_path}: {str(e)}")
+            print(f"Ошибка при обработке изображения: {str(e)}")
 
     # Модификация фрейма данных
-    df["Высота"] = heights
-    df["Ширина"] = widths
-    df["Каналы"] = channels
+    dataframe["Высота"] = heights
+    dataframe["Ширина"] = widths
+    dataframe["Каналы"] = channels
 
-    return df[['Absolute path', 'Class', 'Label', 'Height', 'Width', 'Channels']]
+    return dataframe[['Absolute path', 'Class', 'Height', 'Width', 'Channels']]
+
+def filter_by_label(dataframe: pd.DataFrame, class_label) -> pd.DataFrame:
+    return dataframe[dataframe['Class'] == class_label]
+
+def filter_by_parameters(dataframe: pd.DataFrame, class_label, max_height, max_width) -> pd.DataFrame:
+    return dataframe[(dataframe['Class'] == class_label) &
+                     (dataframe['Height'] <= max_height) &
+                     (dataframe['Width'] <= max_width)]
+
