@@ -18,7 +18,7 @@ def create_dataframe(data_folder):
     """
     data = {'Class': [], 'Path': []}
 
-    for class_label in os.listdir(data_folder):
+    for class_label in os.listdir
         class_folder = os.path.join(data_folder, class_label)
         if os.path.isdir(class_folder):
             for file_name in os.listdir(class_folder):
