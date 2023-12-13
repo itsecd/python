@@ -17,7 +17,6 @@ def process_dataframe(df: pd.DataFrame) -> pd.DataFrame:
         widths = []
         channels = []
         abs_paths = df["Absolute path"]
-        counter=0
         class_labels = {'polar bear': 0, 'brown bear': 1}
         df['Label'] = df['Class'].map(class_labels)
         
@@ -28,8 +27,6 @@ def process_dataframe(df: pd.DataFrame) -> pd.DataFrame:
                 heights.append(height)
                 widths.append(width)
                 channels.append(channel)
-                print(counter)
-                counter+=1
             else:
                 heights.append(None)
                 widths.append(None)
@@ -96,11 +93,12 @@ def generate_histogram(df: pd.DataFrame, label: str) -> Tuple[np.ndarray, np.nda
 
         image_path = random_row['Absolute path'].values[0]
         image = cv2.imread(image_path)
+        height,width=image.shape
         b, g, r = cv2.split(image)
 
-        hist_b = cv2.calcHist([b], [0], None, [256], [0, 256])
-        hist_g = cv2.calcHist([g], [0], None, [256], [0, 256])
-        hist_r = cv2.calcHist([r], [0], None, [256], [0, 256])
+        hist_b = cv2.calcHist([b], [0], None, [256], [0, 256])/(height*width)
+        hist_g = cv2.calcHist([g], [0], None, [256], [0, 256])/(height*width)
+        hist_r = cv2.calcHist([r], [0], None, [256], [0, 256])/(height*width)
         
         return hist_b, hist_g, hist_r
     except Exception as ex:
