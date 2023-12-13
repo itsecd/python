@@ -2,12 +2,22 @@ import numpy as np
 import cv2
 import matplotlib.pyplot as plt
 import logging
-
+from pandas import DataFrame
 
 logging.basicConfig(level=logging.INFO)
 
 
-def calculate_opencv_histogram(dataframe, target_label):
+def calculate_opencv_histogram(dataframe: DataFrame, target_label: int) -> tuple:
+    """
+    Calculate OpenCV histograms for the RGB channels of images in the DataFrame.
+
+    Parameters:
+        dataframe: Input DataFrame.
+        target_label: Numeric label for filtering.
+
+    Returns:
+        tuple: Histograms for the Blue, Green, and Red channels.
+    """
     try:
         filtered_df = dataframe[dataframe['label'] == target_label]
         random_image_path = np.random.choice(
@@ -16,11 +26,12 @@ def calculate_opencv_histogram(dataframe, target_label):
 
         b, g, r = cv2.split(image)
 
-        hist_b = cv2.calcHist([b], [0], None, [256], [0, 256])
-        hist_g = cv2.calcHist([g], [0], None, [256], [0, 256])
-        hist_r = cv2.calcHist([r], [0], None, [256], [0, 256])
+        hist_b = cv2.calcHist([b], [0], None, [256], [0, 256]) / np.sum(hist_b)
+        hist_g = cv2.calcHist([g], [0], None, [256], [0, 256]) / np.sum(hist_g)
+        hist_r = cv2.calcHist([r], [0], None, [256], [0, 256]) / np.sum(hist_r)
 
-        logging.info(f"OpenCV Histogram calculated for Class {target_label}.")
+        logging.info(
+            f"Normalized OpenCV Histogram calculated for Class {target_label}.")
         return hist_b, hist_g, hist_r
 
     except Exception as e:
@@ -28,7 +39,16 @@ def calculate_opencv_histogram(dataframe, target_label):
         return None, None, None
 
 
-def plot_opencv_histogram(hist_b, hist_g, hist_r, target_label):
+def plot_opencv_histogram(hist_b: np.ndarray, hist_g: np.ndarray, hist_r: np.ndarray, target_label: int) -> None:
+    """
+    Plot OpenCV histograms for the RGB channels using Matplotlib.
+
+    Parameters:
+        hist_b: Histogram for the Blue channel.
+        hist_g: Histogram for the Green channel.
+        hist_r: Histogram for the Red channel.
+        target_label: Numeric label for the class.
+    """
     try:
         plt.figure(figsize=(10, 6))
         plt.title(f'OpenCV Histograms for Class {target_label}')
@@ -46,7 +66,16 @@ def plot_opencv_histogram(hist_b, hist_g, hist_r, target_label):
         logging.error(f"Error in plot_opencv_histogram: {e}")
 
 
-def plot_histogram_matplotlib(hist_b, hist_g, hist_r, target_label):
+def plot_histogram_matplotlib(hist_b: np.ndarray, hist_g: np.ndarray, hist_r: np.ndarray, target_label: int) -> None:
+    """
+    Plot histograms for the RGB channels using Matplotlib.
+
+    Parameters:
+        hist_b: Histogram for the Blue channel.
+        hist_g: Histogram for the Green channel.
+        hist_r: Histogram for the Red channel.
+        target_label: Numeric label for the class.
+    """
     try:
         plt.figure(figsize=(15, 8))
 
