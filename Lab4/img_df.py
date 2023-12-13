@@ -4,6 +4,7 @@ import numpy as np
 import logging
 from typing import List
 
+
 def df_from_csv(path: str) -> pd.DataFrame | None:
     """This function for reading data from 'csv' and converting it into a DataFrame\n
        with the addition of new attribute columns: 'width'; 'height'; 'class'; 'channels'
@@ -21,6 +22,7 @@ def df_from_csv(path: str) -> pd.DataFrame | None:
     except FileNotFoundError as ex:
         logging.error(ex) 
 
+
 def get_img_props(row: pd.Series) -> tuple[int] | None:
     """This function get image properties as like: width, height, channels count"""
     keys = list(row.to_dict())
@@ -30,11 +32,13 @@ def get_img_props(row: pd.Series) -> tuple[int] | None:
     except FileNotFoundError as ex:
         logging.error(ex)    
 
+
 def df_imgs_stats(df: pd.DataFrame, ratio_acc: float = 0.05) -> pd.DataFrame:
     """This function calc statistic-data for attrs as like: width, height, channels, class"""
     images_info: pd.DataFrame = df[["height", "width", "channels"]].describe()       
     df_stats: pd.DataFrame = class_ratio_check(df, ratio_acc)    
     return pd.concat([images_info, df_stats], axis=1)
+
 
 def class_ratio_check(df: pd.DataFrame, accuracy: float = 0.05) -> pd.DataFrame:
     """This function calc the ratio of classes in a sample"""
@@ -56,11 +60,13 @@ def class_ratio_check(df: pd.DataFrame, accuracy: float = 0.05) -> pd.DataFrame:
         logging.info("df is disalanced")   
     return df_stats            
 
+
 def filter_by_class_lbl(df: pd.DataFrame, class_lbl: int = None) -> pd.DataFrame:
     """This function returns a filtered selection by class label"""
     if class_lbl:
         df: pd.DataFrame = df[df["class"] == class_lbl]    
     return df
+
 
 def filter_by_imgsize(df: pd.DataFrame, wmax: int = None, hmax: int = None) -> pd.DataFrame:
     """This function returns a filtered selection by size-image charactheristics"""
@@ -70,14 +76,17 @@ def filter_by_imgsize(df: pd.DataFrame, wmax: int = None, hmax: int = None) -> p
         df: pd.DataFrame = df[df["height"] <= hmax]        
     return df
 
+
 def filter_by(df: pd.DataFrame, wmax: int = None, hmax: int = None, class_lbl: int = None) -> pd.DataFrame:
     """This function returns a filtered selection by class label"""
     return filter_by_imgsize(filter_by_class_lbl(df, class_lbl), wmax, hmax)
+
 
 def group_by_resolution(df: pd.DataFrame) -> pd.DataFrame:
     """This function returns a filtered sample based on the specified characteristics"""
     df["resolution"] = df["height"] * df["width"]    
     return df.groupby("class").agg({"resolution": ["max", "min", "mean"]})
+
 
 def build_hist(df: pd.DataFrame, class_lbl: int) -> np.ndarray | None:
     """this function returns statistical data\n

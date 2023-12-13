@@ -2,6 +2,7 @@ import img_df
 import img_hist
 import argparse
 
+
 def main():
     parser = argparse.ArgumentParser()
 
@@ -35,6 +36,6 @@ def main():
         img_hist.draw_hist(img_df.build_hist(df,args.class_label))
     if args.save:
         df.to_csv(args.df_path, index=False)  
-          
+
 if __name__ == "__main__":
     main()
