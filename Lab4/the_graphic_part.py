@@ -26,9 +26,9 @@ def calculate_opencv_histogram(dataframe: DataFrame, target_label: int) -> tuple
 
         b, g, r = cv2.split(image)
 
-        hist_b = cv2.calcHist([b], [0], None, [256], [0, 256]) / np.sum(hist_b)
-        hist_g = cv2.calcHist([g], [0], None, [256], [0, 256]) / np.sum(hist_g)
-        hist_r = cv2.calcHist([r], [0], None, [256], [0, 256]) / np.sum(hist_r)
+        hist_b = cv2.calcHist([b], [0], None, [256], [0, 256]) / b.size
+        hist_g = cv2.calcHist([g], [0], None, [256], [0, 256]) / g.size
+        hist_r = cv2.calcHist([r], [0], None, [256], [0, 256]) / r.size
 
         logging.info(
             f"Normalized OpenCV Histogram calculated for Class {target_label}.")
