@@ -16,7 +16,7 @@ def create_dataframe(data_folder):
     Returns:
     - pd.DataFrame: DataFrame с информацией о классах и путях к изображениям.
     """
-    data = {'Class': [], 'Path': []}
+    data = {'Class': [],   'Path': []}
 
     for class_label in os.listdir(data_folder):
         class_folder = os.path.join(data_folder, class_label)
