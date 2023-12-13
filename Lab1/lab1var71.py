@@ -70,7 +70,7 @@ def img_download(subfolder_path: str, folder_path: str, num_images: int) -> None
 if __name__ == "__main__":
     parser = argparse.ArgumentParser(description = 'Download images from Bing Images')
     parser.add_argument('subfolder_path1', type = str, default = 'zebra', help = 'Name of the image 1st class')
-    parser.add_argument('subfolder_path2', type = str, default = 'dogs', help = 'Name of the image 2nd class')
+    parser.add_argument('subfolder_path2', type = str, default = 'bay horse', help = 'Name of the image 2nd class')
     parser.add_argument('folder_path', type = str, default = 'dataset', help = 'Output directory for saving images')
     parser.add_argument('num_images', type = int, default = 1000, help = 'Number of images to download')
 
