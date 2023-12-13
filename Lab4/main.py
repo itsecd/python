@@ -1,6 +1,10 @@
 import argparse
+import logging
 import df_functions as df_func
 import histogram
+
+
+logging.basicConfig(level=logging.INFO)
 
 
 if __name__ == "__main__":
@@ -21,14 +25,15 @@ if __name__ == "__main__":
     df = df_func.make_dataframe(args.csv_path)
 
     if args.option1:
-        print(df_func.create_stats(df))
+        logging.info(f'Статистика датафрема\n{df_func.create_stats(df)}')
     elif args.option2:
-        print(df_func.count_filter(df, args.count))
+        logging.info(f'Фильтрация датафрейма по кол-ву слов\n{df_func.count_filter(df, args.count)}')
     elif args.option3:
-        print(df_func.class_filter(df, args.rate))
+        logging.info(f'Фильтрация датафрейма по классу{df_func.class_filter(df, args.rate)}')
     elif args.option4:
-        print(df_func.group_by_class(df))
+        logging.info(f'Группировка датафрейма по классам{df_func.group_by_class(df)}')
     elif args.option5:
+        logging.info("Создание гистограммы по датафрейму и заданному классу")
         histogram.build_histogram(df, args.rate)
     else:
-        print("Ни одна опция не выбрана")
+        logging.info("Ни одна опция не выбрана")
