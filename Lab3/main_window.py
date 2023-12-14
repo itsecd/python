@@ -1,12 +1,14 @@
+import os
 import sys
 
 from PyQt6.QtWidgets import QApplication, QWidget, QLabel, QVBoxLayout, QDateEdit, QPushButton, QFileDialog
 from PyQt6.QtCore import Qt, QDate
 from datetime import datetime
 
-sys.path.append("D:/python/Lab2")
 from get_value_form_date import read_data_for_date
 from spliting_into_two_files import split_csv_by_columns
+from division_by_year import split_csv_by_years
+from division_by_week import split_csv_by_weeks
 
 
 class DateApp(QWidget):
@@ -25,6 +27,15 @@ class DateApp(QWidget):
         self.browse_data_button = QPushButton('Browse Data', self)
         self.browse_data_button.clicked.connect(self.browse_data)
 
+        self.split_button = QPushButton('Split Data', self)
+        self.split_button.clicked.connect(self.split_by_x_y)
+
+        self.split_by_year_button = QPushButton('Split by year', self)
+        self.split_by_year_button.clicked.connect(self.split_csv_by_year)
+
+        self.split_by_week_button = QPushButton('Split by week', self)
+        self.split_by_week_button.clicked.connect(self.split_csv_by_week)
+
         self.select_datafile = QLabel('No data file selected')
 
         self.result_label = QLabel('Data for the selected date will be displayed here')
@@ -38,6 +49,9 @@ class DateApp(QWidget):
         layout.addWidget(self.browse_data_button)
         layout.addWidget(self.select_datafile)
         layout.addWidget(self.get_data_button)
+        layout.addWidget(self.split_button)
+        layout.addWidget(self.split_by_week_button)
+        layout.addWidget(self.split_by_year_button)
         layout.addWidget(self.result_label)
 
         self.setLayout(layout)
@@ -45,30 +59,69 @@ class DateApp(QWidget):
         self.setWindowTitle('GetDataByDate')
         self.setGeometry(300, 300, 400, 200)
 
-
-def show_data(self) -> None:
+    def show_data(self) -> None:
         """
         Display data for the selected date.
         """
         selected_date = self.date_edit.date().toString(Qt.DateFormat.ISODate)
         if self.data_path is not None:
-            r = read_data_for_date(self.data_path, datetime.strptime(selected_date, '%Y-%m-%d'))
+            r = read_data_for_date(file_path=self.data_path,
+                                   target_date=datetime.strptime(selected_date, '%Y-%m-%d'))
             if r is not None:
                 self.result_label.setText(" ".join(r))
             else:
                 self.result_label.setText("No data for the selected time")
         else:
             self.result_label.setText("Please select a file")
+    
+    def split_by_x_y(self) -> None:
+        """
+        Splitting into two files
+        """
+        if self.data_path is not None:
+            print(self.data_path)
+            if split_csv_by_columns(input_file=self.data_path,
+                                    output_file_x=f'{os.path.dirname(self.data_path)}/X.csv',
+                                    output_file_y=f'{os.path.dirname(self.data_path)}/Y.csv'):
+                self.result_label.setText("Files created successfully")
 
-def browse_data(self) -> None:
+        else:
+            self.result_label.setText("Can't create files X or Y")
+
+    def split_csv_by_year(self) -> None:
+        """
+        This function writes a CSV file separated by year.
+        """
+        if self.data_path is not None:
+            print(self.data_path)
+            if split_csv_by_years(input_file=self.data_path,
+                                  output_folder=f'{os.path.dirname(self.data_path)}/years'):
+                self.result_label.setText("Files created successfully")
+        else:
+            self.result_label.setText("Can't create files X or Y")
+
+    def split_csv_by_week(self) -> None:
+        """
+        This function writes a CSV file separated by week.
+        """
+        if self.data_path is not None:
+            print(self.data_path)
+            if split_csv_by_weeks(input_file=self.data_path,
+                                  output_folder=f'{os.path.dirname(self.data_path)}/weeks'):
+                self.result_label.setText("Files created successfully")
+        else:
+            self.result_label.setText("Can't create files X or Y")
+
+    def browse_data(self) -> None:
         """
         Open a file dialog to browse and select data file.
         """
         self.data_path = QFileDialog.getOpenFileName(self, "Select Data File")[0]
         self.select_datafile.setText(self.data_path)
 
+
 if __name__ == '__main__':
     app = QApplication(sys.argv)
     window = DateApp()
     window.show()
-    app.exec() 
+    app.exec()
