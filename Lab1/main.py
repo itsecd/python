@@ -1,6 +1,6 @@
+import argparse
 import logging
 import os
-import argparse
 import requests
 from bs4 import BeautifulSoup
 from fake_headers import Headers
@@ -67,6 +67,8 @@ def img_download(subfolder_path: str, folder_path: str, num_images: int) -> None
                 page += 1
         except Exception as e:
             logging.exception(f"Error fetching data: {e}")
+
+
 if __name__ == "__main__":
     parser = argparse.ArgumentParser(description = 'Download images from Bing Images')
     parser.add_argument('subfolder_path1', type = str, default = 'zebra', help = 'Name of the image 1st class')
