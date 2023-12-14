@@ -41,33 +41,33 @@ def filter_by_parameters(dataframe: pd.DataFrame, class_label, max_height, max_w
                      (dataframe['Height'] <= max_height) &
                      (dataframe['Width'] <= max_width)]
 
-def compute_image_stats(dataframe: pd.DataFrame) -> Tuple[pd.DataFrame, pd.Series]:
-    image = dataframe[["Height", "Width", "Channels"]].describe()
-    label_st = dataframe["Label"]
-    label_info = label_st.value_counts()
-    dataframe = pd.DataFrame()
-    tag_mentions = label_info.values
-    balance = tag_mentions[0] / tag_mentions[1]
-    dataframe["Tag mentions"] = tag_mentions
-    dataframe["Balance"] = f"{balance:.1f}"
-    if balance >= 0.95 and balance <= 1.05:
-        print("Balanced")
-    return pd.concat([image, dataframe], axis=1)
+def image_stats(dataframe: pd.DataFrame) -> Tuple[pd.DataFrame, pd.Series]:
+    label_column = 'Label'
+    size_columns = ['Height', 'Width', 'Channels']
+    label_stats = dataframe[label_column].value_counts()
+    size_stats = dataframe[size_columns].describe()
+    if len(label_stats) > 1:
+        print("Dataset is balanced")
+    else:
+        print("Dataset may be unbalanced")
+    return size_stats, label_stats
 
 
 def group_by_stats(dataframe: pd.DataFrame) -> pd.DataFrame:
-    dataframe['Pixels'] = dataframe.apply(lambda row: row['Height'] * row['Width'], axis=1)
+    dataframe['Pixels'] = dataframe['Width'] * dataframe['Height']
     grouped_stats = dataframe.groupby('Class')['Pixels'].agg(['max', 'min', 'mean'])
     return grouped_stats
 
-def create_histogram(dataframe, class_label):
+def create_histogram(dataframe: pd.DataFrame, class_label: str) -> Tuple[np.ndarray, np.ndarray, np.ndarray]:
     filter_df = filter_by_label(dataframe, class_label)
-    img = filter_df["Absolute path"].sample().values[0]
-    image_bgr = cv2.imread(img)
-    height, width, channels = image_bgr.shape
-    b, g, r = cv2.split(image_bgr)
-    hist_b = cv2.calcHist([b], [0], None, [256], [0, 256]) / (height * width)
-    hist_g = cv2.calcHist([g], [0], None, [256], [0, 256]) / (height * width)
-    hist_r = cv2.calcHist([r], [0], None, [256], [0, 256]) / (height * width)
-    histograms = [hist_b, hist_g, hist_r]
-    return histograms
+    random_row = filter_df.sample(n=1)
+    image_path = random_row['Absolute path'].values[0]
+    image = cv2.imread(image_path)
+    height,width=image.shape
+    b, g, r = cv2.split(image)
+
+    hist_b = cv2.calcHist([b], [0], None, [256], [0, 256])/(height*width)
+    hist_g = cv2.calcHist([g], [0], None, [256], [0, 256])/(height*width)
+    hist_r = cv2.calcHist([r], [0], None, [256], [0, 256])/(height*width)
+    
+    return hist_b, hist_g, hist_r
