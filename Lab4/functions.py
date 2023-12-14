@@ -4,11 +4,11 @@ import numpy as np
 from typing import Tuple, Any
 
 def process_dataframe(dataframe: pd.DataFrame) -> pd.DataFrame:
-    dataframe = dataframe.drop("Relative path", axis=1, errors='ignore')
+    dataframe = dataframe.drop("Relative Path", axis=1, errors='ignore')
     heights = []
     widths = []
     channels = []
-    abs_paths = dataframe["Absolute path"]
+    abs_paths = dataframe["Absolute Path"]
     class_labels = {'brown bear': 0, 'polar bear': 1}
     dataframe['Label'] = dataframe['Class'].map(class_labels)
     for path in abs_paths:
@@ -31,7 +31,7 @@ def process_dataframe(dataframe: pd.DataFrame) -> pd.DataFrame:
     dataframe["Width"] = widths
     dataframe["Channels"] = channels
 
-    return dataframe[['Absolute path', 'Class', 'Label', 'Height', 'Width', 'Channels']]
+    return dataframe[['Absolute Path', 'Class', 'Label', 'Height', 'Width', 'Channels']]
 
 def filter_by_label(dataframe: pd.DataFrame, class_label) -> pd.DataFrame:
     return dataframe[dataframe['Label'] == class_label]
@@ -41,7 +41,7 @@ def filter_by_parameters(dataframe: pd.DataFrame, class_label, max_height, max_w
                      (dataframe['Height'] <= max_height) &
                      (dataframe['Width'] <= max_width)]
 
-def image_stats(dataframe: pd.DataFrame) -> Tuple[pd.DataFrame, pd.Series]:
+def extract_image_stats(dataframe: pd.DataFrame) -> Tuple[pd.DataFrame, pd.Series]:
     label_column = 'Label'
     size_columns = ['Height', 'Width', 'Channels']
     label_stats = dataframe[label_column].value_counts()
@@ -59,9 +59,9 @@ def group_by_stats(dataframe: pd.DataFrame) -> pd.DataFrame:
     return grouped_stats
 
 def create_histogram(dataframe: pd.DataFrame, class_label: str) -> Tuple[np.ndarray, np.ndarray, np.ndarray]:
-    filter_df = filter_by_label(dataframe, class_label)
+    filter_df = dataframe[dataframe['Class'] == class_label]
     random_row = filter_df.sample(n=1)
-    image_path = random_row['Absolute path'].values[0]
+    image_path = random_row['Absolute Path'].values[0]
     image = cv2.imread(image_path)
     height,width=image.shape
     b, g, r = cv2.split(image)

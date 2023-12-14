@@ -1,0 +1,9 @@
+{
+    "action": "make_hist",
+    "input_csv": "K:/Pyth/PLab1/annotation.csv",
+    "output_csv": "K:/Pyth/PLab1/final.csv",
+    "label": 0,
+    "max_width": 800,
+    "max_height": 600
+  }
+  
