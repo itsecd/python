@@ -1,7 +1,11 @@
 import cv2
+import logging
 import pandas as pd
 import numpy as np
 from typing import Tuple, Any
+
+
+logging.basicConfig(level=logging.INFO)
 
 
 def process_dataframe(dataframe: pd.DataFrame) -> pd.DataFrame:
@@ -25,7 +29,7 @@ def process_dataframe(dataframe: pd.DataFrame) -> pd.DataFrame:
                 widths.append(None)
                 channels.append(None)
         except Exception as e:
-            print(f"Error in image processing: {str(e)}")
+            logging.error(f"Error in image processing")
 
     dataframe["Height"] = heights
     dataframe["Width"] = widths
@@ -33,15 +37,18 @@ def process_dataframe(dataframe: pd.DataFrame) -> pd.DataFrame:
 
     return dataframe[['Absolute Path', 'Class', 'Label', 'Height', 'Width', 'Channels']]
 
+
 def filter_by_label(dataframe: pd.DataFrame, class_label) -> pd.DataFrame:
     '''This function filter dataframe by label'''
     return dataframe[dataframe['Label'] == class_label]
+
 
 def filter_by_parameters(dataframe: pd.DataFrame, class_label, max_height, max_width) -> pd.DataFrame:
     '''This function filter dataframe by parameters'''
     return dataframe[(dataframe['Class'] == class_label) &
                      (dataframe['Height'] <= max_height) &
                      (dataframe['Width'] <= max_width)]
+
 
 def extract_image_stats(dataframe: pd.DataFrame) -> Tuple[pd.DataFrame, pd.Series]:
     '''This function extract stats of image'''
@@ -50,16 +57,18 @@ def extract_image_stats(dataframe: pd.DataFrame) -> Tuple[pd.DataFrame, pd.Serie
     label_stats = dataframe[label_column].value_counts()
     size_stats = dataframe[size_columns].describe()
     if len(label_stats) > 1:
-        print("Dataset is balanced")
+        logging.info("Dataset is balanced")
     else:
-        print("Dataset may be unbalanced")
+        logging.info("Dataset may be unbalanced")
     return size_stats, label_stats
+
 
 def group_by_stats(dataframe: pd.DataFrame) -> pd.DataFrame:
     '''This function groups a DataFrame by class label with calculation of the maximum, minimum and average values by the number of pixels'''
     dataframe['Pixels'] = dataframe['Width'] * dataframe['Height']
     grouped_stats = dataframe.groupby('Class')['Pixels'].agg(['max', 'min', 'mean'])
     return grouped_stats
+
 
 def create_histogram(dataframe: pd.DataFrame, class_label: str) -> Tuple[np.ndarray, np.ndarray, np.ndarray]:
     '''This function create histograms'''
