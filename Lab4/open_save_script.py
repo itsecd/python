@@ -1,20 +1,24 @@
 import pandas as pd
 
-def open_csv(csv_path: str, new_format: bool = False) -> pd.DataFrame:
+def open_original_csv(csv_path: str) -> pd.DataFrame:
     '''
-    Function for opening the annotation CSV as a dataframe.
-    If new_format is True, it renames columns and removes unnecessary ones.
+    Opens the original annotation CSV as a dataframe, assigns column names, and removes unnecessary columns.
     '''
-    if new_format:
-        dframe = pd.read_csv(
-            csv_path, delimiter=",", names=["Absolute path", "Relative path", "Class"]
-        )
-        dframe.drop("Relative path", axis=1, inplace=True)
-    else:
-        dframe = pd.read_csv(csv_path)
+    dataframe = pd.read_csv(
+        csv_path, delimiter=",", names=["Absolute path", "Relative path", "Class"]
+    )
+    dataframe = dataframe.drop("Relative path", axis=1)
+    return dataframe
 
-    return dframe
+def open_csv_annotation(csv_path: str) -> pd.DataFrame:
+    '''
+    Opens the CSV annotation file as a dataframe.
+    '''
+    dataframe = pd.read_csv(csv_path)
+    return dataframe
 
-def save_csv(dframe: pd.DataFrame, file_path: str) -> None:
-    '''Function for saving a dataframe to a CSV file'''
-    dframe.to_csv(file_path, index=False)
+def save_dataframe_to_csv(dataframe: pd.DataFrame, file_path: str) -> None:
+    '''
+    Saves a dataframe to a CSV file.
+    '''
+    dataframe.to_csv(file_path, index=False)
