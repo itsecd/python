@@ -1,8 +1,8 @@
 import argparse
 import logging
-import functions
+from functions import add_image_parameters, check_balance, filter_by_label, filter_by_min_max, group_by_label, build_histogram
 from histogram import plot_histograms
-from open_save_script import open_original_csv, open_csv_annotation, save_dataframe_to_csv
+from open_save_script import open_csv, save_dataframe_to_csv
 
 logging.basicConfig(level=logging.INFO)
 
@@ -24,21 +24,22 @@ def main():
     parser.add_argument("--class", help="Class of the image (rose or tulip)")
     parser.add_argument("--new-file-path", help="Path for saving the new CSV file")
     args = parser.parse_args()
+
     if args.check_balance:
-        dataframe = functions.add_image_parameters(open_original_csv(args.csv_path), "rose")
-        open_csv_annotation(functions.check_balance(dataframe), args.new_file_path)
+        dataframe = add_image_parameters(open_csv(args.csv_path), "rose")
+        save_dataframe_to_csv(check_balance(dataframe), args.new_file_path)
     elif args.filter_by_label:
-        dataframe = save_dataframe_to_csv(args.csv_path)
-        logging.info(functions.filter_by_label(dataframe, args.label))
+        dataframe = open_csv(args.csv_path, original=False)
+        logging.info(filter_by_label(dataframe, args.label))
     elif args.filter_by_min_max:
-        dataframe = save_dataframe_to_csv(args.csv_path)
-        logging.info(functions.min_max_filter(dataframe, args.width, args.height, args.label))
+        dataframe = open_csv(args.csv_path, original=False)
+        logging.info(filter_by_min_max(dataframe, args.width, args.height, args.label))
     elif args.group_by_label:
-        dataframe = save_dataframe_to_csv(args.csv_path)
-        logging.info(functions.group_by_label(dataframe))
+        dataframe = open_csv(args.csv_path, original=False)
+        logging.info(group_by_label(dataframe))
     elif args.build_histogram:
-        dataframe = save_dataframe_to_csv(args.csv_path)
-        plot_histograms(functions.build_histogram(dataframe, args.label))
+        dataframe = open_csv(args.csv_path, original=False)
+        plot_histograms(build_histogram(dataframe, args.label))
     else:
         logging.info("No option selected")
 
