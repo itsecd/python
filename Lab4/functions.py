@@ -1,5 +1,9 @@
 import pandas as pd
+import logging
 import cv2
+
+logging.basicConfig(level=logging.INFO)
+
 
 def add_image_parameters(dframe: pd.DataFrame, class_one: str) -> pd.DataFrame:
     """
@@ -24,7 +28,7 @@ def add_image_parameters(dframe: pd.DataFrame, class_one: str) -> pd.DataFrame:
         dframe["Label"] = labels
         return dframe
     except Exception as ex:
-        pass
+        logging.error(f"Error while processing images: {ex}")
 
 
 def check_balance(dframe: pd.DataFrame) -> pd.DataFrame:
@@ -38,9 +42,14 @@ def check_balance(dframe: pd.DataFrame) -> pd.DataFrame:
         is_balanced = label_info.iloc[0] / label_info.iloc[1]
         df["Balance"] = f"{is_balanced:.1f}"
 
+        if 0.95 <= is_balanced <= 1.05:
+            logging.info("The dataset is balanced.")
+        else:
+            logging.info("The dataset is unbalanced, deviation: {:.1%}".format(abs(is_balanced - 1)))
+
         return pd.concat([images_info, df], axis=1)
     except Exception as ex:
-        pass
+        logging.error(f"Error checking balance: {ex}")
 
 
 def filter_by_label(dframe: pd.DataFrame, label: int) -> pd.DataFrame:
@@ -80,4 +89,4 @@ def build_histogram(dframe: pd.DataFrame, label: int) -> list:
         hists = [hist_b, hist_g, hist_r]
         return hists
     except Exception as ex:
-        pass
+        logging.error(f"File for histogram was not found: {ex}")
