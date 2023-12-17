@@ -8,13 +8,13 @@ from file_manipulation import read_csv
 from file_manipulation import write_csv
 
 
-def split_csv_by_weeks(input_file: str, output_folder: str) -> None:
-    '''
+def split_csv_by_weeks(input_file: str, output_folder: str) -> bool:
+    """
     This function writes a CSV file separated by week.
     :param input_file:
     :param output_folder:
     :return:
-    '''
+    """
     try:
         os.makedirs(output_folder, exist_ok=True)
         header, data = read_csv(input_file)
@@ -30,5 +30,7 @@ def split_csv_by_weeks(input_file: str, output_folder: str) -> None:
             week_end = week_start + timedelta(days=6)
             output_file = f'{output_folder}/{week_start.strftime("%Y%m%d")}_{week_end.strftime("%Y%m%d")}.csv'
             write_csv(output_file, header, week_data)
+        return True
     except Exception as e:
         logging.exception(f"Can't split scv by weeks: {e}\n{e.args}\n")
+        return False

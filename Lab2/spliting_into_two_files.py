@@ -6,7 +6,7 @@ from file_manipulation import read_csv
 from file_manipulation import write_csv
 
 
-def split_csv_by_columns(input_file: str, output_file_x: str, output_file_y: str) -> None:
+def split_csv_by_columns(input_file: str, output_file_x: str, output_file_y: str) -> bool:
     """
     This function writes a CSV file separated by columns.
     :param input_file:
@@ -24,5 +24,7 @@ def split_csv_by_columns(input_file: str, output_file_x: str, output_file_y: str
         y_data = [[t for t in row[1:]] for row in data]
         write_csv(output_file_x, [header[0]], x_data)
         write_csv(output_file_y, [*header[1:]], y_data)
+        return True
     except Exception as e:
         logging.exception(f"Can't split scv by columns: {e}\n{e.args}\n")
+        return False

@@ -1,14 +1,24 @@
 import os
 import sys
 
+import enum
+
 from PyQt6.QtWidgets import QApplication, QWidget, QLabel, QVBoxLayout, QDateEdit, QPushButton, QFileDialog
 from PyQt6.QtCore import Qt, QDate
 from datetime import datetime
+
+sys.path.insert(0, "C:/Users/pudov/Desktop/lab3/Lab2")
 
 from get_value_form_date import read_data_for_date
 from spliting_into_two_files import split_csv_by_columns
 from division_by_year import split_csv_by_years
 from division_by_week import split_csv_by_weeks
+
+
+class Mode(enum.Enum):
+    split_csv_by_weeks = 3
+    split_csv_by_year = 2
+    split_by_x_y = 1
 
 
 class DateApp(QWidget):
@@ -28,13 +38,13 @@ class DateApp(QWidget):
         self.browse_data_button.clicked.connect(self.browse_data)
 
         self.split_button = QPushButton('Split Data', self)
-        self.split_button.clicked.connect(self.split_by_x_y)
+        self.split_button.clicked.connect(lambda: self.file_splitter(Mode.split_by_x_y))
 
         self.split_by_year_button = QPushButton('Split by year', self)
-        self.split_by_year_button.clicked.connect(self.split_csv_by_year)
+        self.split_by_year_button.clicked.connect(lambda: self.file_splitter(Mode.split_csv_by_year))
 
         self.split_by_week_button = QPushButton('Split by week', self)
-        self.split_by_week_button.clicked.connect(self.split_csv_by_week)
+        self.split_by_week_button.clicked.connect(lambda: self.file_splitter(Mode.split_csv_by_weeks))
 
         self.select_datafile = QLabel('No data file selected')
 
@@ -73,44 +83,27 @@ class DateApp(QWidget):
                 self.result_label.setText("No data for the selected time")
         else:
             self.result_label.setText("Please select a file")
-    
-    def split_by_x_y(self) -> None:
+
+    def file_splitter(self, mode: Mode) -> None:
         """
-        Splitting into two files
+        Splitting into files
         """
         if self.data_path is not None:
-            print(self.data_path)
-            if split_csv_by_columns(input_file=self.data_path,
+            if (mode == Mode.split_by_x_y and split_csv_by_columns(input_file=self.data_path,
                                     output_file_x=f'{os.path.dirname(self.data_path)}/X.csv',
-                                    output_file_y=f'{os.path.dirname(self.data_path)}/Y.csv'):
+                                    output_file_y=f'{os.path.dirname(self.data_path)}/Y.csv')):
+                self.result_label.setText("Files created successfully")
+
+            if (mode == Mode.split_csv_by_year and split_csv_by_years(input_file=self.data_path,
+                                  output_folder=f'{os.path.dirname(self.data_path)}/years')):
+                self.result_label.setText("Files created successfully")
+
+            if (mode == Mode.split_csv_by_weeks and split_csv_by_weeks(input_file=self.data_path,
+                                  output_folder=f'{os.path.dirname(self.data_path)}/weeks')):
                 self.result_label.setText("Files created successfully")
 
         else:
-            self.result_label.setText("Can't create files X or Y")
-
-    def split_csv_by_year(self) -> None:
-        """
-        This function writes a CSV file separated by year.
-        """
-        if self.data_path is not None:
-            print(self.data_path)
-            if split_csv_by_years(input_file=self.data_path,
-                                  output_folder=f'{os.path.dirname(self.data_path)}/years'):
-                self.result_label.setText("Files created successfully")
-        else:
-            self.result_label.setText("Can't create files X or Y")
-
-    def split_csv_by_week(self) -> None:
-        """
-        This function writes a CSV file separated by week.
-        """
-        if self.data_path is not None:
-            print(self.data_path)
-            if split_csv_by_weeks(input_file=self.data_path,
-                                  output_folder=f'{os.path.dirname(self.data_path)}/weeks'):
-                self.result_label.setText("Files created successfully")
-        else:
-            self.result_label.setText("Can't create files X or Y")
+            self.result_label.setText("Can't create files")
 
     def browse_data(self) -> None:
         """
