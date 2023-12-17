@@ -34,8 +34,7 @@ def divide_data(img_list) -> list:
 
 
 class dataset(torch.utils.data.Dataset):
-    '''для загрузки наборов изображений'''
-
+    '''для загрузки наборов изображений''' 
     def __init__(self, file_list, transform=None):
         self.file_list = file_list
         self.transform = transform
@@ -81,6 +80,7 @@ def image_augumentation(training_list, testing_list, validation_list) -> dataset
 def main(csv_dataset) -> None:
     img_list = upload_dataset(csv_dataset)
     training_list, testing_list, validation_list = divide_data(img_list)
+
 
 
 if __name__ == "__main__":
