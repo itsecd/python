@@ -37,3 +37,13 @@ def copy_dataset(src_folder: str, dest_folder: str, randomize: bool = False) -> 
         logging.info(f"Dataset copied and {'randomized' if randomize else 'renamed'}")
     except Exception as e:
         logging.error(f"Error {'randomizing' if randomize else 'renaming'} dataset: {e}")
+
+if __name__ == "__main__":
+    parser = argparse.ArgumentParser(description='Copy and rename or randomize dataset.')
+    parser.add_argument('src_folder', type=str, help='Source folder path')
+    parser.add_argument('dest_folder', type=str, help='Destination folder path')
+    parser.add_argument('--randomize', action='store_true', help='Assign random numbers?')
+
+    args = parser.parse_args()
+
+    copy_dataset(args.src_folder, args.dest_folder, randomize=args.randomize)
