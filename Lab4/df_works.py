@@ -57,14 +57,8 @@ def lemmatize_text(df: pd.DataFrame) -> pd.DataFrame:
     for review in df['Review text']:
         tokens = Mystem().lemmatize(review.lower())
         tokens = [token for token in tokens if token not in russian_stopwords and token != " " and token.strip() not in punctuation]
-        print(tokens[0])
 
         text = " ".join(tokens)
         reviews.append(text)
     df['Review text'] = reviews
     return df
-
-
-if __name__ == '__main__':
-    df = df_build('Lab2/csv/dataset.csv')
-    print(lemmatize_text(rating_filter(df, 1)))
