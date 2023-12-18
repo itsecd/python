@@ -3,15 +3,19 @@ import csv
 import logging
 import os
 
+
 def create_annotation_file(folder_path: str, subfolder_paths: list, annotation_file_path: str):
     """
     the function creates a csv file
 
     Parameters
     ----------
-    folder_path : str
-    subfolder_paths : list
-    annotation_file_path : str
+    folder_path (str): The path to the main folder containing subfolders.
+    subfolder_paths (List[str]): List of paths to subfolders within the main folder.
+    annotation_file_path (str): The path where the CSV annotation file will be created.
+
+    Returns:
+    None: This function does not return any value.
     """
     try:
         with open(annotation_file_path, 'w', newline='') as csvfile:
@@ -29,6 +33,7 @@ def create_annotation_file(folder_path: str, subfolder_paths: list, annotation_f
         logging.info(f"The file with the annotation has been created: {annotation_file_path}")
     except Exception as e:
         logging.exception(f"Error in creating an annotation file: {e}")
+
 
 if __name__ == "__main__":
     parser = argparse.ArgumentParser(description='Create annotation file for the dataset')
