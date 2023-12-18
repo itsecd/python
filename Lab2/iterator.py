@@ -45,3 +45,19 @@ class ClassIterator:
             return DatasetIterator(self.annotation_file, current_class_name)
         else:
             raise StopIteration
+
+if __name__ == "__main__":
+    parser = argparse.ArgumentParser(description='Process a dataset')
+    parser.add_argument('annotation_file', type=str, help='Path to annotation')
+    parser.add_argument('class_names', type=str, nargs='+', help='List of class names')
+
+    args = parser.parse_args()
+
+    annotation_file = args.annotation_file
+    class_names = args.class_names
+
+    iterator = ClassIterator(annotation_file, class_names)
+
+    for dataset_iterator in iterator:
+        for instance in dataset_iterator:
+            print(instance)
