@@ -2,14 +2,14 @@ import argparse
 import csv
 import logging
 import os
-
+from typing import List, Tuple
 
 ABSOLUTE_PATH_COLUMN = 'The absolute path'
 RELATIVE_PATH_COLUMN = 'Relative path'
 CLASS_NAME_COLUMN = 'The text name of the class'
 
 
-def create_annotation_file(folder_path: str, subfolder_paths: list, annotation_file_path: str):
+def create_annotation_file(folder_path: str, subfolder_paths: List[str], annotation_file_path: str) -> Tuple[str, str, str]:
     """
     the function creates a csv file
 
@@ -20,7 +20,7 @@ def create_annotation_file(folder_path: str, subfolder_paths: list, annotation_f
     annotation_file_path (str): The path where the CSV annotation file will be created.
 
     Returns:
-    None: This function does not return any value.
+    Tuple[str, str, str]: A tuple containing absolute path, relative path, and class name.
     """
     try:
         with open(annotation_file_path, 'w', newline='') as csvfile:
@@ -36,8 +36,10 @@ def create_annotation_file(folder_path: str, subfolder_paths: list, annotation_f
                     csv_writer.writerow([absolute_path, relative_path, class_name])
 
         logging.info(f"The file with the annotation has been created: {annotation_file_path}")
+        return absolute_path, relative_path, class_name
     except Exception as e:
         logging.exception(f"Error in creating an annotation file: {e}")
+        return '', '', ''
 
 
 if __name__ == "__main__":
