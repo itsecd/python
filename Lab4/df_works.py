@@ -1,5 +1,8 @@
 import logging
 import pandas as pd
+from string import punctuation
+from nltk.corpus import stopwords
+from pymystem3 import Mystem
 
 
 logging.basicConfig(level=logging.INFO)
@@ -46,10 +49,22 @@ def rating_group(df: pd.DataFrame) -> pd.DataFrame:
     grouped_df = df.groupby('Rating').agg({"Word count": ["min", "max", "mean"]})
     return grouped_df
 
+
+russian_stopwords = stopwords.words("russian")
+def lemmatize_text(df: pd.DataFrame) -> pd.DataFrame:
+    """Returns a dataframe with lemmatized text"""
+    reviews = []
+    for review in df['Review text']:
+        tokens = Mystem().lemmatize(review.lower())
+        tokens = [token for token in tokens if token not in russian_stopwords and token != " " and token.strip() not in punctuation]
+        print(tokens[0])
+
+        text = " ".join(tokens)
+        reviews.append(text)
+    df['Review text'] = reviews
+    return df
+
+
 if __name__ == '__main__':
     df = df_build('Lab2/csv/dataset.csv')
-    print(df)
-    print(stats_df(df))
-    print(rating_filter(df, 2))
-    print(word_count_filter(df, 100))
-    print(rating_group(df))
+    print(lemmatize_text(rating_filter(df, 1)))
