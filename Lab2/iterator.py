@@ -28,3 +28,20 @@ class DatasetIterator:
             return next_instance
         else:
             raise StopIteration
+
+class ClassIterator:
+    def __init__(self, annotation_file: str, class_names: list):
+        self.annotation_file = annotation_file
+        self.class_names = class_names
+        self.current_name_index = 0
+
+    def __iter__(self):
+        return self
+
+    def __next__(self):
+        if self.current_name_index < len(self.class_names):
+            current_class_name = self.class_names[self.current_name_index]
+            self.current_name_index += 1
+            return DatasetIterator(self.annotation_file, current_class_name)
+        else:
+            raise StopIteration
