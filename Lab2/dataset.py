@@ -1,7 +1,7 @@
 import argparse
 import logging
 import os
-import random
+import uuid
 import shutil
 
 
@@ -11,9 +11,9 @@ def copy_dataset(src_folder: str, dest_folder: str, randomize: bool = False) -> 
 
     Parameters
     ----------
-    src_folder : str
-    dest_folder : str
-    randomize : bool, optional
+    src_folder (str): The path to the source folder containing the dataset.
+    dest_folder (str): The path to the destination folder where the dataset will be copied.
+    randomize (bool, optional): If True, the dataset will be copied with randomized filenames;
     """
     try:
         if not os.path.exists(dest_folder):
@@ -26,17 +26,17 @@ def copy_dataset(src_folder: str, dest_folder: str, randomize: bool = False) -> 
                     src_filepath = os.path.join(class_path, filename)
 
                     if randomize:
-                        dest_filename = f"{random.randint(0, 10000)}.jpg"
+                        unique_id = str(uuid.uuid4())[:8]
+                        dest_filename = f"{unique_id}.jpg"
                     else:
                         dest_filename = f"{class_folder}_{idx:04}.jpg"
 
                     dest_filepath = os.path.join(dest_folder, dest_filename)
-
                     shutil.copy(src_filepath, dest_filepath)
 
-        logging.info(f"Dataset copied and {'randomized' if randomize else 'renamed'}")
-    except Exception as e:
-        logging.error(f"Error {'randomizing' if randomize else 'renaming'} dataset: {e}")
+        logging.info(f"Dataset copied and {'randomized' if randomize else 'uniquely named'}")
+    except (FileNotFoundError, PermissionError) as e:
+        logging.exception(f"Error in copying the dataset: {e}")
 
 if __name__ == "__main__":
     parser = argparse.ArgumentParser(description='Copy and rename or randomize dataset.')
