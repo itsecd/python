@@ -33,17 +33,24 @@ class MainWindow(QtWidgets.QMainWindow):
         self.create_annotation_button = QtWidgets.QPushButton('Create Annotation File')
         self.create_annotation_button.clicked.connect(self.create_annotation)
 
+        self.copy_dataset_button = QtWidgets.QPushButton('Copy Dataset')
+        self.copy_dataset_button.clicked.connect(self.copy_dataset)
+
+        self.random_copy = QtWidgets.QCheckBox('Random')
+        self.random_copy.stateChanged.connect(self.get_random)
 
         layout = QtWidgets.QVBoxLayout()
         layout.addWidget(self.folder_label)
         layout.addWidget(self.folder_path)
         layout.addWidget(self.browse_button)
         layout.addWidget(self.create_annotation_button)
-
+        layout.addWidget(self.copy_dataset_button)
+        layout.addWidget(self.random_copy)
 
         container = QtWidgets.QWidget()
         container.setLayout(layout)
         self.setCentralWidget(container)
+
 
     def browse_folder(self):
         folder_path = QtWidgets.QFileDialog.getExistingDirectory(self, 'Select Folder')
@@ -52,11 +59,24 @@ class MainWindow(QtWidgets.QMainWindow):
     def create_annotation(self):
         folder_path = self.folder_path.text()
         QtWidgets.QMessageBox.information(self, 'Select', 'Select Destination File And Name Of Annotation file')
-        destination_file, _ = QtWidgets.QFileDialog.getSaveFileName(self, 'Select Destination File', filter='CSV Files (*.csv)')
+        destination_file, _ = QtWidgets.QFileDialog.getSaveFileName(self, 'Select Destination File', filter='(*.csv)')
 
         if folder_path and destination_file:
             create_annotation_file(folder_path, destination_file)
             QtWidgets.QMessageBox.information(self, 'Success', 'Annotation file created successfully.')
+
+    def get_random(self):
+        return self.random_copy.isChecked()
+
+    def copy_dataset(self):
+        source_folder = self.folder_path.text()
+        destination_folder = QtWidgets.QFileDialog.getExistingDirectory(self, 'Select Destination Folder')
+        annotation_file, _ = QtWidgets.QFileDialog.getSaveFileName(self, 'Select Destination File', filter='(*.csv)')
+        random_copy =self.random_copy.isChecked()
+        if source_folder and destination_folder:
+            copy_and_rename_dataset(source_folder, destination_folder, destination_folder, random_copy)
+            create_annotation_file(destination_folder, str(annotation_file))
+            QtWidgets.QMessageBox.information(self, 'Success', 'Dataset copy successfully.')
 
 
 
