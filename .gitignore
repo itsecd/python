@@ -103,7 +103,7 @@ celerybeat.pid
 
 # Environments
 .env
-.venv
+# .venv
 env/
 venv/
 ENV/
@@ -128,9 +128,7 @@ dmypy.json
 # Pyre type checker
 .pyre/
 dataset/
-Lab1/README.md
 annotation.csv
-Lab1/
 copy_dataset/
 copy_dataset.csv
 random_copy_dataset
