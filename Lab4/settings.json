@@ -1,0 +1,6 @@
+{
+    "action": "stats",
+    "input_csv": "Lab2/csv/dataset.csv",
+    "rating": 1,
+    "word_count": 100
+  }
