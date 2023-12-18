@@ -4,6 +4,11 @@ import logging
 import os
 
 
+ABSOLUTE_PATH_COLUMN = 'The absolute path'
+RELATIVE_PATH_COLUMN = 'Relative path'
+CLASS_NAME_COLUMN = 'The text name of the class'
+
+
 def create_annotation_file(folder_path: str, subfolder_paths: list, annotation_file_path: str):
     """
     the function creates a csv file
@@ -20,7 +25,7 @@ def create_annotation_file(folder_path: str, subfolder_paths: list, annotation_f
     try:
         with open(annotation_file_path, 'w', newline='') as csvfile:
             csv_writer = csv.writer(csvfile)
-            csv_writer.writerow(['The absolute path', 'relative path', 'the text name of the class'])
+            csv_writer.writerow([ABSOLUTE_PATH_COLUMN, RELATIVE_PATH_COLUMN, CLASS_NAME_COLUMN])
 
             for subfolder_path in subfolder_paths:
                 class_name = os.path.basename(subfolder_path)
