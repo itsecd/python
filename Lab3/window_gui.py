@@ -23,7 +23,7 @@ class MainWindow(QtWidgets.QMainWindow):
 
     def init_ui(self):
         self.setWindowTitle('Dataset Processing App')
-        self.setGeometry(100, 100, 300, 300)
+        self.setGeometry(300, 300, 200, 200)
 
         self.folder_label = QtWidgets.QLabel('Select Dataset Folder:')
         self.folder_path = QtWidgets.QLineEdit()
@@ -33,19 +33,31 @@ class MainWindow(QtWidgets.QMainWindow):
         self.create_annotation_button = QtWidgets.QPushButton('Create Annotation File')
         self.create_annotation_button.clicked.connect(self.create_annotation)
 
-        self.copy_dataset_button = QtWidgets.QPushButton('Copy Dataset')
-        self.copy_dataset_button.clicked.connect(self.copy_dataset)
 
         layout = QtWidgets.QVBoxLayout()
         layout.addWidget(self.folder_label)
         layout.addWidget(self.folder_path)
         layout.addWidget(self.browse_button)
         layout.addWidget(self.create_annotation_button)
-        layout.addWidget(self.organize_dataset_button)
+
 
         container = QtWidgets.QWidget()
         container.setLayout(layout)
         self.setCentralWidget(container)
+
+    def browse_folder(self):
+        folder_path = QtWidgets.QFileDialog.getExistingDirectory(self, 'Select Folder')
+        self.folder_path.setText(folder_path)
+
+    def create_annotation(self):
+        folder_path = self.folder_path.text()
+        QtWidgets.QMessageBox.information(self, 'Select', 'Select Destination File And Name Of Annotation file')
+        destination_file, _ = QtWidgets.QFileDialog.getSaveFileName(self, 'Select Destination File', filter='CSV Files (*.csv)')
+
+        if folder_path and destination_file:
+            create_annotation_file(folder_path, destination_file)
+            QtWidgets.QMessageBox.information(self, 'Success', 'Annotation file created successfully.')
+
 
 
 if __name__ == '__main__':
