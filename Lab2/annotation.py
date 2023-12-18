@@ -29,3 +29,12 @@ def create_annotation_file(folder_path: str, subfolder_paths: list, annotation_f
         logging.info(f"The file with the annotation has been created: {annotation_file_path}")
     except Exception as e:
         logging.exception(f"Error in creating an annotation file: {e}")
+
+if __name__ == "__main__":
+    parser = argparse.ArgumentParser(description='Create annotation file for the dataset')
+    parser.add_argument('folder_path', type=str, default='dataset', help='Path to the dataset directory')
+    parser.add_argument('subfolder_paths', nargs='+', type=str, help='List of subfolder paths')
+    parser.add_argument('annotation_file', type=str, default='annotation.csv', help='Path for the annotation file')
+
+    args = parser.parse_args()
+    create_annotation_file(args.folder_path, args.subfolder_paths, args.annotation_file)
