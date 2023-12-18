@@ -5,12 +5,8 @@ class DatasetIterator:
     def __init__(self, annotation_file: str, class_name: str):
         self.annotation_file = annotation_file
         self.class_name = class_name
-        self.class_instances = None
+        self.instances = self._get_class_instances()
         self.current_index = 0
-
-    def __iter__(self):
-        self.class_instances = self._get_class_instances()
-        return self
 
     def _get_class_instances(self):
         instances = []
@@ -21,30 +17,36 @@ class DatasetIterator:
                     instances.append(row[0])
         return instances
 
+    def __iter__(self):
+        return self
+
     def __next__(self):
-        if self.current_index < len(self.class_instances):
-            next_instance = self.class_instances[self.current_index]
+        if self.current_index < len(self.instances):
+            next_instance = self.instances[self.current_index]
             self.current_index += 1
             return next_instance
         else:
             raise StopIteration
 
-class ClassIterator:
+class MultiClassDatasetIterator:
     def __init__(self, annotation_file: str, class_names: list):
         self.annotation_file = annotation_file
         self.class_names = class_names
-        self.current_name_index = 0
+        self.dataset_iterators = [DatasetIterator(annotation_file, class_name) for class_name in class_names]
+        self.current_dataset_iterator = None
 
     def __iter__(self):
+        self.current_dataset_iterator = iter(self.dataset_iterators)
         return self
 
     def __next__(self):
-        if self.current_name_index < len(self.class_names):
-            current_class_name = self.class_names[self.current_name_index]
-            self.current_name_index += 1
-            return DatasetIterator(self.annotation_file, current_class_name)
-        else:
-            raise StopIteration
+        while self.current_dataset_iterator:
+            try:
+                return next(self.current_dataset_iterator)
+            except StopIteration:
+                self.current_dataset_iterator = next(iter(self.dataset_iterators), None)
+
+        raise StopIteration
 
 if __name__ == "__main__":
     parser = argparse.ArgumentParser(description='Process a dataset')
@@ -56,8 +58,7 @@ if __name__ == "__main__":
     annotation_file = args.annotation_file
     class_names = args.class_names
 
-    iterator = ClassIterator(annotation_file, class_names)
+    multi_class_iterator = MultiClassDatasetIterator(annotation_file, class_names)
 
-    for dataset_iterator in iterator:
-        for instance in dataset_iterator:
-            print(instance)
+    for instance in multi_class_iterator:
+        print(instance)
