@@ -10,7 +10,7 @@ logging.basicConfig(level=logging.INFO)
 
 
 def plot_word_frequency(df: pd.DataFrame, class_label: int) -> None:
-    """This function generates a word frequency plot based on the provided class label."""
+    """Эта функция генерирует график частоты слов на основе предоставленной метки класса."""
     try:
         filtered_reviews = preprocess_reviews_text(filter_reviews_by_class(df, class_label))
         all_reviews = ' '.join(filtered_reviews['Текст отзыва']).split()

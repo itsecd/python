@@ -6,14 +6,15 @@ import histogram
 
 logging.basicConfig(level=logging.INFO)
 
-
-def main():
+if __name__ == "__main__":
     parser = argparse.ArgumentParser(description="Обработка данных отзывов")
-    parser.add_argument("--option1", action="store_true", help="Получить статистику датафрейма")
-    parser.add_argument("--option2", action="store_true", help="Фильтрация датафрейма по количеству слов")
-    parser.add_argument("--option3", action="store_true", help="Фильтрация датафрейма по классу")
-    parser.add_argument("--option4", action="store_true", help="Группировка датафрейма по классам")
-    parser.add_argument("--option5", action="store_true", help="Создание гистограммы для заданного класса")
+    
+    group = parser.add_mutually_exclusive_group()
+    group.add_argument("--option1", action="store_true", help="Получить статистику датафрейма")
+    group.add_argument("--option2", action="store_true", help="Фильтрация датафрейма по количеству слов")
+    group.add_argument("--option3", action="store_true", help="Фильтрация датафрейма по классу")
+    group.add_argument("--option4", action="store_true", help="Группировка датафрейма по классам")
+    group.add_argument("--option5", action="store_true", help="Создание гистограммы для заданного класса")
 
     parser.add_argument("--rate", type=str, default="good", help="Оценка отзыва")
     parser.add_argument("--csv_path", default="P:/python-v8/normal_dataset.csv", help="Путь к файлу CSV")
@@ -35,7 +36,3 @@ def main():
         histogram.plot_word_frequency(df, args.rate)
     else:
         logging.info("Не выбрана ни одна опция")
-
-
-if __name__ == "__main__":
-    main()

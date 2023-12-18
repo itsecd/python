@@ -1,8 +1,10 @@
 import pandas as pd
 import logging
+from pandas.core.frame import DataFrame
 
 
-def load_reviews(csv_path):
+def load_reviews(csv_path: str) -> DataFrame:
+    """Загружает отзывы из файла CSV и возвращает DataFrame."""
     try:
         df = pd.read_csv(csv_path, delimiter=",", names=['Абсолютный путь', 'Относительный путь', 'Класс'])
         df = df.drop('Относительный путь', axis=1)
@@ -25,7 +27,8 @@ def load_reviews(csv_path):
         logging.error(f"Can't create dataframe: {exc}\n{exc.args}\n")
 
 
-def get_reviews_statistics(df):
+def get_reviews_statistics(df: DataFrame) -> DataFrame:
+    """Вычисляет статистику по количеству слов в отзывах для каждого класса."""
     try:
         statistics = df[['Класс', 'Количество слов']].describe()
         return statistics
@@ -33,7 +36,8 @@ def get_reviews_statistics(df):
         logging.error(f"Can't get statistics: {e}")
 
 
-def filter_reviews_by_word_count(df, count):
+def filter_reviews_by_word_count(df: DataFrame, count: int) -> DataFrame:
+    """Фильтрует отзывы по количеству слов."""
     try:
         filtered_df = df[df['Количество слов'] <= count].reset_index(drop=True)
         return filtered_df
@@ -41,7 +45,8 @@ def filter_reviews_by_word_count(df, count):
         logging.error(f"Can't filter by word count: {e}")
 
 
-def filter_reviews_by_class(df, class_label):
+def filter_reviews_by_class(df: DataFrame, class_label: str) -> DataFrame:
+    """Фильтрует отзывы по заданному классу."""
     try:
         filtered_df = df[df['Класс'] == class_label].reset_index(drop=True)
         return filtered_df
@@ -49,7 +54,8 @@ def filter_reviews_by_class(df, class_label):
         logging.error(f"Can't filter by rating: {e}")
 
 
-def group_reviews_by_class(df):
+def group_reviews_by_class(df: DataFrame) -> DataFrame:
+    """Группирует отзывы по классу и вычисляет статистику количества слов."""
     try:
         grouped_df = df.groupby('Класс').agg({"Количество слов": ["min", "max", "mean"]})
         return grouped_df

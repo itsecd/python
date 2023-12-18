@@ -1,7 +1,7 @@
+import pandas as pd
 from string import punctuation
 from nltk.corpus import stopwords
 from pymystem3 import Mystem
-import pandas as pd
 import nltk
 
 
@@ -9,8 +9,8 @@ nltk.download('stopwords')
 russian_stopwords = stopwords.words("russian")
 
 
-def preprocess_reviews_text(df):
-    """This function performs text preprocessing by lemmatizing the text in the dataframe."""
+def preprocess_reviews_text(df: pd.DataFrame) -> pd.DataFrame:
+    """Эта функция выполняет предварительную обработку текста путем лемматизации текста во фрейме данных."""
     reviews = []
     for review in df['Текст отзыва']:
         tokens = Mystem().lemmatize(review.lower())
