@@ -3,6 +3,8 @@ from nltk.corpus import stopwords
 from pymystem3 import Mystem
 import pandas as pd
 import nltk
+
+
 nltk.download('stopwords')
 russian_stopwords = stopwords.words("russian")
 

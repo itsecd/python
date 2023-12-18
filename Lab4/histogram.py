@@ -5,7 +5,9 @@ from collections import Counter
 from func import filter_reviews_by_class
 from lemmatize import preprocess_reviews_text
 
+
 logging.basicConfig(level=logging.INFO)
+
 
 def plot_word_frequency(df: pd.DataFrame, class_label: int) -> None:
     """This function generates a word frequency plot based on the provided class label."""

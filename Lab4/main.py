@@ -3,7 +3,9 @@ import logging
 import func
 import histogram
 
+
 logging.basicConfig(level=logging.INFO)
+
 
 def main():
     parser = argparse.ArgumentParser(description="Обработка данных отзывов")
@@ -33,6 +35,7 @@ def main():
         histogram.plot_word_frequency(df, args.rate)
     else:
         logging.info("Не выбрана ни одна опция")
+
 
 if __name__ == "__main__":
     main()
