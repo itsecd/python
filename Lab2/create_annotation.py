@@ -11,8 +11,6 @@ def create_annotation_file(dataset, output_file):
     try:
         with open(output_file, 'w', newline='', encoding='utf-8') as csvfile:
             csv_writer = csv.writer(csvfile)
-            csv_writer.writerow(['Absolute Path', 'Relative Path', 'Class'])
-
             for file_dataset, subfolders, files_list in os.walk(dataset):
                 for file_name in files_list:
                     if file_name.endswith('.txt'):

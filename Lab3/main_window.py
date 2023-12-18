@@ -28,7 +28,6 @@ class MainWindow(QMainWindow):
         self.classes = ["bad", "good"]
         self.default_size = 1000
         self.combo = QComboBox(self)
-        self.combo.addItems(self.classes)
         self.combo.setCurrentIndex(0)
         self.dataset_type = ["copy","random"]
         self.init_ui()
