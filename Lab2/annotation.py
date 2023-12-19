@@ -4,40 +4,45 @@ import logging
 import os
 
 
-ABSOLUTE_PATH_COLUMN = 'The absolute path'
-RELATIVE_PATH_COLUMN = 'Relative path'
-CLASS_NAME_COLUMN = 'The text name of the class'
-
-
-def create_annotation_file(folder_path: str, subfolder_paths: list, annotation_file_path: str)-> None:
+def create_annotation_file(folder_path: str, subfolder_paths: list, dest_folder_path: str):
     """
     the function creates a csv file
-
     Parameters
     ----------
-    folder_path (str): The path to the main folder containing subfolders.
-    subfolder_paths (List[str]): List of paths to subfolders within the main folder.
-    annotation_file_path (str): The path where the CSV annotation file will be created.
-
-    Returns:
-    None: This function does not return any value.
+    folder_path : str
+    subfolder_paths : list
+    annotation_file_path : str
     """
     try:
-        with open(annotation_file_path, 'w', newline='') as csvfile:
-            csv_writer = csv.writer(csvfile)
-            csv_writer.writerow(['The absolute path', 'relative path', 'the text name of the class'])
+        cat_annotation_file = os.path.join(folder_path, 'cat_annotation.csv')
+        dog_annotation_file = os.path.join(folder_path, 'dog_annotation.csv')
 
-            for subfolder_path in subfolder_paths:
-                class_name = os.path.basename(subfolder_path)
+        with open(cat_annotation_file, 'w', newline='') as cat_csvfile:
+            cat_csv_writer = csv.writer(cat_csvfile)
+            cat_csv_writer.writerow(['The absolute path', 'relative path', 'the text name of the class'])
 
-                for filename in os.listdir(os.path.join(folder_path, subfolder_path)):
-                    absolute_path = os.path.join(folder_path, subfolder_path, filename)
-                    relative_path = os.path.join(subfolder_path, filename)
-                    csv_writer.writerow([absolute_path, relative_path, class_name])
+            with open(dog_annotation_file, 'w', newline='') as dog_csvfile:
+                dog_csv_writer = csv.writer(dog_csvfile)
+                dog_csv_writer.writerow(['The absolute path', 'relative path', 'the text name of the class'])
 
-        logging.info(f"The file with the annotation has been created: {annotation_file_path}")
+                for subfolder_path in subfolder_paths:
+                    if os.path.isdir(os.path.join(folder_path, subfolder_path)):
+                        class_name = os.path.basename(subfolder_path)
+
+                        for filename in os.listdir(os.path.join(folder_path, subfolder_path)):
+                            absolute_path = os.path.join(folder_path, subfolder_path, filename)
+                            relative_path = os.path.join(subfolder_path, filename)
+
+                            if class_name == 'cat':
+                                cat_csv_writer.writerow([absolute_path, relative_path, class_name])
+                            elif class_name == 'dog':
+                                dog_csv_writer.writerow([absolute_path, relative_path, class_name])
+
+        logging.info(f"The files with the annotations for cat and dog have been created.")
     except Exception as e:
-        logging.exception(f"Error in creating an annotation file: {e}")
+        logging.exception(f"Error in creating annotation files: {e}")
+
+
 
 
 if __name__ == "__main__":
