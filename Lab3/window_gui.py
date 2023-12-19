@@ -26,7 +26,7 @@ class MainWindow(QtWidgets.QMainWindow):
         self.setGeometry(300, 300, 200, 200)
 
         self.folder_label = QtWidgets.QLabel('Select Dataset Folder:')
-        self.folder_path = QtWidgets.QLineEdit()
+        self.folder_path = QtWidgets.QLabel(self)
         self.browse_button = QtWidgets.QPushButton('Browse',self)
         self.browse_button.clicked.connect(self.browse_folder)
 
@@ -82,7 +82,7 @@ class MainWindow(QtWidgets.QMainWindow):
         """
         Создаем аннотацию
         """
-        folder_path = self.folder_path.text()
+        folder_path = self.folder_path
         QtWidgets.QMessageBox.information(self, 'Select', 'Select Destination File And Name Of Annotation file')
         destination_file, _ = QtWidgets.QFileDialog.getSaveFileName(self, 'Select Destination File', filter='(*.csv)')
 
