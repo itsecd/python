@@ -2,16 +2,13 @@ import torch
 import torch.nn as nn
 import torch
 import torch.optim as optim
-from torchvision import datasets, models, transforms
-from torch.utils.data import DataLoader, Dataset
+from torchvision import transforms
 import torch.nn.functional as F
-import numpy as np
 import pandas as pd
 import matplotlib.pyplot as plt
 import random
 from PIL import Image
 import os
-import zipfile
 
 
 def upload_dataset(csv_path: str) -> list:
@@ -135,20 +132,133 @@ def show_results(epochs, acc, loss, val_acc, val_loss) -> None:
     plt.show()
 
 
+def train_loop(epochs, batch_size, lear, val_data, train_data, test_data) -> list:
+    '''создание и обучение модели нейронной сети'''
+    """Функция предназначена для создания и обучения модели нейронной сети,
+    а также построения графиков и анализа результатов."""
+    device = "cuda" if torch.cuda.is_available() else "cpu"
+    torch.manual_seed(1234)
+    if device == "cuda":
+        torch.cuda.manual_seed_all(1234)
+    model = Cnn()
+    model.train()
+
+    optimizer = optim.Adam(params=model.parameters(), lr=lear)
+    criterion = nn.CrossEntropyLoss()
+
+    epochs = epochs
+    accuracy_values = []
+    loss_values = []
+    val_accuracy_values = []
+    val_loss_values = []
+    val_loader = torch.utils.data.DataLoader(
+        dataset=val_data, batch_size=batch_size, shuffle=False
+    )
+    train_loader = torch.utils.data.DataLoader(
+        dataset=train_data, batch_size=batch_size, shuffle=True
+    )
+    for epoch in range(epochs):
+        epoch_loss = 0
+        epoch_accuracy = 0
+
+        for data, label in train_loader:
+            data = data.to(device)
+            label = label.to(device)
+
+            output = model(data)
+            loss = criterion(output, label)
+
+            optimizer.zero_grad()
+            loss.backward()
+            optimizer.step()
+
+            acc = (output.argmax(dim=1) == label).float().mean()
+            epoch_accuracy += acc / len(train_loader)
+            epoch_loss += loss / len(train_loader)
+
+        print(
+            "Epoch : {}, train accuracy : {}, train loss : {}".format(
+                epoch + 1, epoch_accuracy, epoch_loss
+            )
+        )
+        accuracy_values.append(epoch_accuracy.item())
+        loss_values.append(epoch_loss.item())
+
+        with torch.no_grad():
+            epoch_val_accuracy = 0
+            epoch_val_loss = 0
+            for data, label in val_loader:
+                data = data.to(device)
+                label = label.to(device)
+
+                val_output = model(data)
+                val_loss = criterion(val_output, label)
+
+                acc = (val_output.argmax(dim=1) == label).float().mean()
+                epoch_val_accuracy += acc / len(val_loader)
+                epoch_val_loss += val_loss / len(val_loader)
+
+            print(
+                "Epoch : {}, val_accuracy : {}, val_loss : {}".format(
+                    epoch + 1, epoch_val_accuracy, epoch_val_loss
+                )
+            )
+            val_accuracy_values.append(epoch_val_accuracy.item())
+            val_loss_values.append(epoch_val_loss.item())
+    show_results(epochs, accuracy_values, loss_values)
+    show_results(epochs, val_accuracy_values, val_loss_values)
+
+    cat_probs = []
+    model.eval()
+    test_loader = torch.utils.data.DataLoader(
+        dataset=test_data, batch_size=100, shuffle=False)
+    with torch.no_grad():
+        for data, fileid in test_loader:
+            data = data.to(device)
+            preds = model(data)
+            preds_list = F.softmax(preds, dim=1)[:, 1].tolist()
+            cat_probs += list(zip(list(fileid), preds_list))
+    cat_probs.sort(key=lambda x: int(x[0]))
+    return cat_probs, model
+
+
 def save_csv(cat_probs, csv_path) -> None:
     '''сохраненить результат в csv-файл'''
-    id = list(i for i in range(len(cat_probs)))
+    id = list(range(len(cat_probs)))
     label = list(map(lambda x: x[1], cat_probs))
     submission = pd.DataFrame({"id": id, "label": label})
     submission.to_csv(csv_path, index=False)
 
 
-def main(csv_dataset) -> None:
+def main(csv_dataset, epochs, batch_size, lear, result, model_path) -> None:
+    '''демонстрация работоспособность модели''' 
     img_list = upload_dataset(csv_dataset)
     training_list, testing_list, validation_list = divide_data(img_list)
     train_data, test_data, val_data = image_augumentation(
         training_list, testing_list, validation_list)
+    cat_probs, model = train_loop(
+        epochs, batch_size, lear, val_data, train_data, test_data
+    )
+    save_csv(cat_probs, result)
+    class_ = {0: "cat", 1: "dog"}
+    fig, axes = plt.subplots(2, 3, figsize=(10, 6), facecolor='w') 
+    submission = pd.read_csv(result)
+    for ax in axes.ravel():
+        i = random.choice(submission["id"].values)
+        label = submission.loc[submission["id"] == i, "label"].values[0]
+        if label > 0.5:
+            label = 1
+        else:
+            label = 0
+        img_path = train_list[i]
+        img = Image.open(img_path)
+        ax.set_title(class_[label])
+        ax.imshow(img)
+    plt.show()
+    torch.save(model.state_dict(), model_path)
 
 
 if __name__ == "__main__":
-    train_list = main("Lab2\set\dataset.csv")
+    train_list = main(
+        "Lab2\set\dataset.csv", 10, 100, 0.001, "final.csv", "Lab5\lab5_final.pt"
+    )
