@@ -17,6 +17,7 @@ def preprocess_data(df: pd.DataFrame) -> pd.DataFrame:
     df['Ветер'] = pd.to_numeric(df['Ветер'], errors='coerce')
     return df
 
+
 def filter_data(df: pd.DataFrame, start_date: str, end_date: str) -> pd.DataFrame:
     """
     Фильтрует данные в DataFrame по указанному периоду.
@@ -29,6 +30,7 @@ def filter_data(df: pd.DataFrame, start_date: str, end_date: str) -> pd.DataFram
     """
     filtered_data = df[(df['Дата'] >= start_date) & (df['Дата'] <= end_date)]
     return filtered_data
+
 
 def plot_temperature_statistics(data: pd.DataFrame) -> None:
     """
@@ -48,6 +50,7 @@ def plot_temperature_statistics(data: pd.DataFrame) -> None:
     plt.title('График изменения температуры')
     plt.legend()
 
+
 def plot_pressure_statistics(data: pd.DataFrame) -> None:
     """
     Строит график изменения давления, медианы и среднего значения.
@@ -64,6 +67,7 @@ def plot_pressure_statistics(data: pd.DataFrame) -> None:
     plt.ylabel('Давление')
     plt.title('График изменения давления')
     plt.legend()
+
 
 def plot_wind_speed_statistics(data: pd.DataFrame) -> None:
     """
@@ -82,6 +86,7 @@ def plot_wind_speed_statistics(data: pd.DataFrame) -> None:
     plt.title('График изменения скорости ветра')
     plt.legend()
 
+
 def save_and_show_plots(output_file: str = 'weather_statistics.png') -> None:
     """
     Сохраняет и отображает графики.
@@ -94,6 +99,7 @@ def save_and_show_plots(output_file: str = 'weather_statistics.png') -> None:
     plt.savefig(output_file)
     plt.show()
     print(f'Графики сохранены в файл: {output_file}')
+
 
 if __name__ == "__main__":
     parser = argparse.ArgumentParser(description='Plot weather statistics for a given period.')
