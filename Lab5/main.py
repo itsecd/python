@@ -1,6 +1,7 @@
 import pandas as pd
 import torch
 import torch.nn as nn
+import matplotlib.pyplot as plt
 from torch.utils.data import random_split, TensorDataset, DataLoader
 
 
@@ -80,6 +81,7 @@ def train_model(model, criterion, optimizer, train_loader, val_loader, num_epoch
 
     return train_losses, val_losses
 
+
 class LSTMModel(nn.Module):
     def __init__(self, input_size, hidden_size, num_layers, output_size):
         super(LSTMModel, self).__init__()
@@ -93,8 +95,28 @@ class LSTMModel(nn.Module):
         out = self.fc(out[:, -1, :])
         return out
     
+def show_graphs(results, num_epochs):
+    num_plots = len(results)
+    num_cols = 3
+    num_rows = (num_plots + num_cols - 1) // num_cols
+
+    plt.figure(figsize=(15, 3 * num_rows))
+
+    for i, result in enumerate(results, start=1):
+        plt.subplot(num_rows, num_cols, i)
+        plt.plot(range(1, num_epochs + 1), result['train_losses'], label='Training Loss')
+        plt.plot(range(1, num_epochs + 1), result['val_losses'], label='Validation Loss')
+        plt.xlabel('Epochs')
+        plt.ylabel('Loss')
+        plt.title(f"LR={result['lr']}, BS={result['batch_size']}")
+        plt.legend()
+
+    plt.tight_layout()
+    plt.show()
+
 
 if __name__ == "__main__":
+    results = []
     file_path = 'Lab5/dataset.csv'
     data = load_and_preprocess_data(file_path)
 
@@ -108,8 +130,8 @@ if __name__ == "__main__":
     num_layers = 2
     output_size = 1
 
-    learning_rates = [0.001, 0.01, 0.1]  # Различные значения learning rate
-    batch_sizes = [32, 64, 128]  # Различные значения batch size
+    learning_rates = [0.001, 0.01, 0.1]
+    batch_sizes = [32, 64, 128]
 
     num_epochs = 10
 
@@ -126,5 +148,15 @@ if __name__ == "__main__":
             val_loader = DataLoader(val_dataset, batch_size=batch_size)
 
             train_losses, val_losses = train_model(model, criterion, optimizer, train_loader, val_loader, num_epochs)
-            # Здесь можно сохранять или анализировать результаты, например, выводить графики и т.д.
+
+            experiment_results = {
+                'lr': lr,
+                'batch_size': batch_size,
+                'train_losses': train_losses,
+                'val_losses': val_losses
+            }
+            results.append(experiment_results)
+
             print("Training completed.\n")
+    
+    show_graphs(results, num_epochs)
