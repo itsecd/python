@@ -186,3 +186,9 @@ class MainWindow(QtWidgets.QWidget):
             logger.exception(f"Error in copying dataset: {e}")
 
 
+if __name__ == "__main__":
+    print(sys.path)
+    app = QtWidgets.QApplication(sys.argv)
+    window = MainWindow()
+    window.show()
+    sys.exit(app.exec_())
