@@ -15,7 +15,6 @@ class MainWindow(QtWidgets.QMainWindow):
     def __init__(self):
         super(MainWindow, self).__init__()
         self.review_iterator = None
-        self.folder_path = ''
         self.annotation_path = ''
         self.review_path = ''
         self.class_label = ''
@@ -72,17 +71,14 @@ class MainWindow(QtWidgets.QMainWindow):
         """
         Получаем директорию с датасетом и создаем итератор
         """
-        self.folder_path = QFileDialog.getExistingDirectory(self, 'Select Folder')
-        if self.folder_path:
-            dataset_iterator = self.get_dataset_files()
-            dataset_files = list(dataset_iterator)
-            self.review_iterator = ReviewIterator(dataset_files)
+        folder = QFileDialog.getExistingDirectory(self, 'Select Folder')
+        self.folder_path.setText(folder)
 
     def create_annotation(self) -> None:
         """
         Создаем аннотацию
         """
-        folder_path = self.folder_path
+        folder_path = str(self.folder_path)
         QtWidgets.QMessageBox.information(self, 'Select', 'Select Destination File And Name Of Annotation file')
         destination_file, _ = QtWidgets.QFileDialog.getSaveFileName(self, 'Select Destination File', filter='(*.csv)')
 
@@ -119,35 +115,38 @@ class MainWindow(QtWidgets.QMainWindow):
         """
          Выводим на экран ревью
         """
-        if self.review_iterator is None:
-            QMessageBox.warning(None, "File not selected", "No file selected for iteration")
-            return
+        iterator = getattr(self, f'{review_type}_iterator', None)
 
-        if review_type == "good":
-            element = self.review_iterator.next_good()
-        elif review_type == "bad":
-            element = self.review_iterator.next_bad()
+        if iterator is None:
+            csv_file, _ = QFileDialog.getOpenFileName(
+                self, 'Выберите CSV-файл', '', 'CSV Files (*.csv);;All Files (*)')
+
+            if not csv_file.lower().endswith('.csv'):
+                QtWidgets.QMessageBox.warning(
+                    self, 'Error', 'Invalid file selected. Please select a CSV file.')
+                return
+
+
+            setattr(self, f'{review_type}_iterator',
+                    ReviewIterator(csv_file,  review_type))
+            if not getattr(self, f'{ review_type}_iterator', None):
+                QtWidgets.QMessageBox.warning(
+                    self, 'Error', 'Failed to initialize iterator.')
+                return
+
+        review_path = getattr(self, f'{ review_type}_iterator').__next__()
+
+        if review_path:
+            display_review(self, review_path)
         else:
-            QMessageBox.warning(None, "Invalid value", "An invalid value has been selected")
-            return
+            QtWidgets.QMessageBox.information(
+                self, 'Information', 'There are no more reviews in the dataset.')
 
-        review_path = element
 
-        if review_path is None:
-            QMessageBox.warning(None, "End of class", "No more files for this class")
-            return
-
-        self.text_label.update()
-
+def display_review(self, review_path: str) -> None:
         with open(review_path, 'r', encoding='utf-8') as file:
             self.txt_file.setText(review_path)
             self.text_label.setText(file.read())
-
-    def get_dataset_files(self):
-        if self.folder_path:
-            for root, dirs, files in os.walk(self.folder_path):
-                for file in files:
-                    yield os.path.join(root, file)
 
 
 if __name__ == '__main__':
