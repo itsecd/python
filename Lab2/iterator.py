@@ -5,32 +5,34 @@ import json
 
 
 class ReviewIterator:
-
-    def __init__(self, output_file_annotation: str, class_label: str) -> None:
-        self.output_file_annotation = output_file_annotation
-        self.class_label = class_label
-        self.instances = self._load_instances()
+    def __init__(self, file_paths: list):
+        self.file_paths = file_paths
         self.current_index = 0
-
-    def _load_instances(self) -> list:
-        instances = []
-        with open(self.output_file_annotation, 'r') as csvfile:
-            reader = csv.DictReader(csvfile)
-            for row in reader:
-                if (self.class_label in row['class_label']):
-                    instances.append(row['absolute_path'])
-        return instances
 
     def __iter__(self):
         return self
 
-    def __next__(self) -> None:
-        if self.current_index < len(self.instances):
-            next_instance = self.instances[self.current_index]
+    def __next__(self) -> str:
+        if self.current_index < len(self.file_paths):
+            current_path = self.file_paths[self.current_index]
             self.current_index += 1
-            return next_instance
+            return current_path
         else:
             raise StopIteration
+
+    def next_good(self) -> str:
+        for idx in range(self.current_index, len(self.file_paths)):
+            if "good" in self.file_paths[idx]:
+                self.current_index = idx + 1
+                return self.file_paths[idx]
+        return None
+
+    def next_bad(self) -> str:
+        for idx in range(self.current_index, len(self.file_paths)):
+            if "bad" in self.file_paths[idx]:
+                self.current_index = idx + 1
+                return self.file_paths[idx]
+        return None
 
 
 if __name__ == "__main__":

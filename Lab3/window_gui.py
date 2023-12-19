@@ -18,6 +18,7 @@ class MainWindow(QtWidgets.QMainWindow):
         self.folder_path = ''
         self.annotation_path = ''
         self.review_path = ''
+        self.class_label = ''
         self.init_ui()
 
     def init_ui(self):
@@ -71,8 +72,7 @@ class MainWindow(QtWidgets.QMainWindow):
         """
         Получаем директорию с датасетом и создаем итератор
         """
-        folder_path = QFileDialog.getExistingDirectory(self, 'Select Folder')
-        self.folder_path.setText(folder_path)
+        self.folder_path = QFileDialog.getExistingDirectory(self, 'Select Folder')
         if self.folder_path:
             dataset_iterator = self.get_dataset_files()
             dataset_files = list(dataset_iterator)
@@ -91,7 +91,6 @@ class MainWindow(QtWidgets.QMainWindow):
         else:
             create_annotation_file(folder_path, destination_file)
             self.annotation_path = os.path.join(folder_path, destination_file)
-            self.review_iterator = ReviewIterator(self.annotation_path)
             QtWidgets.QMessageBox.information(self, 'Success', 'Annotation file created successfully.')
 
     def copy_dataset(self) -> None:
@@ -109,9 +108,11 @@ class MainWindow(QtWidgets.QMainWindow):
             copy_and_rename_dataset(source_folder, destination_folder, destination_folder, self.random_copy.isChecked())
             if self.need_annotation.isChecked():
                 annotation_file, _ = QtWidgets.QFileDialog.getSaveFileName(self, 'Select Destination File',filter='(*.csv)')
-                create_annotation_file(destination_folder, str(annotation_file))
-                self.annotation_path = os.path.join(destination_folder, annotation_file)
-                self.review_iterator = ReviewIterator(self.annotation_path)
+                if annotation_file is None:
+                    QMessageBox.warning(None, "Annotation file name is empty", "No annotation file name")
+                else:
+                    create_annotation_file(destination_folder, str(annotation_file))
+                    self.annotation_path = os.path.join(destination_folder, annotation_file)
             QtWidgets.QMessageBox.information(self, 'Success', 'Dataset copy successfully.')
 
     def next(self, review_type):
@@ -144,7 +145,7 @@ class MainWindow(QtWidgets.QMainWindow):
 
     def get_dataset_files(self):
         if self.folder_path:
-            for root, dirs, files in os.walk(self.dataset_path):
+            for root, dirs, files in os.walk(self.folder_path):
                 for file in files:
                     yield os.path.join(root, file)
 
