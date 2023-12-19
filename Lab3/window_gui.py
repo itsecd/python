@@ -26,13 +26,13 @@ class MainWindow(QtWidgets.QMainWindow):
 
         self.folder_label = QtWidgets.QLabel('Select Dataset Folder:')
         self.folder_path = QtWidgets.QLineEdit()
-        self.browse_button = QtWidgets.QPushButton('Browse')
+        self.browse_button = QtWidgets.QPushButton('Browse',self)
         self.browse_button.clicked.connect(self.browse_folder)
 
-        self.create_annotation_button = QtWidgets.QPushButton('Create Annotation File')
+        self.create_annotation_button = QtWidgets.QPushButton('Create Annotation File',self)
         self.create_annotation_button.clicked.connect(self.create_annotation)
 
-        self.copy_dataset_button = QtWidgets.QPushButton('Copy Dataset')
+        self.copy_dataset_button = QtWidgets.QPushButton('Copy Dataset',self)
         self.copy_dataset_button.clicked.connect(self.copy_dataset)
 
         self.random_copy = QtWidgets.QCheckBox('Random name of new dataset?')
@@ -86,7 +86,9 @@ class MainWindow(QtWidgets.QMainWindow):
         QtWidgets.QMessageBox.information(self, 'Select', 'Select Destination File And Name Of Annotation file')
         destination_file, _ = QtWidgets.QFileDialog.getSaveFileName(self, 'Select Destination File', filter='(*.csv)')
 
-        if folder_path and destination_file:
+        if folder_path or destination_file is None:
+            QMessageBox.warning(None, "Folder path or Destination file not selected", "No file selected for create annotation")
+        else:
             create_annotation_file(folder_path, destination_file)
             self.annotation_path = os.path.join(folder_path, destination_file)
             self.review_iterator = ReviewIterator(self.annotation_path)
@@ -101,7 +103,9 @@ class MainWindow(QtWidgets.QMainWindow):
         destination_folder = os.path.join(destination_folder, "_dataset")
         if not os.path.isdir(destination_folder):
             os.makedirs(destination_folder)
-        if source_folder and destination_folder:
+        if source_folder or destination_folder is None:
+            QMessageBox.warning(None, "Source or Destination folder not selected", "No file selected for copy")
+        else:
             copy_and_rename_dataset(source_folder, destination_folder, destination_folder, self.random_copy.isChecked())
             if self.need_annotation.isChecked():
                 annotation_file, _ = QtWidgets.QFileDialog.getSaveFileName(self, 'Select Destination File',filter='(*.csv)')
@@ -126,17 +130,23 @@ class MainWindow(QtWidgets.QMainWindow):
             QMessageBox.warning(None, "Invalid value", "An invalid value has been selected")
             return
 
-        self.review_path = element
+        review_path = element
 
-        if self.review_path is None:
+        if review_path is None:
             QMessageBox.warning(None, "End of class", "No more files for this class")
             return
 
         self.text_label.update()
 
-        with open(self.review_path, 'r', encoding='utf-8') as file:
-            self.txt_file.setText(self.review_path)
+        with open(review_path, 'r', encoding='utf-8') as file:
+            self.txt_file.setText(review_path)
             self.text_label.setText(file.read())
+
+    def get_dataset_files(self):
+        if self.folder_path:
+            for root, dirs, files in os.walk(self.dataset_path):
+                for file in files:
+                    yield os.path.join(root, file)
 
 
 if __name__ == '__main__':
