@@ -14,16 +14,16 @@ def create_annotation_file(folder_path: str, subfolder_paths: list, dest_folder_
     annotation_file_path : str
     """
     try:
-        cat_annotation_file = os.path.join(folder_path, 'cat_annotation.csv')
-        dog_annotation_file = os.path.join(folder_path, 'dog_annotation.csv')
+        zebra_annotation_file = os.path.join(folder_path, 'zebra_annotation.csv')
+        bayhorse_annotation_file = os.path.join(folder_path, 'bayhorse_annotation.csv')
 
-        with open(cat_annotation_file, 'w', newline='') as cat_csvfile:
-            cat_csv_writer = csv.writer(cat_csvfile)
-            cat_csv_writer.writerow(['The absolute path', 'relative path', 'the text name of the class'])
+        with open(zebra_annotation_file, 'w', newline='') as zebra_csvfile:
+            zebra_csv_writer = csv.writer(zebra_csvfile)
+            zebra_csv_writer.writerow(['The absolute path', 'relative path', 'the text name of the class'])
 
-            with open(dog_annotation_file, 'w', newline='') as dog_csvfile:
-                dog_csv_writer = csv.writer(dog_csvfile)
-                dog_csv_writer.writerow(['The absolute path', 'relative path', 'the text name of the class'])
+            with open(bayhorse_annotation_file, 'w', newline='') as bayhorse_csvfile:
+                bayhorse_csv_writer = csv.writer(bayhorse_csvfile)
+                bayhorse_csv_writer.writerow(['The absolute path', 'relative path', 'the text name of the class'])
 
                 for subfolder_path in subfolder_paths:
                     if os.path.isdir(os.path.join(folder_path, subfolder_path)):
@@ -33,10 +33,10 @@ def create_annotation_file(folder_path: str, subfolder_paths: list, dest_folder_
                             absolute_path = os.path.join(folder_path, subfolder_path, filename)
                             relative_path = os.path.join(subfolder_path, filename)
 
-                            if class_name == 'cat':
-                                cat_csv_writer.writerow([absolute_path, relative_path, class_name])
-                            elif class_name == 'dog':
-                                dog_csv_writer.writerow([absolute_path, relative_path, class_name])
+                            if class_name == 'zebra':
+                                zebra_csv_writer.writerow([absolute_path, relative_path, class_name])
+                            elif class_name == 'bayhorse':
+                                bayhorse_csv_writer.writerow([absolute_path, relative_path, class_name])
 
         logging.info(f"The files with the annotations for cat and dog have been created.")
     except Exception as e:
