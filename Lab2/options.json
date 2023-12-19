@@ -1,7 +1,7 @@
 {
     "dataset_path":"C://Users/Ceh9/PycharmProjects/pythonProject/Lab1/dataset",
     "output_file":"annotation.csv",
-    "output_file_annotation": "_annotation.csv",
+    "output_file_annotation": "annotation.csv",
     "output_dataset_path": "C://Users//Ceh9//PycharmProjects//pythonProject//Lab2/",
     "name_of_output_file": "_dataset",
     "class_label": ["good","bad"],

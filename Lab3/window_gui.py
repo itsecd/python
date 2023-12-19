@@ -1,9 +1,7 @@
 import os
 import sys
-import logging
 from PyQt5 import QtWidgets
-from PyQt5.QtWidgets import QVBoxLayout, QHBoxLayout, QPushButton, QLabel, QLineEdit, QFileDialog, QMessageBox, QTextBrowser
-from PyQt5.QtGui import QPixmap
+from PyQt5.QtWidgets import QPushButton, QLabel, QFileDialog, QMessageBox, QTextBrowser
 
 sys.path.insert(1, r"C:\Users\Ceh9\PycharmProjects\pythonProject\Lab2")
 from create_annotation import create_annotation_file
@@ -11,8 +9,6 @@ from copy_dataset import copy_and_rename_dataset, generate_random_set
 from iterator import ReviewIterator
 
 
-logging.basicConfig(level=logging.INFO)
-logger = logging.getLogger(__name__)
 
 
 class MainWindow(QtWidgets.QMainWindow):
@@ -21,6 +17,7 @@ class MainWindow(QtWidgets.QMainWindow):
         self.review_iterator = None
         self.folder_path = ''
         self.annotation_path = ''
+        self.review_path = ''
         self.init_ui()
 
     def init_ui(self):
@@ -50,7 +47,8 @@ class MainWindow(QtWidgets.QMainWindow):
         self.txt_file = QLabel(self)
         self.text_label = QTextBrowser(self)
         self.text_label.setText("Review:")
-        self.text_label.setFixedSize(300, 200)
+        self.text_label.setMinimumSize(300, 200)
+        self.text_label.setMaximumSize(1920,1080)
 
         layout = QtWidgets.QVBoxLayout()
         layout.addWidget(self.folder_label)
@@ -69,7 +67,7 @@ class MainWindow(QtWidgets.QMainWindow):
         container.setLayout(layout)
         self.setCentralWidget(container)
 
-    def browse_folder(self):
+    def browse_folder(self)-> None:
         """
         Получаем директорию с датасетом и создаем итератор
         """
@@ -82,7 +80,7 @@ class MainWindow(QtWidgets.QMainWindow):
 
     def create_annotation(self) -> None:
         """
-                Создаем аннотацию
+        Создаем аннотацию
         """
         folder_path = self.folder_path.text()
         QtWidgets.QMessageBox.information(self, 'Select', 'Select Destination File And Name Of Annotation file')
@@ -96,7 +94,7 @@ class MainWindow(QtWidgets.QMainWindow):
 
     def copy_dataset(self) -> None:
         """
-                        Копируем датасет и в зависимости от чек боксов мы называем его и создаем аннотацию
+        Копируем датасет и в зависимости от чек боксов мы называем его и создаем аннотацию
         """
         source_folder = self.folder_path.text()
         destination_folder = QtWidgets.QFileDialog.getExistingDirectory(self, 'Select Destination Folder')
@@ -114,10 +112,10 @@ class MainWindow(QtWidgets.QMainWindow):
 
     def next(self, review_type):
         """
-                        Выводим на экран ревью
+         Выводим на экран ревью
         """
         if self.review_iterator is None:
-            QMessageBox.information(None, "File not selected", "No file selected for iteration")
+            QMessageBox.warning(None, "File not selected", "No file selected for iteration")
             return
 
         if review_type == "good":
@@ -125,13 +123,13 @@ class MainWindow(QtWidgets.QMainWindow):
         elif review_type == "bad":
             element = self.review_iterator.next_bad()
         else:
-            QMessageBox.information(None, "Invalid value", "An invalid value has been selected")
+            QMessageBox.warning(None, "Invalid value", "An invalid value has been selected")
             return
 
         self.review_path = element
 
         if self.review_path is None:
-            QMessageBox.information(None, "End of class", "No more files for this class")
+            QMessageBox.warning(None, "End of class", "No more files for this class")
             return
 
         self.text_label.update()
@@ -139,7 +137,6 @@ class MainWindow(QtWidgets.QMainWindow):
         with open(self.review_path, 'r', encoding='utf-8') as file:
             self.txt_file.setText(self.review_path)
             self.text_label.setText(file.read())
-
 
 
 if __name__ == '__main__':
