@@ -92,7 +92,7 @@ class MainWindow(QtWidgets.QWidget):
         target_class : str
         """
         if target_class not in ["zebra", "bayhorse"]:
-            logger.error("Invalid target class. Supported classes: 'cat', 'bayhorse'")
+            logger.error("Invalid target class. Supported classes: 'zebra', 'bayhorse'")
             return
 
         if self.class_iterator is not None:
