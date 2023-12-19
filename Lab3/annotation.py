@@ -38,7 +38,7 @@ def create_annotation_file(folder_path: str, subfolder_paths: list, dest_folder_
                             elif class_name == 'bayhorse':
                                 bayhorse_csv_writer.writerow([absolute_path, relative_path, class_name])
 
-        logging.info(f"The files with the annotations for zebra and bayhorse have been created.")
+        logging.info(f"The files with the annotations for cat and dog have been created.")
     except Exception as e:
         logging.exception(f"Error in creating annotation files: {e}")
 
