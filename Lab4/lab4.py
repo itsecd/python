@@ -11,8 +11,6 @@ def preprocess_data(df: pd.DataFrame) -> pd.DataFrame:
     Parameters:
     - df: pandas.DataFrame, входной DataFrame.
 
-    Returns:
-    - pandas.DataFrame, обработанный DataFrame.
     """
     df['Дата'] = pd.to_datetime(df['Дата'], format='%Y-%m-%d')
     df['Ветер'] = df['Ветер'].str.extract('(\d+)', expand=False)
@@ -28,8 +26,6 @@ def filter_data(df: pd.DataFrame, start_date: str, end_date: str) -> pd.DataFram
     - start_date: str, начальная дата в формате 'DD/MM/YYYY'.
     - end_date: str, конечная дата в формате 'DD/MM/YYYY'.
 
-    Returns:
-    - pandas.DataFrame, отфильтрованный DataFrame.
     """
     filtered_data = df[(df['Дата'] >= start_date) & (df['Дата'] <= end_date)]
     return filtered_data
@@ -41,8 +37,6 @@ def plot_temperature_statistics(data: pd.DataFrame) -> None:
     Parameters:
     - data: pandas.DataFrame, входной DataFrame.
 
-    Returns:
-    - None (график отображается).
     """
     plt.figure(figsize=(15, 8))
     plt.subplot(2, 2, 1)
@@ -61,8 +55,6 @@ def plot_pressure_statistics(data: pd.DataFrame) -> None:
     Parameters:
     - data: pandas.DataFrame, входной DataFrame.
 
-    Returns:
-    - None (график отображается).
     """
     plt.subplot(2, 2, 2)
     plt.plot(data['Дата'], data['Давление'], label='Давление')
