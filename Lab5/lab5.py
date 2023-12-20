@@ -5,8 +5,9 @@ import torch.optim as optim
 from torch.utils.data import DataLoader, Dataset
 from torchvision import transforms
 from PIL import Image
-import pandas as pd 
+import pandas as pd
 import random
+
 
 class SimpleCNN(nn.Module):
     def __init__(self, num_classes=10):
@@ -29,7 +30,7 @@ class SimpleCNN(nn.Module):
         x = self.fc1(x)
         return x
 
-# Define a custom dataset class
+
 class CustomDataset(Dataset):
     def __init__(self, img_paths, labels, transform=None, label_mapping=None):
         self.img_paths = img_paths
@@ -48,9 +49,11 @@ class CustomDataset(Dataset):
             img = self.transform(img)
 
         label_str = self.labels[idx]
-        label = self.label_mapping[label_str] if self.label_mapping else int(label_str)
+        label = self.label_mapping[label_str] if self.label_mapping else int(
+            label_str)
 
         return img, torch.tensor(label)
+
 
 def load_dataset(csv_path: str, train_size=0.8, val_size=0.1, test_size=0.1) -> tuple:
     """Function for uploading data from an annotation file to a list"""
@@ -66,10 +69,8 @@ def load_dataset(csv_path: str, train_size=0.8, val_size=0.1, test_size=0.1) -> 
         if not img_list or not labels:
             raise ValueError("Empty dataset: No images or labels found.")
 
-        # Convert img_list and labels to lists
         img_list, labels = list(img_list), list(labels)
 
-        # Shuffle the data
         combined = list(zip(img_list, labels))
         random.seed(42)
         random.shuffle(combined)
@@ -97,13 +98,13 @@ def load_dataset(csv_path: str, train_size=0.8, val_size=0.1, test_size=0.1) -> 
         print(f"An unexpected error occurred: {e}")
         return [], [], [], [], [], []
 
+
 def split_dataset(img_list, labels, train_size=0.8, val_size=0.1, test_size=0.1):
     """Split the dataset into training, validation, and test sets"""
     total_size = len(img_list)
 
     print(f"Total dataset size: {total_size}")
 
-    # Calculate the number of samples for training, validation, and test sets
     train_size = int(total_size * train_size)
     val_size = int(total_size * val_size)
     test_size = int(total_size * test_size)
@@ -112,26 +113,28 @@ def split_dataset(img_list, labels, train_size=0.8, val_size=0.1, test_size=0.1)
     print(f"Validation dataset size: {val_size}")
     print(f"Test dataset size: {test_size}")
 
-    # Ensure there are enough samples for training
     if train_size <= 0:
         raise ValueError("Not enough samples for training.")
 
-    # Shuffle the data
     combined = list(zip(img_list, labels))
     random.seed(42)
     random.shuffle(combined)
     img_list[:], labels[:] = zip(*combined)
 
     img_val, labels_val = img_list[:val_size], labels[:val_size]
-    img_test, labels_test = img_list[val_size:val_size + test_size], labels[val_size:val_size + test_size]
-    img_train, labels_train = img_list[val_size + test_size:val_size + test_size + train_size], labels[val_size + test_size:val_size + test_size + train_size]
+    img_test, labels_test = img_list[val_size:val_size +
+                                     test_size], labels[val_size:val_size + test_size]
+    img_train, labels_train = img_list[val_size + test_size:val_size + test_size +
+                                       train_size], labels[val_size + test_size:val_size + test_size + train_size]
 
     return img_train, labels_train, img_val, labels_val, img_test, labels_test
+
 
 def calculate_accuracy(predictions, true_labels):
     correct = sum(p == t for p, t in zip(predictions, true_labels))
     total = len(predictions)
     return correct / total
+
 
 def train_model(model, train_loader, val_loader, device, num_epochs=10, learning_rate=0.001):
     model.to(device)
@@ -143,7 +146,8 @@ def train_model(model, train_loader, val_loader, device, num_epochs=10, learning
         model.train()
         for images, labels in train_loader:
             images = torch.stack([img.to(device) for img in images])
-            labels = torch.as_tensor(labels, dtype=torch.long).clone().detach().to(device)
+            labels = torch.as_tensor(
+                labels, dtype=torch.long).clone().detach().to(device)
             optimizer.zero_grad()
             outputs = model(images)
             loss = criterion(outputs, labels)
@@ -157,7 +161,8 @@ def train_model(model, train_loader, val_loader, device, num_epochs=10, learning
             true_labels = []
             for images, labels in val_loader:
                 images = torch.stack([img.to(device) for img in images])
-                labels = torch.as_tensor(labels, dtype=torch.long).clone().detach().to(device)
+                labels = torch.as_tensor(
+                    labels, dtype=torch.long).clone().detach().to(device)
                 outputs = model(images)
                 val_loss += criterion(outputs, labels).item()
                 _, predicted = torch.max(outputs, 1)
@@ -167,7 +172,9 @@ def train_model(model, train_loader, val_loader, device, num_epochs=10, learning
             val_loss /= len(val_loader)
             accuracy = calculate_accuracy(predictions, true_labels)
 
-            print(f"Epoch {epoch+1}/{num_epochs}, Validation Loss: {val_loss:.4f}, Accuracy: {accuracy:.4f}")
+            print(
+                f"Epoch {epoch+1}/{num_epochs}, Validation Loss: {val_loss:.4f}, Accuracy: {accuracy:.4f}")
+
 
 def evaluate_model(model, test_loader, device):
     model.to(device)
@@ -185,34 +192,85 @@ def evaluate_model(model, test_loader, device):
     test_accuracy = calculate_accuracy(test_predictions, test_true_labels)
     print(f"Test Accuracy: {test_accuracy:.4f}")
 
-def main(csv_path, num_epochs=10, batch_size=32, learning_rate=0.001):
+
+def main(csv_path, num_epochs=10):
     device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
     print(f"Using device: {device}")
 
-    img_train, labels_train, img_val, labels_val, img_test, labels_test = load_dataset(csv_path)
+    img_train, labels_train, img_val, labels_val, img_test, labels_test = load_dataset(
+        csv_path)
 
-    # Define label mapping
     unique_labels = set(labels_train + labels_val + labels_test)
     label_mapping = {label: idx for idx, label in enumerate(unique_labels)}
 
-    transform = transforms.Compose([
-        transforms.Resize((128, 128)),
-        transforms.ToTensor(),
-    ])
+    learning_rates = [0.001, 0.01, 0.1]
+    batch_sizes = [16, 32, 64]
 
-    # Pass label_mapping to the dataset
-    train_dataset = CustomDataset(img_train, labels_train, transform, label_mapping)
-    val_dataset = CustomDataset(img_val, labels_val, transform, label_mapping)
-    test_dataset = CustomDataset(img_test, labels_test, transform, label_mapping)
+    for learning_rate in learning_rates:
+        for batch_size in batch_sizes:
+            print(
+                f"\nExperiment: Learning Rate = {learning_rate}, Batch Size = {batch_size}")
 
-    train_loader = DataLoader(train_dataset, batch_size=batch_size, shuffle=True, pin_memory=True)
-    val_loader = DataLoader(val_dataset, batch_size=batch_size, shuffle=False, pin_memory=True)
-    test_loader = DataLoader(test_dataset, batch_size=batch_size, shuffle=False, pin_memory=True)
+            transform = transforms.Compose([
+                transforms.Resize((128, 128)),
+                transforms.ToTensor(),
+            ])
 
-    model = SimpleCNN(num_classes=len(unique_labels)).to(device)
-    
-    train_model(model, train_loader, val_loader, device, num_epochs, learning_rate)
-    evaluate_model(model, test_loader, device)
+            train_dataset = CustomDataset(
+                img_train, labels_train, transform, label_mapping)
+            val_dataset = CustomDataset(
+                img_val, labels_val, transform, label_mapping)
+            test_dataset = CustomDataset(
+                img_test, labels_test, transform, label_mapping)
+
+            train_loader = DataLoader(
+                train_dataset, batch_size=batch_size, shuffle=True, pin_memory=True)
+            val_loader = DataLoader(
+                val_dataset, batch_size=batch_size, shuffle=False, pin_memory=True)
+            test_loader = DataLoader(
+                test_dataset, batch_size=batch_size, shuffle=False, pin_memory=True)
+
+            model = SimpleCNN(num_classes=len(unique_labels)).to(device)
+
+            criterion = nn.CrossEntropyLoss()
+            optimizer = optim.Adam(model.parameters(), lr=learning_rate)
+
+            for epoch in range(num_epochs):
+                model.train()
+                for images, labels in train_loader:
+                    images = torch.stack([img.to(device) for img in images])
+                    labels = torch.as_tensor(
+                        labels, dtype=torch.long).clone().detach().to(device)
+                    optimizer.zero_grad()
+                    outputs = model(images)
+                    loss = criterion(outputs, labels)
+                    loss.backward()
+                    optimizer.step()
+
+                model.eval()
+                with torch.no_grad():
+                    val_loss = 0.0
+                    predictions = []
+                    true_labels = []
+                    for images, labels in val_loader:
+                        images = torch.stack([img.to(device)
+                                             for img in images])
+                        labels = torch.as_tensor(
+                            labels, dtype=torch.long).clone().detach().to(device)
+                        outputs = model(images)
+                        val_loss += criterion(outputs, labels).item()
+                        _, predicted = torch.max(outputs, 1)
+                        predictions.extend(predicted.cpu().numpy())
+                        true_labels.extend(labels.cpu().numpy())
+
+                    val_loss /= len(val_loader)
+                    accuracy = calculate_accuracy(predictions, true_labels)
+
+                    print(
+                        f"Epoch {epoch+1}/{num_epochs}, Validation Loss: {val_loss:.4f}, Accuracy: {accuracy:.4f}")
+
+            evaluate_model(model, test_loader, device)
+
 
 if __name__ == "__main__":
     main("annotation.csv")
