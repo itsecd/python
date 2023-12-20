@@ -23,27 +23,29 @@ def create_folder(folder_name: str) -> str:
         logging.error(f"Error creating folder: {e}")
 
 
-def create_list(url: str, count_for_list: str, pages: str) -> list:
+def create_list(url: str, count_for_list: str, pages=600, width=50) -> list:
     """The function scrolls pages and saves all
     found img tags to a list.
     """
-    list = []
+    lst = []
     count = 0
     try:
-        for page in range(1, int(pages)):
+        for page in range(1, pages+1):
             print(page)
-            if count >= int(count_for_list):
-                break
+            #if count >= int(count_for_list) or page>=pages:
+                #break
             url_pages: str = f"{url[:-1]}{page}"
             response = requests.get(url_pages, headers=HEADERS)
             soup = BeautifulSoup(response.text, "lxml")
             images = soup.find_all("img")
-            list += images
-            count += 1
-        return list
+            for img in images:
+                if img.get("width") and int(img.get("width")) > width:
+                    lst.append(img)
+                    count += 1
     except Exception as e:
         logging.error(f"list not created: {e}")
     logging.info("img uploaded to list")
+    return lst
 
 
 def download_images(
@@ -66,10 +68,10 @@ def download_images(
         if num > int(count_for_downloads):
             break
         try:
-            src = img_tag["src"]
-            if str(src).find("rp") != -1:
-                img_tag += 1
-                break
+            src =img_tag["src"] 
+            #if str(src).find("rp") != -1:
+                #img_tag += 1
+                #break
             response = requests.get(src)
             numbers = format(num).zfill(4)
             create_folder(folder_name)
@@ -92,12 +94,12 @@ if __name__ == "__main__":
         os.getenv("FOLDER_TIGER"),
         os.getenv("COUNT_FOR_DOWNLOADS"),
         os.getenv("COUNT_FOR_LIST"),
-        os.getenv("PAGES"),
+        600,
     )
     download_images(
         os.getenv("SEARCH_LEOPARD"),
         os.getenv("FOLDER_LEOPARD"),
         os.getenv("COUNT_FOR_DOWNLOADS"),
         os.getenv("COUNT_FOR_LIST"),
-        os.getenv("PAGES"),
+        600,
     )
