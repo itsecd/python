@@ -11,7 +11,13 @@ import matplotlib.pyplot as plt
 
 
 class SimpleCNN(nn.Module):
-    def __init__(self, num_classes=10):
+    def __init__(self, num_classes: int = 10) -> None:
+        """
+        Simple Convolutional Neural Network (CNN) model.
+
+        Parameters:
+        - num_classes: Number of classes for classification.
+        """
         super(SimpleCNN, self).__init__()
         self.conv1 = nn.Conv2d(3, 16, kernel_size=3, stride=1, padding=1)
         self.relu = nn.ReLU()
@@ -20,7 +26,16 @@ class SimpleCNN(nn.Module):
         self.flatten = nn.Flatten()
         self.fc1 = nn.Linear(32 * 32 * 32, num_classes)
 
-    def forward(self, x):
+    def forward(self, x: torch.Tensor) -> torch.Tensor:
+        """
+        Forward pass through the network.
+
+        Parameters:
+        - x: Input tensor.
+
+        Returns:
+        - torch.Tensor: Output tensor.
+        """
         x = self.conv1(x)
         x = self.relu(x)
         x = self.maxpool(x)
@@ -33,16 +48,46 @@ class SimpleCNN(nn.Module):
 
 
 class CustomDataset(Dataset):
-    def __init__(self, img_paths, labels, transform=None, label_mapping=None):
+    def __init__(
+        self,
+        img_paths: list,
+        labels: list,
+        transform: transforms.Compose = None,
+        label_mapping: dict = None,
+    ) -> None:
+        """
+        Custom dataset class for image classification.
+
+        Parameters:
+        - img_paths: List of image file paths.
+        - labels: List of corresponding labels.
+        - transform: Image transformations.
+        - label_mapping: Mapping of label strings to numerical indices.
+        """
         self.img_paths = img_paths
         self.labels = labels
         self.transform = transform
         self.label_mapping = label_mapping
 
-    def __len__(self):
+    def __len__(self) -> int:
+        """
+        Get the length of the dataset.
+
+        Returns:
+        - int: Length of the dataset.
+        """
         return len(self.img_paths)
 
-    def __getitem__(self, idx):
+    def __getitem__(self, idx: int) -> tuple:
+        """
+        Get item from the dataset.
+
+        Parameters:
+        - idx: Index of the item.
+
+        Returns:
+        - tuple: (image, label)
+        """
         img_path = self.img_paths[idx]
         img = Image.open(img_path).convert("RGB")
 
@@ -56,8 +101,24 @@ class CustomDataset(Dataset):
         return img, torch.tensor(label)
 
 
-def load_dataset(csv_path: str, train_size=0.8, val_size=0.1, test_size=0.1) -> tuple:
-    """Function for uploading data from an annotation file to a list"""
+def load_dataset(
+    csv_path: str,
+    train_size: float = 0.8,
+    val_size: float = 0.1,
+    test_size: float = 0.1,
+) -> tuple:
+    """
+    Load dataset from a CSV file and split it into training, validation, and test sets.
+
+    Parameters:
+    - csv_path: Path to the CSV file containing image annotations.
+    - train_size: Percentage of data for training.
+    - val_size: Percentage of data for validation.
+    - test_size: Percentage of data for testing.
+
+    Returns:
+    - tuple: img_train, labels_train, img_val, labels_val, img_test, labels_test
+    """
     try:
         dframe = pd.read_csv(
             csv_path, delimiter=",", names=["Absolute path", "Relative path", "Class"]
@@ -100,8 +161,26 @@ def load_dataset(csv_path: str, train_size=0.8, val_size=0.1, test_size=0.1) -> 
         return [], [], [], [], [], []
 
 
-def split_dataset(img_list, labels, train_size=0.8, val_size=0.1, test_size=0.1):
-    """Split the dataset into training, validation, and test sets"""
+def split_dataset(
+    img_list: list,
+    labels: list,
+    train_size: float = 0.8,
+    val_size: float = 0.1,
+    test_size: float = 0.1,
+) -> tuple:
+    """
+    Split the dataset into training, validation, and test sets.
+
+    Parameters:
+    - img_list: List of image file paths.
+    - labels: List of corresponding labels.
+    - train_size: Percentage of data for training.
+    - val_size: Percentage of data for validation.
+    - test_size: Percentage of data for testing.
+
+    Returns:
+    - tuple: img_train, labels_train, img_val, labels_val, img_test, labels_test
+    """
     total_size = len(img_list)
 
     print(f"Total dataset size: {total_size}")
@@ -131,13 +210,39 @@ def split_dataset(img_list, labels, train_size=0.8, val_size=0.1, test_size=0.1)
     return img_train, labels_train, img_val, labels_val, img_test, labels_test
 
 
-def calculate_accuracy(predictions, true_labels):
+def calculate_accuracy(predictions: list, true_labels: list) -> float:
+    """
+    Calculate accuracy given predicted and true labels.
+
+    Parameters:
+    - predictions: Predicted labels.
+    - true_labels: True labels.
+
+    Returns:
+    - float: Accuracy.
+    """
     correct = sum(p == t for p, t in zip(predictions, true_labels))
     total = len(predictions)
     return correct / total
 
 
-def plot_training_results(train_losses, val_losses, val_accuracies, learning_rate, batch_size):
+def plot_training_results(
+    train_losses: list,
+    val_losses: list,
+    val_accuracies: list,
+    learning_rate: float,
+    batch_size: int,
+) -> None:
+    """
+    Plot training and validation results.
+
+    Parameters:
+    - train_losses: Training losses.
+    - val_losses: Validation losses.
+    - val_accuracies: Validation accuracies.
+    - learning_rate: Learning rate.
+    - batch_size: Batch size.
+    """
     epochs = list(range(1, len(train_losses) + 1))
 
     plt.figure(figsize=(12, 5))
@@ -162,7 +267,28 @@ def plot_training_results(train_losses, val_losses, val_accuracies, learning_rat
     plt.show()
 
 
-def train_model(model, train_loader, val_loader, device, num_epochs=10, learning_rate=0.001):
+def train_model(
+    model: nn.Module,
+    train_loader: DataLoader,
+    val_loader: DataLoader,
+    device: torch.device,
+    num_epochs: int = 10,
+    learning_rate: float = 0.001,
+) -> tuple:
+    """
+    Train the given model using the specified data loaders.
+
+    Parameters:
+    - model: Neural network model.
+    - train_loader: Training data loader.
+    - val_loader: Validation data loader.
+    - device: Device for training (e.g., "cuda" or "cpu").
+    - num_epochs: Number of training epochs.
+    - learning_rate: Learning rate.
+
+    Returns:
+    - tuple: train_losses, val_losses, val_accuracies
+    """
     model.to(device)
 
     criterion = nn.CrossEntropyLoss()
@@ -216,7 +342,15 @@ def train_model(model, train_loader, val_loader, device, num_epochs=10, learning
     return train_losses, val_losses, val_accuracies
 
 
-def evaluate_model(model, test_loader, device):
+def evaluate_model(model: nn.Module, test_loader: DataLoader, device: torch.device) -> None:
+    """
+    Evaluate the model on the test set and print the accuracy.
+
+    Parameters:
+    - model: Neural network model.
+    - test_loader: Test data loader.
+    - device: Device for evaluation (e.g., "cuda" or "cpu").
+    """
     model.to(device)
     model.eval()
     with torch.no_grad():
@@ -233,7 +367,17 @@ def evaluate_model(model, test_loader, device):
     print(f"Test Accuracy: {test_accuracy:.4f}")
 
 
-def main(csv_path, num_epochs=10):
+def main(csv_path: str, num_epochs: int = 10) -> nn.Module:
+    """
+    Main function for training and evaluating the model.
+
+    Parameters:
+    - csv_path: Path to the CSV file containing image annotations.
+    - num_epochs: Number of training epochs.
+
+    Returns:
+    - nn.Module: Trained neural network model.
+    """
     device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
     print(f"Using device: {device}")
 
