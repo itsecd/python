@@ -7,6 +7,7 @@ from torchvision import transforms
 from PIL import Image
 import pandas as pd
 import random
+import matplotlib.pyplot as plt
 
 
 class SimpleCNN(nn.Module):
@@ -136,14 +137,44 @@ def calculate_accuracy(predictions, true_labels):
     return correct / total
 
 
+def plot_training_results(train_losses, val_losses, val_accuracies, learning_rate, batch_size):
+    epochs = list(range(1, len(train_losses) + 1))
+
+    plt.figure(figsize=(12, 5))
+    plt.subplot(1, 2, 1)
+    plt.plot(epochs, train_losses, label='Training Loss', marker='o')
+    plt.plot(epochs, val_losses, label='Validation Loss', marker='o')
+    plt.title('Training and Validation Loss')
+    plt.xlabel('Epoch')
+    plt.ylabel('Loss')
+    plt.legend()
+
+    plt.subplot(1, 2, 2)
+    plt.plot(epochs, val_accuracies, label='Validation Accuracy',
+             marker='o', color='green')
+    plt.title('Validation Accuracy')
+    plt.xlabel('Epoch')
+    plt.ylabel('Accuracy')
+    plt.suptitle(f'Learning Rate: {learning_rate}, Batch Size: {batch_size}')
+    plt.legend()
+
+    plt.tight_layout()
+    plt.show()
+
+
 def train_model(model, train_loader, val_loader, device, num_epochs=10, learning_rate=0.001):
     model.to(device)
 
     criterion = nn.CrossEntropyLoss()
     optimizer = optim.Adam(model.parameters(), lr=learning_rate)
 
+    train_losses = []
+    val_losses = []
+    val_accuracies = []
+
     for epoch in range(num_epochs):
         model.train()
+        epoch_train_losses = []
         for images, labels in train_loader:
             images = torch.stack([img.to(device) for img in images])
             labels = torch.as_tensor(
@@ -153,6 +184,10 @@ def train_model(model, train_loader, val_loader, device, num_epochs=10, learning
             loss = criterion(outputs, labels)
             loss.backward()
             optimizer.step()
+            epoch_train_losses.append(loss.item())
+
+        avg_train_loss = sum(epoch_train_losses) / len(epoch_train_losses)
+        train_losses.append(avg_train_loss)
 
         model.eval()
         with torch.no_grad():
@@ -174,6 +209,11 @@ def train_model(model, train_loader, val_loader, device, num_epochs=10, learning
 
             print(
                 f"Epoch {epoch+1}/{num_epochs}, Validation Loss: {val_loss:.4f}, Accuracy: {accuracy:.4f}")
+
+            val_losses.append(val_loss)
+            val_accuracies.append(accuracy)
+
+    return train_losses, val_losses, val_accuracies
 
 
 def evaluate_model(model, test_loader, device):
@@ -232,42 +272,11 @@ def main(csv_path, num_epochs=10):
 
             model = SimpleCNN(num_classes=len(unique_labels)).to(device)
 
-            criterion = nn.CrossEntropyLoss()
-            optimizer = optim.Adam(model.parameters(), lr=learning_rate)
+            train_losses, val_losses, val_accuracies = train_model(model, train_loader, val_loader, device,
+                                                                   num_epochs=num_epochs, learning_rate=learning_rate)
 
-            for epoch in range(num_epochs):
-                model.train()
-                for images, labels in train_loader:
-                    images = torch.stack([img.to(device) for img in images])
-                    labels = torch.as_tensor(
-                        labels, dtype=torch.long).clone().detach().to(device)
-                    optimizer.zero_grad()
-                    outputs = model(images)
-                    loss = criterion(outputs, labels)
-                    loss.backward()
-                    optimizer.step()
-
-                model.eval()
-                with torch.no_grad():
-                    val_loss = 0.0
-                    predictions = []
-                    true_labels = []
-                    for images, labels in val_loader:
-                        images = torch.stack([img.to(device)
-                                             for img in images])
-                        labels = torch.as_tensor(
-                            labels, dtype=torch.long).clone().detach().to(device)
-                        outputs = model(images)
-                        val_loss += criterion(outputs, labels).item()
-                        _, predicted = torch.max(outputs, 1)
-                        predictions.extend(predicted.cpu().numpy())
-                        true_labels.extend(labels.cpu().numpy())
-
-                    val_loss /= len(val_loader)
-                    accuracy = calculate_accuracy(predictions, true_labels)
-
-                    print(
-                        f"Epoch {epoch+1}/{num_epochs}, Validation Loss: {val_loss:.4f}, Accuracy: {accuracy:.4f}")
+            plot_training_results(train_losses, val_losses,
+                                  val_accuracies, learning_rate, batch_size)
 
             evaluate_model(model, test_loader, device)
 
