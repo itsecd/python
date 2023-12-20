@@ -11,7 +11,7 @@ import matplotlib.pyplot as plt
 
 
 class SimpleCNN(nn.Module):
-    def __init__(self, num_classes: int = 10) -> None:
+    def __init__(self, num_classes: int = 2) -> None:
         """
         Simple Convolutional Neural Network (CNN) model.
 
@@ -101,66 +101,6 @@ class CustomDataset(Dataset):
         return img, torch.tensor(label)
 
 
-def load_dataset(
-    csv_path: str,
-    train_size: float = 0.8,
-    val_size: float = 0.1,
-    test_size: float = 0.1,
-) -> tuple:
-    """
-    Load dataset from a CSV file and split it into training, validation, and test sets.
-
-    Parameters:
-    - csv_path: Path to the CSV file containing image annotations.
-    - train_size: Percentage of data for training.
-    - val_size: Percentage of data for validation.
-    - test_size: Percentage of data for testing.
-
-    Returns:
-    - tuple: img_train, labels_train, img_val, labels_val, img_test, labels_test
-    """
-    try:
-        dframe = pd.read_csv(
-            csv_path, delimiter=",", names=["Absolute path", "Relative path", "Class"]
-        )
-        img_list = dframe["Absolute path"].tolist()
-        labels = dframe["Class"].tolist()
-
-        print(f"Original dataset size: {len(img_list)}")
-
-        if not img_list or not labels:
-            raise ValueError("Empty dataset: No images or labels found.")
-
-        img_list, labels = list(img_list), list(labels)
-
-        combined = list(zip(img_list, labels))
-        random.seed(42)
-        random.shuffle(combined)
-        img_list[:], labels[:] = zip(*combined)
-
-        img_train, labels_train, img_val, labels_val, img_test, labels_test = split_dataset(
-            img_list, labels, train_size=train_size, val_size=val_size, test_size=test_size
-        )
-
-        print(f"Training dataset size: {len(img_train)}")
-        print(f"Validation dataset size: {len(img_val)}")
-        print(f"Test dataset size: {len(img_test)}")
-
-        return img_train, labels_train, img_val, labels_val, img_test, labels_test
-    except FileNotFoundError:
-        print(f"Error: File not found at path '{csv_path}'")
-        return [], [], [], [], [], []
-    except pd.errors.EmptyDataError:
-        print(f"Error: Empty file at path '{csv_path}'")
-        return [], [], [], [], [], []
-    except ValueError as ve:
-        print(f"ValueError: {ve}")
-        return [], [], [], [], [], []
-    except Exception as e:
-        print(f"An unexpected error occurred: {e}")
-        return [], [], [], [], [], []
-
-
 def split_dataset(
     img_list: list,
     labels: list,
@@ -208,6 +148,60 @@ def split_dataset(
                                        train_size], labels[val_size + test_size:val_size + test_size + train_size]
 
     return img_train, labels_train, img_val, labels_val, img_test, labels_test
+
+
+def load_dataset(
+    csv_path: str,
+    train_size: float = 0.8,
+    val_size: float = 0.1,
+    test_size: float = 0.1,
+) -> tuple:
+    """
+    Load dataset from a CSV file and split it into training, validation, and test sets.
+
+    Parameters:
+    - csv_path: Path to the CSV file containing image annotations.
+    - train_size: Percentage of data for training.
+    - val_size: Percentage of data for validation.
+    - test_size: Percentage of data for testing.
+
+    Returns:
+    - tuple: img_train, labels_train, img_val, labels_val, img_test, labels_test
+    """
+    try:
+        dframe = pd.read_csv(
+            csv_path, delimiter=",", names=["Absolute path", "Relative path", "Class"]
+        )
+        img_list = dframe["Absolute path"].tolist()
+        labels = dframe["Class"].tolist()
+
+        if not img_list or not labels:
+            raise ValueError("Empty dataset: No images or labels found.")
+
+        img_list, labels = list(img_list), list(labels)
+
+        combined = list(zip(img_list, labels))
+        random.seed(42)
+        random.shuffle(combined)
+        img_list[:], labels[:] = zip(*combined)
+
+        img_train, labels_train, img_val, labels_val, img_test, labels_test = split_dataset(
+            img_list, labels, train_size=train_size, val_size=val_size, test_size=test_size
+        )
+
+        return img_train, labels_train, img_val, labels_val, img_test, labels_test
+    except FileNotFoundError:
+        print(f"Error: File not found at path '{csv_path}'")
+        return [], [], [], [], [], []
+    except pd.errors.EmptyDataError:
+        print(f"Error: Empty file at path '{csv_path}'")
+        return [], [], [], [], [], []
+    except ValueError as ve:
+        print(f"ValueError: {ve}")
+        return [], [], [], [], [], []
+    except Exception as e:
+        print(f"An unexpected error occurred: {e}")
+        return [], [], [], [], [], []
 
 
 def calculate_accuracy(predictions: list, true_labels: list) -> float:
@@ -433,7 +427,7 @@ if __name__ == "__main__":
     img_train, labels_train, img_val, labels_val, img_test, labels_test = load_dataset(
         "annotation.csv")
 
-    unique_labels = set(labels_train + labels_val + labels_test)
+    unique_labels = list(set(labels_train + labels_val + labels_test)) 
     label_mapping = {label: idx for idx, label in enumerate(unique_labels)}
 
     trained_model = main("annotation.csv", num_epochs=10)
@@ -443,20 +437,31 @@ if __name__ == "__main__":
     print(f"Trained model saved at: {model_save_path}")
 
     new_model = SimpleCNN(num_classes=len(unique_labels)).to(device)
-
     new_model.load_state_dict(torch.load(model_save_path))
     new_model.eval()
 
-    sample_image_path = "dataset/leopard/0017.jpg"
-    transform = transforms.Compose([
-        transforms.Resize((128, 128)),
-        transforms.ToTensor(),
-    ])
-    sample_image = Image.open(sample_image_path).convert("RGB")
-    sample_image = transform(sample_image).unsqueeze(0).to(device)
+    img_paths = [
+        "dataset/leopard/0012.jpg",
+        "dataset/tiger/0004.jpg",
+    ]
 
-    with torch.no_grad():
-        output = new_model(sample_image)
-        _, predicted_class = torch.max(output, 1)
+    for img_path in img_paths:
+        img = Image.open(img_path).convert("RGB")
 
-    print(f"Predicted class index: {predicted_class.item()}")
+        transform = transforms.Compose([
+            transforms.Resize((128, 128)),
+            transforms.ToTensor(),
+        ])
+        sample_image = transform(img).unsqueeze(0).to(device)
+
+        with torch.no_grad():
+            output = new_model(sample_image)
+            _, predicted_class = torch.max(output, 1)
+
+        print(
+            f"Predicted class index for image {img_path}: {predicted_class.item()}")
+
+        img_array = transforms.ToPILImage()(sample_image.squeeze(0).cpu())
+        plt.imshow(img_array)
+        plt.title(f"Predicted class: {predicted_class.item()}")
+        plt.show()

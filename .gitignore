@@ -139,3 +139,6 @@ stats.csv
 filter.csv
 filtes.csv
 grouped.csv
+Lab5/simple_cnn_model.pth
+Lab5/dataset
+Lab5/annotation.csv
