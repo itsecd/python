@@ -279,7 +279,40 @@ def main(csv_path, num_epochs=10):
                                   val_accuracies, learning_rate, batch_size)
 
             evaluate_model(model, test_loader, device)
+    return model
 
 
 if __name__ == "__main__":
-    main("annotation.csv")
+    device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
+    print(f"Using device: {device}")
+
+    img_train, labels_train, img_val, labels_val, img_test, labels_test = load_dataset(
+        "annotation.csv")
+
+    unique_labels = set(labels_train + labels_val + labels_test)
+    label_mapping = {label: idx for idx, label in enumerate(unique_labels)}
+
+    trained_model = main("annotation.csv", num_epochs=10)
+
+    model_save_path = "simple_cnn_model.pth"
+    torch.save(trained_model.state_dict(), model_save_path)
+    print(f"Trained model saved at: {model_save_path}")
+
+    new_model = SimpleCNN(num_classes=len(unique_labels)).to(device)
+
+    new_model.load_state_dict(torch.load(model_save_path))
+    new_model.eval()
+
+    sample_image_path = "dataset/leopard/0017.jpg"
+    transform = transforms.Compose([
+        transforms.Resize((128, 128)),
+        transforms.ToTensor(),
+    ])
+    sample_image = Image.open(sample_image_path).convert("RGB")
+    sample_image = transform(sample_image).unsqueeze(0).to(device)
+
+    with torch.no_grad():
+        output = new_model(sample_image)
+        _, predicted_class = torch.max(output, 1)
+
+    print(f"Predicted class index: {predicted_class.item()}")
