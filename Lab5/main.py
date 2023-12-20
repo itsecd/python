@@ -42,14 +42,60 @@ class LogisticRegression(nn.Module):
         x = F.relu(self.linear2(x))
         x = self.linear3(x)
         return x
+    
+def split_data(review_list) -> (list, list, list):
+    """Function splits the list into three sublists
+    (train_list, test_list, val_list) in a ratio of 80:10:10"""
+    train_list = review_list[0 : int(len(review_list) * 0.8)]
+    test_list = review_list[int(len(review_list) * 0.8) : int(len(review_list) * 0.9)]
+    val_list = review_list[int(len(review_list) * 0.9) : int(len(review_list))]
+    return train_list, test_list, val_list
 
 data = df_build('D:\Study\Applied Programming (Python)\Applied-Programming\csv\dataset.csv')
 
 remove_non_alphabets =lambda x: re.sub(r'[^a-zA-Z]',' ',x)
 data = lemmatize_text(data)
 
-max_words = 1000
+max_words = 10000
 cv = CountVectorizer(max_features=max_words, stop_words=stopwords.words('russian'))
 sparse_matrix = cv.fit_transform(data['Review text']).toarray()
-print(cv.get_feature_names_out())
+l = len(sparse_matrix)
+x_train_list, x_test_list, x_val_list = split_data(sparse_matrix[:l//2])
+y_train_list, y_test_list, y_val_list = split_data(sparse_matrix[l//2+1:])
+print(len(sparse_matrix), len(x_train_list), len(x_test_list), len(x_val_list))
+print(len(sparse_matrix), len(y_train_list), len(y_test_list), len(y_val_list))
 
+model = LogisticRegression()
+criterion = nn.CrossEntropyLoss()
+optimizer = torch.optim.Adam(params=model.parameters() , lr=0.01)
+x_train = Variable(torch.from_numpy(x_train_list)).float()
+y_train = Variable(torch.from_numpy(y_train_list)).long()
+epochs = 20
+model.train()
+loss_values = []
+for epoch in range(epochs):
+    optimizer.zero_grad()
+    y_pred = model(x_train)
+    loss = criterion(y_pred, y_train)
+    loss_values.append(loss.item())
+    pred = torch.max(y_pred, 1)[1].eq(y_train).sum()
+    acc = pred * 100.0 / len(x_train)
+    print('Epoch: {}, Loss: {}, Accuracy: {}%'.format(epoch+1, loss.item(), acc.numpy()))
+    loss.backward()
+    optimizer.step()
+
+plt.plot(loss_values)
+plt.title('Loss Value vs Epochs')
+plt.xlabel('Epochs')
+plt.ylabel('Loss')
+plt.legend(['Loss'])
+plt.show()
+
+x_test = Variable(torch.from_numpy(x_test)).float()
+y_test = Variable(torch.from_numpy(y_test)).long()
+model.eval()
+with torch.no_grad():
+    y_pred = model(x_test)
+    loss = criterion(y_pred, y_test)
+    pred = torch.max(y_pred, 1)[1].eq(y_test).sum()
+    print ("Accuracy : {}%".format(100*pred/len(x_test)))
