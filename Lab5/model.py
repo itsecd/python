@@ -282,11 +282,11 @@ if __name__ == "__main__":
     pred_model.load_state_dict(torch.load('trained_model.pth'))
     pred_model.eval()
 
-    full_data = pd.read_csv("Lab5/dataset.csv")
-    full_data['Date'] = pd.to_datetime(full_data['Date'])
+    pred_data = pd.read_csv("Lab5/dataset.csv")
+    pred_data['Date'] = pd.to_datetime(pred_data['Date'])
 
-    target_month = pd.to_datetime("2003-04")
-    target_index = (full_data['Date'].dt.to_period('M') == target_month.to_period('M')).idxmax()
+    target_month = pd.to_datetime("2023-08")
+    target_index = (pred_data['Date'].dt.to_period('M') == target_month.to_period('M')).idxmax()
 
     with torch.no_grad():
         test_inputs, test_labels = test_sequences, test_labels
