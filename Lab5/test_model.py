@@ -10,10 +10,6 @@ import matplotlib.pyplot as plt
 import re
 import os
 import sys
-import nltk
-from nltk.tokenize import word_tokenize
-from nltk import PorterStemmer
-from nltk import WordNetLemmatizer
 from nltk.corpus import stopwords
 from sklearn.feature_extraction.text import CountVectorizer
 from sklearn.model_selection import train_test_split
@@ -62,8 +58,11 @@ class LogisticRegression(nn.Module):
         x = self.linear3(x)
         return x
 
-
-
+model = LogisticRegression()
+criterion = nn.CrossEntropyLoss()
+optimizer = torch.optim.Adam(params=model.parameters() , lr=0.01)
+x_train = Variable(torch.from_numpy(x_train)).float()
+y_train = Variable(torch.from_numpy(y_train)).long()
     
 df = load_data('D:/AppProgPython/appprog/csv/final1.csv')
 
