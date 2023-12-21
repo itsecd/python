@@ -436,3 +436,46 @@ def main(csv_path: str, num_epochs: int = 10) -> nn.Module:
     return model
 
 
+if __name__ == "__main__":
+    device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
+    print(f"Using device: {device}")
+
+    img_train, labels_train, img_val, labels_val, img_test, labels_test = load_dataset("annotation.csv")
+
+    unique_labels = list(set(labels_train + labels_val + labels_test))
+    label_mapping = {label: idx for idx, label in enumerate(unique_labels)}
+
+    trained_model = main("annotation.csv", num_epochs=10)
+
+    model_save_path = "simple_cnn_model.pth"
+    torch.save(trained_model.state_dict(), model_save_path)
+    print(f"Trained model saved at: {model_save_path}")
+
+    new_model = SimpleCNN(num_classes=len(unique_labels)).to(device)
+    new_model.load_state_dict(torch.load(model_save_path, map_location=device))
+    new_model.eval()
+
+    img_paths = [
+        r"C:\Users\Prodigy-\Desktop\123\dataset\dog\dog_0012.jpg",
+        r"C:\Users\Prodigy-\Desktop\123\dataset\cat\cat_0410.jpg",
+    ]
+
+    for img_path in img_paths:
+        img = Image.open(img_path).convert("RGB")
+
+        transform = transforms.Compose([
+            transforms.Resize((128, 128)),
+            transforms.ToTensor(),
+        ])
+        sample_image = transform(img).unsqueeze(0).to(device)
+
+        with torch.no_grad():
+            output = new_model(sample_image)
+            _, predicted_class = torch.max(output, 1)
+
+        print(f"Predicted class index for image {img_path}: {predicted_class.item()}")
+
+        img_array = transforms.ToPILImage()(sample_image.squeeze(0).cpu())
+        plt.imshow(img_array)
+        plt.title(f"Predicted class: {predicted_class.item()}")
+        plt.show()
