@@ -62,7 +62,7 @@ def write_annotation_to_csv(file_path: str,
                             class_name: str) -> None:
     try:
         with open(file_path, 'a', newline='') as csv_file:
-            writer = csv.writer(csv_file, delimiter=';', lineterminator='\r')
+            writer = csv.writer(csv_file, delimiter=',', lineterminator='\r')
             for absolute_path, relative_path in zip(absolute_paths, relative_paths):
                 writer.writerow([absolute_path, relative_path, class_name])
     except Exception as e:
@@ -71,15 +71,17 @@ def write_annotation_to_csv(file_path: str,
 
 if __name__ == "__main__":
     cat, dog = 'cat', 'dog'
+    dataset_path = 'C:\\Users\\Prodigy-\\Desktop\\123\\dataset'
+  # Replace with the actual path to your dataset
 
-    cat_absolute_paths = get_absolute_paths(cat)
-    cat_relative_paths = get_relative_paths(cat)
-    dog_absolute_paths = get_absolute_paths(dog)
-    dog_relative_paths = get_relative_paths(dog)
+    cat_absolute_paths = get_absolute_paths(cat, dataset_path)
+    cat_relative_paths = get_relative_paths(cat, dataset_path)
+    dog_absolute_paths = get_absolute_paths(dog, dataset_path)
+    dog_relative_paths = get_relative_paths(dog, dataset_path)
 
     annotation_file = 'annotation.csv'
 
     for absolute_paths, relative_paths, class_name in zip([cat_absolute_paths, dog_absolute_paths],
-                                                 [cat_relative_paths, dog_relative_paths],
-                                                 [cat, dog]):
+                                                         [cat_relative_paths, dog_relative_paths],
+                                                         [cat, dog]):
         write_annotation_to_csv(annotation_file, absolute_paths, relative_paths, class_name)
