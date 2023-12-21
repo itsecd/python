@@ -33,7 +33,7 @@ def binarize(data: pd.DataFrame, rating: int) -> pd.DataFrame:
 class LogisticRegression(nn.Module):
     def __init__(self):
         super(LogisticRegression, self).__init__()
-        self.linear1 = nn.Linear(10000, 100)
+        self.linear1 = nn.Linear(1000, 100)
         self.linear2 = nn.Linear(100, 10)
         self.linear3 = nn.Linear(10, 2)
         
@@ -56,16 +56,18 @@ data = df_build('D:\Study\Applied Programming (Python)\Applied-Programming\csv\d
 remove_non_alphabets =lambda x: re.sub(r'[^a-zA-Z]',' ',x)
 data = lemmatize_text(data)
 
-max_words = 10000
+max_words = 1000
 cv = CountVectorizer(max_features=max_words, stop_words=stopwords.words('russian'))
 sparse_matrix = cv.fit_transform(data['Review text']).toarray()
 l = len(sparse_matrix)
 x_train_list, x_test_list, x_val_list = split_data(sparse_matrix[:l//2])
+print(x_train_list)
+print(x_test_list)
 y_train_list, y_test_list, y_val_list = split_data(sparse_matrix[l//2+1:])
-print(len(sparse_matrix), len(x_train_list), len(x_test_list), len(x_val_list))
-print(len(sparse_matrix), len(y_train_list), len(y_test_list), len(y_val_list))
+print(y_train_list)
+print(y_test_list)
 
-model = LogisticRegression()
+'''model = LogisticRegression()
 criterion = nn.CrossEntropyLoss()
 optimizer = torch.optim.Adam(params=model.parameters() , lr=0.01)
 x_train = Variable(torch.from_numpy(x_train_list)).float()
@@ -76,6 +78,7 @@ loss_values = []
 for epoch in range(epochs):
     optimizer.zero_grad()
     y_pred = model(x_train)
+    print(y_pred.shape)
     loss = criterion(y_pred, y_train)
     loss_values.append(loss.item())
     pred = torch.max(y_pred, 1)[1].eq(y_train).sum()
@@ -91,11 +94,11 @@ plt.ylabel('Loss')
 plt.legend(['Loss'])
 plt.show()
 
-x_test = Variable(torch.from_numpy(x_test)).float()
-y_test = Variable(torch.from_numpy(y_test)).long()
+x_test = Variable(torch.from_numpy(x_test_list)).float()
+y_test = Variable(torch.from_numpy(y_test_list)).long()
 model.eval()
 with torch.no_grad():
     y_pred = model(x_test)
     loss = criterion(y_pred, y_test)
     pred = torch.max(y_pred, 1)[1].eq(y_test).sum()
-    print ("Accuracy : {}%".format(100*pred/len(x_test)))
+    print ("Accuracy : {}%".format(100*pred/len(x_test)))'''
