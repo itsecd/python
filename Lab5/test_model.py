@@ -32,14 +32,14 @@ def load_data(file_path: str) -> pd.DataFrame:
     return data
 
 
-def vectorizer(df: pd.DataFrame) -> torch.Tensor:
+def vectorizer(df: pd.DataFrame):
     cv = CountVectorizer(max_features=10000, stop_words=stopwords.words('russian'))
     sparse_matrix = cv.fit_transform(df["Текст отзыва"]).toarray()
     return sparse_matrix
 
 
-def split_data(all_data: torch.Tensor, df:pd.DataFrame) -> (torch.utils.data.Dataset, torch.utils.data.Dataset, torch.utils.data.Dataset, torch.utils.data.Dataset):
-    text = pd.array(df["label"])
+def split_data(all_data: torch.Tensor, df:pd.DataFrame):
+    text = np.array(df["label"])
     x_train, x_test, y_train, y_test = train_test_split(all_data, text)
     return x_train, x_test, y_train, y_test
 
