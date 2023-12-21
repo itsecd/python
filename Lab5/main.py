@@ -220,3 +220,219 @@ def calculate_accuracy(predictions: list, true_labels: list) -> float:
     return correct / total
 
 
+def plot_training_results(
+    train_losses: list,
+    val_losses: list,
+    train_accuracies: list,
+    val_accuracies: list,
+    learning_rate: float,
+    batch_size: int,
+) -> None:
+    """
+    Plot training and validation results.
+
+    Parameters:
+    - train_losses: Training losses.
+    - val_losses: Validation losses.
+    - train_accuracies: Training accuracies.
+    - val_accuracies: Validation accuracies.
+    - learning_rate: Learning rate.
+    - batch_size: Batch size.
+    """
+    epochs = list(range(1, len(train_losses) + 1))
+
+    plt.figure(figsize=(12, 5))
+    plt.subplot(1, 2, 1)
+    plt.plot(epochs, train_losses, label='Training Loss', marker='o')
+    plt.plot(epochs, val_losses, label='Validation Loss', marker='o')
+    plt.title('Training and Validation Loss')
+    plt.xlabel('Epoch')
+    plt.ylabel('Loss')
+    plt.legend()
+
+    plt.subplot(1, 2, 2)
+    plt.plot(epochs, train_accuracies, label='Training Accuracy', marker='o', color='blue')
+    plt.plot(epochs, val_accuracies, label='Validation Accuracy', marker='o', color='green')
+    plt.title('Training and Validation Accuracy')
+    plt.xlabel('Epoch')
+    plt.ylabel('Accuracy')
+    plt.suptitle(f'Learning Rate: {learning_rate}, Batch Size: {batch_size}')
+    plt.legend()
+
+    plt.tight_layout()
+    plt.show()
+
+
+
+def train_model(
+    model: nn.Module,
+    train_loader: DataLoader,
+    val_loader: DataLoader,
+    device: torch.device,
+    num_epochs: int = 10,
+    learning_rate: float = 0.001,
+) -> tuple:
+    """
+    Train the given model using the specified data loaders.
+
+    Parameters:
+    - model: Neural network model.
+    - train_loader: Training data loader.
+    - val_loader: Validation data loader.
+    - device: Device for training (e.g., "cuda" or "cpu").
+    - num_epochs: Number of training epochs.
+    - learning_rate: Learning rate.
+
+    Returns:
+    - tuple: train_losses, val_losses, train_accuracies, val_accuracies
+    """
+    model.to(device)
+
+    criterion = nn.CrossEntropyLoss()
+    optimizer = optim.Adam(model.parameters(), lr=learning_rate)
+
+    train_losses = []
+    val_losses = []
+    train_accuracies = []  # Added
+    val_accuracies = []
+
+    for epoch in range(num_epochs):
+        model.train()
+        epoch_train_losses = []
+        correct_train = 0
+        total_train = 0
+
+        for images, labels in train_loader:
+            images = torch.stack([img.to(device) for img in images])
+            labels = torch.as_tensor(
+                labels, dtype=torch.long).clone().detach().to(device)
+            optimizer.zero_grad()
+            outputs = model(images)
+            loss = criterion(outputs, labels)
+            loss.backward()
+            optimizer.step()
+            epoch_train_losses.append(loss.item())
+
+            _, predicted_train = torch.max(outputs.data, 1)
+            total_train += labels.size(0)
+            correct_train += (predicted_train == labels).sum().item()
+
+        train_accuracy = correct_train / total_train
+        train_accuracies.append(train_accuracy)
+
+        avg_train_loss = sum(epoch_train_losses) / len(epoch_train_losses)
+        train_losses.append(avg_train_loss)
+
+        model.eval()
+        with torch.no_grad():
+            val_loss = 0.0
+            predictions = []
+            true_labels = []
+
+            for images, labels in val_loader:
+                images = torch.stack([img.to(device) for img in images])
+                labels = torch.as_tensor(
+                    labels, dtype=torch.long).clone().detach().to(device)
+                outputs = model(images)
+                val_loss += criterion(outputs, labels).item()
+
+                _, predicted = torch.max(outputs, 1)
+                predictions.extend(predicted.cpu().numpy())
+                true_labels.extend(labels.cpu().numpy())
+
+            val_loss /= len(val_loader)
+            accuracy = calculate_accuracy(predictions, true_labels)
+
+            val_losses.append(val_loss)
+            val_accuracies.append(accuracy)
+
+            print(
+                f"Epoch {epoch+1}/{num_epochs}, Training Loss: {avg_train_loss:.4f}, Training Accuracy: {train_accuracy:.4f}, Validation Loss: {val_loss:.4f}, Validation Accuracy: {accuracy:.4f}")
+
+    return train_losses, val_losses, train_accuracies, val_accuracies
+
+
+def evaluate_model(model: nn.Module, test_loader: DataLoader, device: torch.device) -> None:
+    """
+    Evaluate the model on the test set and print the accuracy.
+
+    Parameters:
+    - model: Neural network model.
+    - test_loader: Test data loader.
+    - device: Device for evaluation (e.g., "cuda" or "cpu").
+    """
+    model.to(device)
+    model.eval()
+    with torch.no_grad():
+        test_predictions = []
+        test_true_labels = []
+        for images, labels in test_loader:
+            images, labels = images.to(device), labels.to(device)
+            outputs = model(images)
+            _, predicted = torch.max(outputs, 1)
+            test_predictions.extend(predicted.cpu().numpy())
+            test_true_labels.extend(labels.cpu().numpy())
+
+    test_accuracy = calculate_accuracy(test_predictions, test_true_labels)
+    print(f"Test Accuracy: {test_accuracy:.4f}")
+
+
+def main(csv_path: str, num_epochs: int = 10) -> nn.Module:
+    """
+    Main function for training and evaluating the model.
+
+    Parameters:
+    - csv_path: Path to the CSV file containing image annotations.
+    - num_epochs: Number of training epochs.
+
+    Returns:
+    - nn.Module: Trained neural network model.
+    """
+    device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
+    print(f"Using device: {device}")
+
+    img_train, labels_train, img_val, labels_val, img_test, labels_test = load_dataset(
+        csv_path)
+
+    unique_labels = set(labels_train + labels_val + labels_test)
+    label_mapping = {label: idx for idx, label in enumerate(unique_labels)}
+
+    learning_rates = [0.001, 0.01, 0.1]
+    batch_sizes = [16, 32, 64]
+
+    for learning_rate in learning_rates:
+        for batch_size in batch_sizes:
+            print(
+                f"\nExperiment: Learning Rate = {learning_rate}, Batch Size = {batch_size}")
+
+            transform = transforms.Compose([
+                transforms.Resize((128, 128)),
+                transforms.ToTensor(),
+            ])
+
+            train_dataset = CustomDataset(
+                img_train, labels_train, transform, label_mapping)
+            val_dataset = CustomDataset(
+                img_val, labels_val, transform, label_mapping)
+            test_dataset = CustomDataset(
+                img_test, labels_test, transform, label_mapping)
+
+            train_loader = DataLoader(
+                train_dataset, batch_size=batch_size, shuffle=True, pin_memory=True)
+            val_loader = DataLoader(
+                val_dataset, batch_size=batch_size, shuffle=False, pin_memory=True)
+            test_loader = DataLoader(
+                test_dataset, batch_size=batch_size, shuffle=False, pin_memory=True)
+
+            model = SimpleCNN(num_classes=len(unique_labels)).to(device)
+
+            train_losses, val_losses, train_accuracies, val_accuracies = train_model(
+                model, train_loader, val_loader, device,
+                num_epochs=num_epochs, learning_rate=learning_rate)
+
+            plot_training_results(train_losses, val_losses, train_accuracies, val_accuracies, learning_rate, batch_size)
+
+            evaluate_model(model, test_loader, device)
+    return model
+
+
