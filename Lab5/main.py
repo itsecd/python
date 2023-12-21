@@ -133,8 +133,9 @@ def split_dataset(
     print(f"Validation dataset size: {val_size}")
     print(f"Test dataset size: {test_size}")
 
-    if train_size <= 0:
-        raise ValueError("Not enough samples for training.")
+    if train_size <= 0 or val_size <= 0 or test_size <= 0:
+        raise ValueError("Invalid split sizes. Please provide positive values for train_size, val_size, and test_size.")
+
 
     combined = list(zip(img_list, labels))
     random.seed(42)
@@ -440,12 +441,12 @@ if __name__ == "__main__":
     device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
     print(f"Using device: {device}")
 
-    img_train, labels_train, img_val, labels_val, img_test, labels_test = load_dataset("annotation.csv")
+    img_train, labels_train, img_val, labels_val, img_test, labels_test = load_dataset("C:/Users/Prodigy-/Desktop/python/Lab5/dataset.csv")
 
     unique_labels = list(set(labels_train + labels_val + labels_test))
     label_mapping = {label: idx for idx, label in enumerate(unique_labels)}
 
-    trained_model = main("annotation.csv", num_epochs=10)
+    trained_model = main("dataset.csv", num_epochs=10)
 
     model_save_path = "simple_cnn_model.pth"
     torch.save(trained_model.state_dict(), model_save_path)
@@ -473,7 +474,7 @@ if __name__ == "__main__":
             output = new_model(sample_image)
             _, predicted_class = torch.max(output, 1)
 
-        predicted_class_index = predicted_class.item() - 1
+        predicted_class_index = predicted_class.item() - 0
         print(f"Predicted class index for image {img_path}: {predicted_class_index}")
 
 
