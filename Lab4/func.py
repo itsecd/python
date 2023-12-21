@@ -17,10 +17,10 @@ def load_reviews(csv_path):
                 logging.error(f"Can't read file at {path}: {e}")
                 reviews.append(None)
 
-        df['Текст отзыва'] = reviews
-        df.dropna(subset=['Текст отзыва'], inplace=True)
+        df['review'] = reviews
+        df.dropna(subset=['review'], inplace=True)
 
-        df['Количество слов'] = df['Текст отзыва'].str.split().apply(len)
+        df['Количество слов'] = df['review'].str.split().apply(len)
         return df
     except Exception as e:
         logging.error(f"Can't create dataframe: {e}")
