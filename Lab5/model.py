@@ -100,4 +100,122 @@ def show_results(epochs, acc, loss, v_acc, v_loss) -> None:
     ax2.legend()
     plt.show()
 
+def train_loop(epochs, batch_size, lear, val_data, train_data, test_data) -> list:
+    device = "cuda" if torch.cuda.is_available() else "cpu"
+    torch.manual_seed(1234)
+    if device == "cuda":
+        torch.cuda.manual_seed_all(1234)
+    model = CNN()
+    model.train()
+    optimizer = optim.Adam(params=model.parameters(), lr=lear)
+    criterion = nn.CrossEntropyLoss()
 
+    epochs = epochs
+    accuracy_values = []
+    loss_values = []
+    val_accuracy_values = []
+    val_loss_values = []
+    val_loader = torch.utils.data.DataLoader(
+        dataset=val_data, batch_size=batch_size, shuffle=False
+    )
+    train_loader = torch.utils.data.DataLoader(
+        dataset=train_data, batch_size=batch_size, shuffle=True
+    )
+    for epoch in range(epochs):
+        epoch_loss = 0
+        epoch_accuracy = 0
+
+        for data, label in train_loader:
+            data = data.to(device)
+            label = label.to(device)
+
+            output = model(data)
+            loss = criterion(output, label)
+
+            optimizer.zero_grad()
+            loss.backward()
+            optimizer.step()
+
+            acc = (output.argmax(dim=1) == label).float().mean()
+            epoch_accuracy += acc / len(train_loader)
+            epoch_loss += loss / len(train_loader)
+
+        print(
+            "Epoch : {}, train accuracy : {}, train loss : {}".format(
+                epoch + 1, epoch_accuracy, epoch_loss
+            )
+        )
+        accuracy_values.append(epoch_accuracy.item())
+        loss_values.append(epoch_loss.item())
+
+        with torch.no_grad():
+            epoch_val_accuracy = 0
+            epoch_val_loss = 0
+            for data, label in val_loader:
+                data = data.to(device)
+                label = label.to(device)
+
+                val_output = model(data)
+                val_loss = criterion(val_output, label)
+
+                acc = (val_output.argmax(dim=1) == label).float().mean()
+                epoch_val_accuracy += acc / len(val_loader)
+                epoch_val_loss += val_loss / len(val_loader)
+
+            print(
+                "Epoch : {}, val_accuracy : {}, val_loss : {}".format(
+                    epoch + 1, epoch_val_accuracy, epoch_val_loss
+                )
+            )
+            val_accuracy_values.append(epoch_val_accuracy.item())
+            val_loss_values.append(epoch_val_loss.item())
+    show_results(epochs, accuracy_values, loss_values, val_accuracy_values, val_loss_values)
+
+    bear_probs = []
+    model.eval()
+    test_loader = torch.utils.data.DataLoader(
+        dataset=test_data, batch_size=100, shuffle=False
+    )
+    with torch.no_grad():
+        for data, fileid in test_loader:
+            data = data.to(device)
+            preds = model(data)
+            preds_list = F.softmax(preds, dim=1)[:, 1].tolist()
+            bear_probs += list(zip(list(fileid), preds_list))
+    bear_probs.sort(key=lambda x: int(x[0]))
+    return bear_probs, model
+
+def save_result(bear_probs, csv_path) -> None:
+    idx = list(i for i in range(len(bear_probs)))
+    prob = list(map(lambda x: x[1], bear_probs))
+    submission = pd.DataFrame({"id": idx, "label": prob})
+    submission.to_csv(csv_path, index=False)
+
+def main(csv_dataset, epochs, batch_size, lear, result, model_path) -> None:
+    img_list = load_dataset(csv_dataset)
+    train_list, test_list, val_list = split_data(img_list)
+    train_data, test_data, val_data = transform_data(train_list, test_list, val_list)
+    bear_probs, model = train_loop(epochs, batch_size, lear, val_data, train_data, test_data)
+    save_result(bear_probs, result)
+
+    class_ = {0: "brown_bear", 1: "polar_bear"}
+    fig, axes = plt.subplots(1, 5, figsize=(20, 12), facecolor="w")
+    submission = pd.read_csv(result)
+    for ax in axes.ravel():
+        i = random.choice(submission["id"].values)
+        label = submission.loc[submission["id"] == i, "label"].values[0]
+        if label > 0.5:
+            label = 1
+        else:
+            label = 0
+
+        img_path = train_list[i]
+        img = Image.open(img_path)
+
+        ax.set_title(class_[label])
+        ax.imshow(img)
+    plt.show()
+    torch.save(model.state_dict(), model_path)
+
+if __name__ == "__main__":
+    main("Lab2/annotation.csv", 10, 100, 0.001, "result.csv", "Lab5\model_weight.pt")
