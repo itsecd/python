@@ -60,6 +60,5 @@ def lemmatize_text(df: pd.DataFrame) -> pd.DataFrame:
 
         text = " ".join(tokens)
         reviews.append(text)
-        print('Token lemmatized')
     df['Review text'] = reviews
     return df
