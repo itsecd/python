@@ -43,7 +43,7 @@ def create_directories():
 create_directories()
 
 
-def get_page(page: int, base_url: str = "https://irecommend.ru/content/internet-magazin-ozon-kazan-0?page=") -> BeautifulSoup:
+def get_page(page: int, base_url: str = "https://irecommend.ru/content/boxberry-httpboxberryru?page=") -> BeautifulSoup:
     """
     Получает страницу с веб-сайта и возвращает объект BeautifulSoup для парсинга.
     """
@@ -132,8 +132,8 @@ if __name__ == "__main__":
     pages = args.pages
 
     number = 0
-    review_number_bad = 127
-    review_number_good = 22
+    review_number_bad = 0
+    review_number_good = 0
     for page in range(1, pages + 1):
         reviews = get_list_of_reviews(get_page(page, base_url))
         for review in reviews:
