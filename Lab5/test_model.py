@@ -38,8 +38,7 @@ def vectorizer(df: pd.DataFrame) -> torch.Tensor:
     return sparse_matrix
 
 
-def split_data(all_data: torch.Tensor, df:pd.DataFrame) -> (torch.utils.data.Dataset,\
-                                                            torch.utils.data.Dataset, torch.utils.data.Dataset, torch.utils.data.Dataset):
+def split_data(all_data: torch.Tensor, df:pd.DataFrame) -> (torch.utils.data.Dataset, torch.utils.data.Dataset, torch.utils.data.Dataset, torch.utils.data.Dataset):
     text = pd.array(df["label"])
     x_train, x_test, y_train, y_test = train_test_split(all_data, text)
     return x_train, x_test, y_train, y_test
@@ -61,11 +60,11 @@ class LogisticRegression(nn.Module):
 model = LogisticRegression()
 criterion = nn.CrossEntropyLoss()
 optimizer = torch.optim.Adam(params=model.parameters() , lr=0.01)
+df = load_data('D:/AppProgPython/appprog/csv/final1.csv')
+changed = change_label(df, 1)
+vec = vectorizer(changed)
+x_train, x_test, y_train, y_test = split_data(vec, changed)
 x_train = Variable(torch.from_numpy(x_train)).float()
 y_train = Variable(torch.from_numpy(y_train)).long()
     
-df = load_data('D:/AppProgPython/appprog/csv/final1.csv')
 
-changed = change_label(df, 1)
-vec = vectorizer(changed)
-print(split_data(vec, changed))
