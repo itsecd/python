@@ -473,7 +473,9 @@ if __name__ == "__main__":
             output = new_model(sample_image)
             _, predicted_class = torch.max(output, 1)
 
-        print(f"Predicted class index for image {img_path}: {predicted_class.item()}")
+        predicted_class_index = predicted_class.item() - 1
+        print(f"Predicted class index for image {img_path}: {predicted_class_index}")
+
 
         img_array = transforms.ToPILImage()(sample_image.squeeze(0).cpu())
         plt.imshow(img_array)
