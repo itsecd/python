@@ -223,6 +223,7 @@ def calculate_accuracy(predictions: list, true_labels: list) -> float:
 def plot_training_results(
     train_losses: list,
     val_losses: list,
+    train_accuracies: list,
     val_accuracies: list,
     learning_rate: float,
     batch_size: int,
@@ -233,6 +234,7 @@ def plot_training_results(
     Parameters:
     - train_losses: Training losses.
     - val_losses: Validation losses.
+    - train_accuracies: Training accuracies.
     - val_accuracies: Validation accuracies.
     - learning_rate: Learning rate.
     - batch_size: Batch size.
@@ -249,9 +251,9 @@ def plot_training_results(
     plt.legend()
 
     plt.subplot(1, 2, 2)
-    plt.plot(epochs, val_accuracies, label='Validation Accuracy',
-             marker='o', color='green')
-    plt.title('Validation Accuracy')
+    plt.plot(epochs, train_accuracies, label='Training Accuracy', marker='o', color='blue')
+    plt.plot(epochs, val_accuracies, label='Validation Accuracy', marker='o', color='green')
+    plt.title('Training and Validation Accuracy')
     plt.xlabel('Epoch')
     plt.ylabel('Accuracy')
     plt.suptitle(f'Learning Rate: {learning_rate}, Batch Size: {batch_size}')
@@ -281,7 +283,7 @@ def train_model(
     - learning_rate: Learning rate.
 
     Returns:
-    - tuple: train_losses, val_losses, val_accuracies
+    - tuple: train_losses, val_losses, train_accuracies, val_accuracies
     """
     model.to(device)
 
@@ -290,11 +292,15 @@ def train_model(
 
     train_losses = []
     val_losses = []
+    train_accuracies = []
     val_accuracies = []
 
     for epoch in range(num_epochs):
         model.train()
         epoch_train_losses = []
+        epoch_train_predictions = []
+        epoch_train_true_labels = []
+
         for images, labels in train_loader:
             images = torch.stack([img.to(device) for img in images])
             labels = torch.as_tensor(
@@ -306,34 +312,41 @@ def train_model(
             optimizer.step()
             epoch_train_losses.append(loss.item())
 
+            _, predicted = torch.max(outputs, 1)
+            epoch_train_predictions.extend(predicted.cpu().numpy())
+            epoch_train_true_labels.extend(labels.cpu().numpy())
+
         avg_train_loss = sum(epoch_train_losses) / len(epoch_train_losses)
         train_losses.append(avg_train_loss)
+
+        train_accuracy = calculate_accuracy(epoch_train_predictions, epoch_train_true_labels)
+        train_accuracies.append(train_accuracy)
 
         model.eval()
         with torch.no_grad():
             val_loss = 0.0
-            predictions = []
-            true_labels = []
+            epoch_val_predictions = []
+            epoch_val_true_labels = []
             for images, labels in val_loader:
                 images = torch.stack([img.to(device) for img in images])
                 labels = torch.as_tensor(
                     labels, dtype=torch.long).clone().detach().to(device)
                 outputs = model(images)
-                val_loss += criterion(outputs, labels).item()
+                loss = criterion(outputs, labels)
+                val_loss += loss.item()
                 _, predicted = torch.max(outputs, 1)
-                predictions.extend(predicted.cpu().numpy())
-                true_labels.extend(labels.cpu().numpy())
+                epoch_val_predictions.extend(predicted.cpu().numpy())
+                epoch_val_true_labels.extend(labels.cpu().numpy())
 
             val_loss /= len(val_loader)
-            accuracy = calculate_accuracy(predictions, true_labels)
-
-            print(
-                f"Epoch {epoch+1}/{num_epochs}, Validation Loss: {val_loss:.4f}, Accuracy: {accuracy:.4f}")
-
+            accuracy = calculate_accuracy(epoch_val_predictions, epoch_val_true_labels)
             val_losses.append(val_loss)
             val_accuracies.append(accuracy)
 
-    return train_losses, val_losses, val_accuracies
+            print(
+                f"Epoch {epoch+1}/{num_epochs}, Training Loss: {avg_train_loss:.4f}, Validation Loss: {val_loss:.4f}, Training Accuracy: {train_accuracy:.4f}, Validation Accuracy: {accuracy:.4f}")
+
+    return train_losses, val_losses, train_accuracies, val_accuracies
 
 
 def evaluate_model(model: nn.Module, test_loader: DataLoader, device: torch.device) -> None:
@@ -410,11 +423,11 @@ def main(csv_path: str, num_epochs: int = 10) -> nn.Module:
 
             model = SimpleCNN(num_classes=len(unique_labels)).to(device)
 
-            train_losses, val_losses, val_accuracies = train_model(model, train_loader, val_loader, device,
-                                                                   num_epochs=num_epochs, learning_rate=learning_rate)
+            train_losses, val_losses, train_accuracies, val_accuracies = train_model(
+                model, train_loader, val_loader, device,
+                num_epochs=num_epochs, learning_rate=learning_rate)
 
-            plot_training_results(train_losses, val_losses,
-                                  val_accuracies, learning_rate, batch_size)
+            plot_training_results(train_losses, val_losses, train_accuracies, val_accuracies, learning_rate, batch_size)
 
             evaluate_model(model, test_loader, device)
     return model
@@ -440,10 +453,13 @@ if __name__ == "__main__":
     new_model.load_state_dict(torch.load(model_save_path))
     new_model.eval()
 
-    img_paths = [
-        "dataset/leopard/0012.jpg",
-        "dataset/tiger/0004.jpg",
+    random_img_paths = [
+        f"dataset/leopard/{str(i).zfill(4)}.jpg" for i in range(200)
+    ] + [
+        f"dataset/tiger/{str(i).zfill(4)}.jpg" for i in range(200)
     ]
+
+    img_paths = random.sample(random_img_paths, k=4)
 
     for img_path in img_paths:
         img = Image.open(img_path).convert("RGB")
