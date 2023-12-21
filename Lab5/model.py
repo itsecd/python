@@ -122,16 +122,15 @@ def split_dataset(
     - tuple: img_train, labels_train, img_val, labels_val, img_test, labels_test
     """
     total_size = len(img_list)
-
-    print(f"Total dataset size: {total_size}")
-
     train_size = int(total_size * train_size)
     val_size = int(total_size * val_size)
     test_size = int(total_size * test_size)
-
-    print(f"Training dataset size: {train_size}")
-    print(f"Validation dataset size: {val_size}")
-    print(f"Test dataset size: {test_size}")
+    if 'device_info_printed' not in globals():
+        print(f"Total dataset size: {total_size}")
+        print(f"Training dataset size: {train_size}")
+        print(f"Validation dataset size: {val_size}")
+        print(f"Test dataset size: {test_size}")
+        globals()['device_info_printed'] = True
 
     if train_size <= 0:
         raise ValueError("Not enough samples for training.")
@@ -251,8 +250,10 @@ def plot_training_results(
     plt.legend()
 
     plt.subplot(1, 2, 2)
-    plt.plot(epochs, train_accuracies, label='Training Accuracy', marker='o', color='blue')
-    plt.plot(epochs, val_accuracies, label='Validation Accuracy', marker='o', color='green')
+    plt.plot(epochs, train_accuracies,
+             label='Training Accuracy', marker='o', color='blue')
+    plt.plot(epochs, val_accuracies, label='Validation Accuracy',
+             marker='o', color='green')
     plt.title('Training and Validation Accuracy')
     plt.xlabel('Epoch')
     plt.ylabel('Accuracy')
@@ -319,7 +320,8 @@ def train_model(
         avg_train_loss = sum(epoch_train_losses) / len(epoch_train_losses)
         train_losses.append(avg_train_loss)
 
-        train_accuracy = calculate_accuracy(epoch_train_predictions, epoch_train_true_labels)
+        train_accuracy = calculate_accuracy(
+            epoch_train_predictions, epoch_train_true_labels)
         train_accuracies.append(train_accuracy)
 
         model.eval()
@@ -339,7 +341,8 @@ def train_model(
                 epoch_val_true_labels.extend(labels.cpu().numpy())
 
             val_loss /= len(val_loader)
-            accuracy = calculate_accuracy(epoch_val_predictions, epoch_val_true_labels)
+            accuracy = calculate_accuracy(
+                epoch_val_predictions, epoch_val_true_labels)
             val_losses.append(val_loss)
             val_accuracies.append(accuracy)
 
@@ -427,7 +430,8 @@ def main(csv_path: str, num_epochs: int = 10) -> nn.Module:
                 model, train_loader, val_loader, device,
                 num_epochs=num_epochs, learning_rate=learning_rate)
 
-            plot_training_results(train_losses, val_losses, train_accuracies, val_accuracies, learning_rate, batch_size)
+            plot_training_results(
+                train_losses, val_losses, train_accuracies, val_accuracies, learning_rate, batch_size)
 
             evaluate_model(model, test_loader, device)
     return model
@@ -440,7 +444,7 @@ if __name__ == "__main__":
     img_train, labels_train, img_val, labels_val, img_test, labels_test = load_dataset(
         "annotation.csv")
 
-    unique_labels = list(set(labels_train + labels_val + labels_test)) 
+    unique_labels = list(set(labels_train + labels_val + labels_test))
     label_mapping = {label: idx for idx, label in enumerate(unique_labels)}
 
     trained_model = main("annotation.csv", num_epochs=10)
