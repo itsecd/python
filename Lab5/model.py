@@ -10,15 +10,20 @@ import torch.optim as optim
 import torch.nn.functional as F
 from torchvision import transforms
 
+
 class Dataset(torch.utils.data.Dataset):
+    """"Custom PyTorch dataset for loading and transforming image data."""
     def __init__(self, file_list, transform=None):
         self.file_list = file_list
         self.transform = transform
 
+
     def __len__(self):
         return len(self.file_list)
 
+
     def __getitem__(self, idx):
+        """" Get transformed image and label for a given index."""
         img_path = self.file_list[idx]
         img = Image.open(img_path)
         img_transformed = self.transform(img)
@@ -26,7 +31,9 @@ class Dataset(torch.utils.data.Dataset):
         label = 0 if label == "brown_bear" else 1
         return img_transformed, label
 
+
 def load_dataset(csv_path: str) -> list:
+    """"Load the dataset from a CSV file."""
     dframe = pd.read_csv(
         csv_path, delimiter=",", names=["Absolute Path", "Relative Path", "Class"]
     )
@@ -34,13 +41,17 @@ def load_dataset(csv_path: str) -> list:
     random.shuffle(img_list)
     return img_list
 
+
 def split_data(img_list) -> list:
+    """" Split the dataset into training, testing, and validation sets."""
     train_list = img_list[0 : int(len(img_list) * 0.8)]
     test_list = img_list[int(len(img_list) * 0.8) : int(len(img_list) * 0.9)]
     val_list = img_list[int(len(img_list) * 0.9) : int(len(img_list))]
     return train_list, test_list, val_list
 
+
 def transform_data(train_list, test_list, val_list) -> Dataset:
+    """" Transform the datasets using predefined transformations."""
     fixed_transforms = transforms.Compose([
         transforms.Resize((224, 224)),
         transforms.RandomResizedCrop(224),
@@ -52,7 +63,9 @@ def transform_data(train_list, test_list, val_list) -> Dataset:
     val_data = Dataset(val_list, transform=fixed_transforms)
     return train_data, test_data, val_data
 
+
 class CNN(nn.Module):
+    """"Convolutional Neural Network (CNN) model."""
     def __init__(self):
         super(CNN, self).__init__()
         self.layer1 = nn.Sequential(
@@ -80,6 +93,7 @@ class CNN(nn.Module):
         self.fc2 = nn.Linear(10, 2)
         self.relu = nn.ReLU()
 
+
     def forward(self, x):
         out = self.layer1(x)
         out = self.layer2(out)
@@ -91,16 +105,19 @@ class CNN(nn.Module):
 
 
 def show_results(epochs, acc, loss, v_acc, v_loss) -> None:
+    """"Display training and validation results."""
     fig, (ax1, ax2) = plt.subplots(1, 2, figsize=(15, 5))
-    ax1.plot(range(epochs), acc, color="orange", label="Train accuracy")
-    ax2.plot(range(epochs), loss, color="orange", label="Train loss")
-    ax1.plot(range(epochs), v_acc, color="steelblue", label="Validation accuracy")
-    ax2.plot(range(epochs), v_loss, color="steelblue", label="Validation loss")
+    ax1.plot(range(epochs), acc, color="green", label="Train accuracy")
+    ax2.plot(range(epochs), loss, color="green", label="Train loss")
+    ax1.plot(range(epochs), v_acc, color="blue", label="Validation accuracy")
+    ax2.plot(range(epochs), v_loss, color="blue", label="Validation loss")
     ax1.legend()
     ax2.legend()
     plt.show()
 
-def train_loop(epochs, batch_size, lear, val_data, train_data, test_data) -> list:
+
+def training(epochs, batch_size, lear, val_data, train_data, test_data) -> list:
+    """"Training loop for the CNN model."""
     device = "cuda" if torch.cuda.is_available() else "cpu"
     torch.manual_seed(1234)
     if device == "cuda":
@@ -185,17 +202,21 @@ def train_loop(epochs, batch_size, lear, val_data, train_data, test_data) -> lis
     bear_probs.sort(key=lambda x: int(x[0]))
     return bear_probs, model
 
+
 def save_result(bear_probs, csv_path) -> None:
+    """"Save the bear probabilities to a CSV file."""
     idx = list(i for i in range(len(bear_probs)))
     prob = list(map(lambda x: x[1], bear_probs))
     submission = pd.DataFrame({"id": idx, "label": prob})
     submission.to_csv(csv_path, index=False)
 
+
 def main(csv_dataset, epochs, batch_size, lear, result, model_path) -> None:
+    """"Main function for training the model and saving results."""
     img_list = load_dataset(csv_dataset)
     train_list, test_list, val_list = split_data(img_list)
     train_data, test_data, val_data = transform_data(train_list, test_list, val_list)
-    bear_probs, model = train_loop(epochs, batch_size, lear, val_data, train_data, test_data)
+    bear_probs, model = training(epochs, batch_size, lear, val_data, train_data, test_data)
     save_result(bear_probs, result)
 
     class_ = {0: "brown_bear", 1: "polar_bear"}
@@ -217,5 +238,6 @@ def main(csv_dataset, epochs, batch_size, lear, result, model_path) -> None:
     plt.show()
     torch.save(model.state_dict(), model_path)
 
+
 if __name__ == "__main__":
-    main("Lab2/annotation.csv", 10, 100, 0.001, "result.csv", "Lab5\model_weight.pt")
+    main("Lab2/annotation.csv", 10, 100, 0.001, "final.csv", "Lab5\model_weight.pt")
