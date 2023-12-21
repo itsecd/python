@@ -1,5 +1,5 @@
 {
-    "action": "check_balance",
+    "action": "filter_df_label",
     "input_csv": "K:/Pyth/PLab1/annotation.csv",
     "output_csv": "K:/Pyth/PLab1/final.csv",
     "label": 0,

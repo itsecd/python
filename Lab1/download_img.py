@@ -58,7 +58,7 @@ if __name__ == "__main__":
     parser = argparse.ArgumentParser(description='Download images in classes')
     parser.add_argument('--class1', type=str,default="polar_bear", help='name of first class')
     parser.add_argument('--class2', type=str,default="brown_bear", help='name of second class')
-    parser.add_argument('--num_images', type=int,default=50,help='num_images_per_class')
+    parser.add_argument('--num_images', type=int,default=1000,help='num_images_per_class')
     parser.add_argument('--save_path', type=str, default="dataset", help='directory path to save images')
     args = parser.parse_args()
     download_img(args.class1, args.num_images, BASE_URL, HEADERS, args.save_path)
