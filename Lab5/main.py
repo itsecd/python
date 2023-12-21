@@ -3,12 +3,15 @@ import torch.nn as nn
 import torch
 import torch.optim as optim
 from torchvision import transforms
+import torch.utils.data
 import torch.nn.functional as F
 import pandas as pd
 import matplotlib.pyplot as plt
 import random
 from PIL import Image
 import os
+import matplotlib
+matplotlib.use('QtAgg') 
 
 
 def upload_dataset(csv_path: str) -> list:
@@ -205,8 +208,7 @@ def train_loop(epochs, batch_size, lear, val_data, train_data, test_data) -> lis
             )
             val_accuracy_values.append(epoch_val_accuracy.item())
             val_loss_values.append(epoch_val_loss.item())
-    show_results(epochs, accuracy_values, loss_values)
-    show_results(epochs, val_accuracy_values, val_loss_values)
+    show_results(epochs,accuracy_values, loss_values, val_accuracy_values, val_loss_values)
 
     cat_probs = []
     model.eval()
@@ -244,7 +246,7 @@ def main(csv_dataset, epochs, batch_size, lear, result, model_path) -> None:
     fig, axes = plt.subplots(2, 3, figsize=(10, 6), facecolor='w') 
     submission = pd.read_csv(result)
     for ax in axes.ravel():
-        i = random.choice(submission["id"].values)
+        i = random.randint(0, len(submission['id'].values) - 1)
         label = submission.loc[submission["id"] == i, "label"].values[0]
         if label > 0.5:
             label = 1
@@ -260,5 +262,5 @@ def main(csv_dataset, epochs, batch_size, lear, result, model_path) -> None:
 
 if __name__ == "__main__":
     train_list = main(
-        "Lab2\set\dataset.csv", 10, 100, 0.001, "final.csv", "Lab5\lab5_final.pt"
+        "Lab2\set\dataset.csv", 4, 100, 0.001, "final.csv", "Lab5\lab5_final.pt"
     )
