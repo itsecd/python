@@ -43,7 +43,7 @@ def create_directories():
 create_directories()
 
 
-def get_page(page: int, base_url: str = "https://irecommend.ru/content/boxberry-httpboxberryru?page=") -> BeautifulSoup:
+def get_page(page: int, base_url: str = "https://irecommend.ru/content/ofitsialnyi-internet-magazin-parfyumerii-i-kosmetiki-letual?page=") -> BeautifulSoup:
     """
     Получает страницу с веб-сайта и возвращает объект BeautifulSoup для парсинга.
     """
