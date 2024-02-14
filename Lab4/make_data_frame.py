@@ -4,7 +4,8 @@ from pandas.core.frame import DataFrame
 
 FIELDNAMES = ['absolute_path', 'relative_path', 'class_label']
 
-def get_reviews(annotation_path :str) -> DataFrame:
+
+def get_reviews(annotation_path: str) -> DataFrame:
     try:
         df = pd.read_csv(annotation_path, delimiter=",", names=FIELDNAMES)
 
@@ -31,3 +32,28 @@ def process_invalid_values(df):
     invalid_values = df.isna().any()
     df.fillna('Unknown', inplace=True)
     return df
+
+
+def filter_reviews_by_word_count(df, count):
+    try:
+        filtered_df = df[df['Количество слов'] <= count].reset_index(drop=True)
+        return filtered_df
+    except Exception as e:
+        logging.error(f"Can't filter by word count: {e}")
+
+
+def filter_reviews_by_rating(df, class_label):
+    try:
+        df['Рейтинг'] = pd.to_numeric(df['Рейтинг'], errors='coerce')
+        filtered_df = df[df['Рейтинг'] == class_label].reset_index(drop=True)
+        return filtered_df
+    except Exception as e:
+        logging.error(f"Can't filter by rating: {e}")
+
+
+def group_reviews_by_rating(df):
+    try:
+        grouped_df = df.groupby('Рейтинг').agg({"Количество слов": ["min", "max", "mean"]})
+        return grouped_df
+    except Exception as e:
+        logging.error(f"Can't group by rating: {e}")
