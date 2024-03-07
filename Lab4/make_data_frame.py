@@ -67,6 +67,14 @@ def get_reviews_statistics(df):
         logging.error(f"Can't get statistics: {e}")
 
 
+def filter_reviews_by_class(df: DataFrame, class_label: str) -> DataFrame:
+    try:
+        filtered_df = df[df['Класс'] == class_label].reset_index(drop=True)
+        return filtered_df
+    except Exception as e:
+        logging.error(f"Can't filter by rating: {e}")
+
+
 def group_reviews_by_class(df: DataFrame) -> DataFrame:
     try:
         grouped_df = df.groupby('Класс').agg({"Количество слов": ["min", "max", "mean"]})
