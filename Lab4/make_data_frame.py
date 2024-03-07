@@ -57,3 +57,19 @@ def group_reviews_by_rating(df):
         return grouped_df
     except Exception as e:
         logging.error(f"Can't group by rating: {e}")
+
+
+def get_reviews_statistics(df):
+    try:
+        statistics = df[['Рейтинг', 'Количество слов']].describe()
+        return statistics
+    except Exception as e:
+        logging.error(f"Can't get statistics: {e}")
+
+
+def group_reviews_by_class(df: DataFrame) -> DataFrame:
+    try:
+        grouped_df = df.groupby('Класс').agg({"Количество слов": ["min", "max", "mean"]})
+        return grouped_df
+    except Exception as e:
+        logging.error(f"Can't group by rating: {e}")
