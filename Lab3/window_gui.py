@@ -3,7 +3,7 @@ import sys
 from PyQt5 import QtWidgets
 from PyQt5.QtWidgets import QPushButton, QLabel, QFileDialog, QMessageBox, QTextBrowser
 
-sys.path.insert(1, r"C:\Users\Ceh9\PycharmProjects\pythonProject\Lab2")
+sys.path.insert(1, r"C:\Users\Ceh9\Desktop\Ceh9firstlab\Lab2")
 from create_annotation import create_annotation_file
 from copy_dataset import copy_and_rename_dataset, generate_random_set
 from iterator import ReviewIterator
