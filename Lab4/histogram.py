@@ -26,4 +26,4 @@ def plot_word_frequency(df: pd.DataFrame, class_label: int) -> None:
         plt.tight_layout()
         plt.show()
     except Exception as e:
-        logging.error(f"Не удалось построить гистограмму: {e}\n{e.args}\n")
+        logging.error(f"Не удалось построить гистограмму : {e}\n{e.args}\n")
